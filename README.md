@@ -57,7 +57,7 @@ The reason cases have a name is that when you call `parse`, you can specify a li
 
 Keeping with the example from above:
 
-```
+```js
 try {
   await registerUser();
 } catch (error) {
@@ -107,7 +107,7 @@ Size Violation - The file is to large (3584KB)
 
 You could use a parser to make that value into MB:
 
-```
+```js
 {
   name: 'fileLimitValidation',
   condition: /Size Violation - The file is to large \((\d+)\w+\)/i,
@@ -120,7 +120,7 @@ You can use the `parse` property to send functions that will allow you to transf
 
 And you can also use multiple parsers for the same parameters, just use and `array`:
 
-```
+```js
 {
   name: 'fileLimitValidation',
   condition: /Size Violation - The file is to large \((\d+)\w+\)/i,
