@@ -14,7 +14,7 @@ Parse errors and generate more human messages
 Parserror allows you parse errors from external resources by defining simple (or complex) cases in order to be able to use them in the context of your project:
 
 ```js
-const { Parserror } = require('parserror');
+const Parserror = require('parserror');
 
 // Define the cases
 const parserror = Parserror
