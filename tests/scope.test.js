@@ -1,11 +1,11 @@
-jest.unmock('/src/lib/scope');
-jest.unmock('/src/lib/errorCase');
-jest.unmock('/src/lib/caseParser');
+jest.unmock('/src/scope');
+jest.unmock('/src/errorCase');
+jest.unmock('/src/caseParser');
 
 require('jasmine-expect');
-const Scope = require('/src/lib/scope');
-const ErrorCase = require('/src/lib/errorCase');
-const CaseParser = require('/src/lib/caseParser');
+const Scope = require('/src/scope');
+const ErrorCase = require('/src/errorCase');
+const CaseParser = require('/src/caseParser');
 
 describe('lib/Scope', () => {
   describe('constructor', () => {

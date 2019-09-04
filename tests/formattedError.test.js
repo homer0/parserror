@@ -1,7 +1,7 @@
-jest.unmock('/src/lib/formattedError');
+jest.unmock('/src/formattedError');
 
 require('jasmine-expect');
-const FormattedError = require('/src/lib/formattedError');
+const FormattedError = require('/src/formattedError');
 
 const originalCaptureStackTrace = Error.captureStackTrace;
 

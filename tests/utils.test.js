@@ -1,7 +1,7 @@
-jest.unmock('/src/lib/utils');
+jest.unmock('/src/utils');
 
 require('jasmine-expect');
-const Utils = require('/src/lib/utils');
+const Utils = require('/src/utils');
 
 describe('lib/Utils', () => {
   describe('escapeForRegExp', () => {

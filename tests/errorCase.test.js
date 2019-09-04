@@ -1,10 +1,10 @@
-jest.unmock('/src/lib/errorCase');
+jest.unmock('/src/errorCase');
 
 require('jasmine-expect');
-const CaseParser = require('/src/lib/caseParser');
-const ErrorCase = require('/src/lib/errorCase');
-const FormattedError = require('/src/lib/formattedError');
-const Utils = require('/src/lib/utils');
+const CaseParser = require('/src/caseParser');
+const ErrorCase = require('/src/errorCase');
+const FormattedError = require('/src/formattedError');
+const Utils = require('/src/utils');
 
 describe('lib/ErrorCase', () => {
   beforeEach(() => {
