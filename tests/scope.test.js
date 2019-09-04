@@ -7,7 +7,7 @@ const Scope = require('/src/scope');
 const ErrorCase = require('/src/errorCase');
 const CaseParser = require('/src/caseParser');
 
-describe('lib/Scope', () => {
+describe('Scope', () => {
   describe('constructor', () => {
     it('should throw an error when instantiated without a name', () => {
       // Given/When/Then

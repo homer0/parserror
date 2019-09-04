@@ -5,7 +5,7 @@ const FormattedError = require('/src/formattedError');
 
 const originalCaptureStackTrace = Error.captureStackTrace;
 
-describe('lib/FormattedError', () => {
+describe('FormattedError', () => {
   afterEach(() => {
     Error.captureStackTrace = originalCaptureStackTrace;
   });

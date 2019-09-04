@@ -6,7 +6,7 @@ const ErrorCase = require('/src/errorCase');
 const FormattedError = require('/src/formattedError');
 const Utils = require('/src/utils');
 
-describe('lib/ErrorCase', () => {
+describe('ErrorCase', () => {
   beforeEach(() => {
     CaseParser.mockReset();
     FormattedError.mockReset();
@@ -20,6 +20,16 @@ describe('lib/ErrorCase', () => {
     it('should throw an error when a required property is missing', () => {
       // Given/When/Then
       expect(() => new ErrorCase({})).toThrow(/The 'name' property is required/i);
+    });
+
+    it('should throw an error when `name` is not a `string`', () => {
+      // Given/When/Then
+      expect(() => new ErrorCase({
+        name: [],
+        condition: 'condition',
+        message: 'message',
+      }))
+      .toThrow(/The 'name' can only be a 'string'/i);
     });
 
     it('should throw an error when `message` is not a `string` nor a `function`', () => {

@@ -8,7 +8,7 @@ const FormattedError = require('/src/formattedError');
 const Scope = require('/src/scope');
 const Utils = require('/src/utils');
 
-describe('lib/Parserror', () => {
+describe('Parserror', () => {
   beforeEach(() => {
     CaseParser.mockReset();
     ErrorCase.mockReset();
