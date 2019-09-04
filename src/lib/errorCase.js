@@ -19,13 +19,13 @@ class ErrorCase {
     this._condition = this._validateCondition(definition.condition);
     this._parsers = this._validateParsers(definition.parsers);
     this._parse = this._validateParseInstructions(definition.parse);
-    this._parseGroups = Utils.isObject(this._parse);
+    this._parseAsGroups = Utils.isObject(this._parse);
   }
 
-  process(errorMessage, scopes = [], context = null) {
+  parse(errorMessage, scopes = [], context = null) {
     let result;
     if (errorMessage.match(this._condition)) {
-      result = this._process(errorMessage, scopes, context);
+      result = this._parseError(errorMessage, scopes, context);
     } else {
       result = null;
     }
@@ -37,12 +37,12 @@ class ErrorCase {
     return this._name;
   }
 
-  _process(errorMessage, scopes, context) {
+  _parseError(errorMessage, scopes, context) {
     let result;
     const extracted = this._extractParameters(errorMessage);
     if (extracted.groups) {
-      if (this._parseGroups) {
-        result = this._processGroups(extracted.groups, scopes, context);
+      if (this._parseAsGroups) {
+        result = this._parseGroups(extracted.groups, scopes, context);
       } else {
         throw new Error(
           `The condition for the case '${this._name}' returned groups, but the 'parse' ` +
@@ -50,13 +50,13 @@ class ErrorCase {
         );
       }
     } else if (extracted.matches.length) {
-      if (this._parseGroups) {
+      if (this._parseAsGroups) {
         throw new Error(
           `The condition for the case '${this._name}' didn't return groups, but the 'parse' ` +
           'instructions were set on an \'object\' format'
         );
       } else {
-        result = this._processList(extracted.matches, scopes, context);
+        result = this._parseList(extracted.matches, scopes, context);
       }
     } else {
       result = this._createError(this._message(), [], context);
@@ -65,7 +65,7 @@ class ErrorCase {
     return result;
   }
 
-  _processGroups(groups, scopes, context) {
+  _parseGroups(groups, scopes, context) {
     const params = Object.keys(groups).reduce(
       (newParams, name) => {
         const value = groups[name];
@@ -91,7 +91,7 @@ class ErrorCase {
     return this._createError(message, params, context);
   }
 
-  _processList(list, scopes, context) {
+  _parseList(list, scopes, context) {
     const params = list.map((value, index) => {
       const parsers = this._parse[index];
       let newValue;

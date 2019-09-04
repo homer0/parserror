@@ -5,7 +5,7 @@ const FormattedError = require('./formattedError');
 const Scope = require('./scope');
 const Utils = require('./utils');
 
-class ErrorsTransformer {
+class Parserror {
   constructor(options) {
     this._options = Object.assign(
       {
@@ -100,7 +100,7 @@ class ErrorsTransformer {
     delete this._scopes[name];
   }
 
-  transform(error, options = {}) {
+  parse(error, options = {}) {
     const useOptions = Object.assign(
       {
         cases: [],
@@ -131,7 +131,7 @@ class ErrorsTransformer {
       context = this._searchForContext(error);
     } else {
       throw new TypeError(
-        '\'transform\' can only handle error messages (\'string\'), ' +
+        '\'parse\' can only handle error messages (\'string\'), ' +
         'native errors (\'Error\') or literal objects (\'object\') with a ' +
         '\'message\' property\''
       );
@@ -172,7 +172,7 @@ class ErrorsTransformer {
 
     let newError;
     cases.some((theCase) => {
-      newError = theCase.process(message, scopesForCases, context);
+      newError = theCase.parse(message, scopesForCases, context);
       return newError;
     });
 
@@ -187,15 +187,15 @@ class ErrorsTransformer {
     return result;
   }
 
-  createTransformer(cases = [], scopes = []) {
-    return (error) => this.transform(error, ({
+  wrap(cases = [], scopes = []) {
+    return (error) => this.parse(error, ({
       cases,
       scopes,
     }));
   }
 
-  createTransformerWithScopes(scopes) {
-    return (error) => this.transform(error, {
+  wrapForScopes(scopes) {
+    return (error) => this.parse(error, {
       scopes,
     });
   }
@@ -212,4 +212,4 @@ class ErrorsTransformer {
   }
 }
 
-module.exports = ErrorsTransformer;
+module.exports = Parserror;

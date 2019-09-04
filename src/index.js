@@ -1,15 +1,15 @@
 const CaseParser = require('./lib/caseParser');
 const ErrorCase = require('./lib/errorCase');
-const ErrorsTransformer = require('./lib/errorsTransformer');
 const FormattedError = require('./lib/formattedError');
+const Parserror = require('./lib/parserror');
 const Scope = require('./lib/scope');
 const Utils = require('./lib/utils');
 
 module.exports = {
   CaseParser,
   ErrorCase,
-  ErrorsTransformer,
   FormattedError,
+  Parserror,
   Scope,
   Utils,
 };

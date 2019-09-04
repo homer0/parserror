@@ -1,14 +1,14 @@
-jest.unmock('/src/lib/errorsTransformer');
+jest.unmock('/src/lib/parserror');
 
 require('jasmine-expect');
 const CaseParser = require('/src/lib/caseParser');
 const ErrorCase = require('/src/lib/errorCase');
-const ErrorsTransformer = require('/src/lib/errorsTransformer');
+const Parserror = require('/src/lib/parserror');
 const FormattedError = require('/src/lib/formattedError');
 const Scope = require('/src/lib/scope');
 const Utils = require('/src/lib/utils');
 
-describe('lib/ErrorsTransformer', () => {
+describe('lib/Parserror', () => {
   beforeEach(() => {
     CaseParser.mockReset();
     ErrorCase.mockReset();
@@ -23,10 +23,10 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       result = sut.getScope(sut.globalScopeName);
       // Then
-      expect(sut).toBeInstanceOf(ErrorsTransformer);
+      expect(sut).toBeInstanceOf(Parserror);
       expect(sut.globalScopeName).toBe('global');
       expect(result).toBeInstanceOf(Scope);
       expect(Scope).toHaveBeenCalledTimes(1);
@@ -48,7 +48,7 @@ describe('lib/ErrorsTransformer', () => {
       let globalScope = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer({
+      sut = new Parserror({
         ErrorCaseClass: ErrorCase,
       });
       globalScope = sut.getScope(sut.globalScopeName);
@@ -78,7 +78,7 @@ describe('lib/ErrorsTransformer', () => {
       let customScope = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer({
+      sut = new Parserror({
         ErrorCaseClass: ErrorCase,
       });
       customScope = sut.getScope(scopeName);
@@ -109,7 +109,7 @@ describe('lib/ErrorsTransformer', () => {
       let customScope = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer({
+      sut = new Parserror({
         ErrorCaseClass: ErrorCase,
       });
       customScope = sut.getScope(scopeName);
@@ -148,7 +148,7 @@ describe('lib/ErrorsTransformer', () => {
       let globalScope = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer({
+      sut = new Parserror({
         ErrorCaseClass: ErrorCase,
       });
       globalScope = sut.getScope(sut.globalScopeName);
@@ -194,7 +194,7 @@ describe('lib/ErrorsTransformer', () => {
       let customScope = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer({
+      sut = new Parserror({
         ErrorCaseClass: ErrorCase,
       });
       customScope = sut.getScope(scopeName);
@@ -235,7 +235,7 @@ describe('lib/ErrorsTransformer', () => {
       let globalScope = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer({
+      sut = new Parserror({
         CaseParserClass: CaseParser,
       });
       globalScope = sut.getScope(sut.globalScopeName);
@@ -261,7 +261,7 @@ describe('lib/ErrorsTransformer', () => {
       let customScope = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer({
+      sut = new Parserror({
         CaseParserClass: CaseParser,
       });
       customScope = sut.getScope(scopeName);
@@ -278,7 +278,7 @@ describe('lib/ErrorsTransformer', () => {
   describe('scopes', () => {
     it('should throw an error when trying to access a scope that doesn\'t exist', () => {
       // Given/When/Then
-      expect(() => (new ErrorsTransformer()).getScope('something', false))
+      expect(() => (new Parserror()).getScope('something', false))
       .toThrow(/The scope '\w+' doesn't exist/i);
     });
 
@@ -286,7 +286,7 @@ describe('lib/ErrorsTransformer', () => {
       // Given
       let sut = null;
       // When/Then
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       expect(() => sut.addScope(sut.globalScopeName))
       .toThrow(
         /The scope '\w+' already exists\. You can use 'removeScope' to remove it first, or set the 'overwrite' parameter to 'true'/i
@@ -297,7 +297,7 @@ describe('lib/ErrorsTransformer', () => {
       // Given
       let sut = null;
       // When/Then
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       expect(() => sut.removeScope(sut.globalScopeName))
       .toThrow(/You can't delete the global scope/i);
     });
@@ -310,7 +310,7 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       result = sut.getScope(scopeName);
       // Then
       expect(result).toEqual(({
@@ -329,7 +329,7 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       sut.getScope(scopeName);
       result = sut.getScope(scopeName);
       // Then
@@ -347,7 +347,7 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       result = sut.addScope(scopeName);
       // Then
       expect(result).toBe(sut);
@@ -372,7 +372,7 @@ describe('lib/ErrorsTransformer', () => {
       let result = null;
       let savedScope = null;
       // When
-      sut = new ErrorsTransformer({
+      sut = new Parserror({
         ErrorCaseClass: ErrorCase,
       });
       result = sut.addScope(scopeName, [caseDefinition]);
@@ -397,7 +397,7 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       sut.addScope(scopeName);
       result = sut.addScope(scopeName, [], true);
       // Then
@@ -409,32 +409,32 @@ describe('lib/ErrorsTransformer', () => {
     });
   });
 
-  describe('transform', () => {
+  describe('parse', () => {
     it('should throw an error if the received error is not a string or an object', () => {
       // Given/When/Then
-      expect(() => (new ErrorsTransformer()).transform([]))
+      expect(() => (new Parserror()).parse([]))
       .toThrow(
-        /'transform' can only handle error messages \('string'\), native errors \('Error'\) or literal objects \('object'\) with a 'message' property/i
+        /'parse' can only handle error messages \('string'\), native errors \('Error'\) or literal objects \('object'\) with a 'message' property/i
       );
     });
 
     it('should throw an error if the `cases` option is not an array', () => {
       // Given/When/Then
-      expect(() => (new ErrorsTransformer()).transform('something', { cases: 'nop' }))
+      expect(() => (new Parserror()).parse('something', { cases: 'nop' }))
       .toThrow(/The 'cases' option can only be an 'array'/i);
     });
 
     it('should throw an error if the `scopes` option is not an array', () => {
       // Given/When/Then
-      expect(() => (new ErrorsTransformer()).transform('something', { scopes: 'nop' }))
+      expect(() => (new Parserror()).parse('something', { scopes: 'nop' }))
       .toThrow(/The 'scopes' option can only be an 'array'/i);
     });
 
-    it('should transform an error (string)', () => {
+    it('should parse an error (string)', () => {
       // Given
       const formatted = 'new error';
       const theCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const scopeInstance = {
         getCases: jest.fn(() => [theCase]),
@@ -444,24 +444,24 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
-      result = sut.transform(error);
+      sut = new Parserror();
+      result = sut.parse(error);
       // Then
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledWith(
+      expect(theCase.parse).toHaveBeenCalledTimes(1);
+      expect(theCase.parse).toHaveBeenCalledWith(
         error,
         [scopeInstance],
         null
       );
     });
 
-    it('should transform an error (Error)', () => {
+    it('should parse an error (Error)', () => {
       // Given
       const formatted = 'new error';
       const theCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const scopeInstance = {
         getCases: jest.fn(() => [theCase]),
@@ -472,25 +472,25 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
-      result = sut.transform(error);
+      sut = new Parserror();
+      result = sut.parse(error);
       // Then
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledWith(
+      expect(theCase.parse).toHaveBeenCalledTimes(1);
+      expect(theCase.parse).toHaveBeenCalledWith(
         errorMessage,
         [scopeInstance],
         null
       );
     });
 
-    it('should transform an error (Object)', () => {
+    it('should parse an error (Object)', () => {
       // Given
       Utils.isObject.mockImplementationOnce(() => true);
       const formatted = 'new error';
       const theCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const scopeInstance = {
         getCases: jest.fn(() => [theCase]),
@@ -503,23 +503,23 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
-      result = sut.transform(error);
+      sut = new Parserror();
+      result = sut.parse(error);
       // Then
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledWith(
+      expect(theCase.parse).toHaveBeenCalledTimes(1);
+      expect(theCase.parse).toHaveBeenCalledWith(
         errorMessage,
         [scopeInstance],
         null
       );
     });
 
-    it('should transform an error with custom scopes', () => {
+    it('should parse an error with custom scopes', () => {
       // Given
       const globalScopeCase = {
-        process: jest.fn(),
+        parse: jest.fn(),
       };
       const globalScopeInstance = {
         getCases: jest.fn(() => [globalScopeCase]),
@@ -527,7 +527,7 @@ describe('lib/ErrorsTransformer', () => {
       const customScopeName = 'customScope';
       const formatted = 'new error';
       const customScopeCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const customScopeInstance = {
         getCases: jest.fn(() => [customScopeCase]),
@@ -538,34 +538,34 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       sut.addScope(customScopeName);
-      result = sut.transform(error, {
+      result = sut.parse(error, {
         scopes: [sut.globalScopeName, customScopeName],
       });
       // Then
       expect(result).toBe(formatted);
       expect(globalScopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(globalScopeCase.process).toHaveBeenCalledTimes(1);
-      expect(globalScopeCase.process).toHaveBeenCalledWith(
+      expect(globalScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [globalScopeInstance, customScopeInstance],
         null
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledWith(
+      expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [globalScopeInstance, customScopeInstance],
         null
       );
     });
 
-    it('should transform an error with custom scopes and cases', () => {
+    it('should parse an error with custom scopes and cases', () => {
       // Given
       const globalScopeCaseName = 'someCase';
       const globalScopeCase = {
-        process: jest.fn(),
+        parse: jest.fn(),
       };
       const globalScopeInstance = {
         getCase: jest.fn(() => globalScopeCase),
@@ -573,7 +573,7 @@ describe('lib/ErrorsTransformer', () => {
       const customScopeName = 'customScope';
       const formatted = 'new error';
       const customScopeCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const customScopeInstance = {
         getCases: jest.fn(() => [customScopeCase]),
@@ -584,9 +584,9 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       sut.addScope(customScopeName);
-      result = sut.transform(error, {
+      result = sut.parse(error, {
         scopes: [customScopeName],
         cases: [globalScopeCaseName],
       });
@@ -594,15 +594,15 @@ describe('lib/ErrorsTransformer', () => {
       expect(result).toBe(formatted);
       expect(globalScopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(globalScopeInstance.getCase).toHaveBeenCalledWith(globalScopeCaseName);
-      expect(globalScopeCase.process).toHaveBeenCalledTimes(1);
-      expect(globalScopeCase.process).toHaveBeenCalledWith(
+      expect(globalScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
         null
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledWith(
+      expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
         null
@@ -613,7 +613,7 @@ describe('lib/ErrorsTransformer', () => {
       // Given
       const globalScopeCaseName = 'someCase';
       const globalScopeCase = {
-        process: jest.fn(),
+        parse: jest.fn(),
       };
       const globalScopeInstance = {
         getCase: jest.fn(),
@@ -622,7 +622,7 @@ describe('lib/ErrorsTransformer', () => {
       const customScopeName = 'customScope';
       const formatted = 'new error';
       const customScopeCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const customScopeInstance = {
         getCases: jest.fn(() => [customScopeCase]),
@@ -633,9 +633,9 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       sut.addScope(customScopeName);
-      result = sut.transform(error, {
+      result = sut.parse(error, {
         scopes: [sut.globalScopeName, customScopeName],
         cases: [globalScopeCaseName],
       });
@@ -643,27 +643,27 @@ describe('lib/ErrorsTransformer', () => {
       expect(result).toBe(formatted);
       expect(globalScopeInstance.getCase).toHaveBeenCalledTimes(0);
       expect(globalScopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(globalScopeCase.process).toHaveBeenCalledTimes(1);
-      expect(globalScopeCase.process).toHaveBeenCalledWith(
+      expect(globalScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [globalScopeInstance, customScopeInstance],
         null
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledWith(
+      expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [globalScopeInstance, customScopeInstance],
         null
       );
     });
 
-    it('should transform an error with context information', () => {
+    it('should parse an error with context information', () => {
       // Given
       Utils.isObject.mockImplementationOnce(() => true);
       const formatted = 'new error';
       const theCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const scopeInstance = {
         getCases: jest.fn(() => [theCase]),
@@ -678,20 +678,20 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
-      result = sut.transform(error);
+      sut = new Parserror();
+      result = sut.parse(error);
       // Then
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledWith(
+      expect(theCase.parse).toHaveBeenCalledTimes(1);
+      expect(theCase.parse).toHaveBeenCalledWith(
         errorMessage,
         [scopeInstance],
         errorContext
       );
     });
 
-    it('should fail to transform an error message and return the original', () => {
+    it('should fail to parse an error message and return the original', () => {
       // Given
       Utils.isObject.mockImplementationOnce(() => true);
       const scopeInstance = {
@@ -706,8 +706,8 @@ describe('lib/ErrorsTransformer', () => {
       let sut = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
-      result = sut.transform(error);
+      sut = new Parserror();
+      result = sut.parse(error);
       // Then
       expect(result).toEqual(errorInstance);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
@@ -720,12 +720,12 @@ describe('lib/ErrorsTransformer', () => {
     });
   });
 
-  describe('createTransformer', () => {
-    it('should create a transfomer for the global cases', () => {
+  describe('wrap', () => {
+    it('should create a wrapped parser for the global cases', () => {
       // Given
       const formatted = 'new error';
       const theCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const scopeInstance = {
         getCases: jest.fn(() => [theCase]),
@@ -733,30 +733,30 @@ describe('lib/ErrorsTransformer', () => {
       Scope.mockImplementationOnce(() => scopeInstance);
       const error = 'original error';
       let sut = null;
-      let transformer = null;
+      let parser = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
-      transformer = sut.createTransformer();
-      result = transformer(error);
+      sut = new Parserror();
+      parser = sut.wrap();
+      result = parser(error);
       // Then
-      expect(transformer).toBeFunction();
+      expect(parser).toBeFunction();
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledWith(
+      expect(theCase.parse).toHaveBeenCalledTimes(1);
+      expect(theCase.parse).toHaveBeenCalledWith(
         error,
         [scopeInstance],
         null
       );
     });
 
-    it('should create a transfomer for a global case', () => {
+    it('should create a wrapped parser for a global case', () => {
       // Given
       const formatted = 'new error';
       const theCaseName = 'myCase';
       const theCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const scopeInstance = {
         getCase: jest.fn(() => theCase),
@@ -764,30 +764,30 @@ describe('lib/ErrorsTransformer', () => {
       Scope.mockImplementationOnce(() => scopeInstance);
       const error = 'original error';
       let sut = null;
-      let transformer = null;
+      let parser = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
-      transformer = sut.createTransformer([theCaseName]);
-      result = transformer(error);
+      sut = new Parserror();
+      parser = sut.wrap([theCaseName]);
+      result = parser(error);
       // Then
-      expect(transformer).toBeFunction();
+      expect(parser).toBeFunction();
       expect(result).toBe(formatted);
       expect(scopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(scopeInstance.getCase).toHaveBeenCalledWith(theCaseName);
-      expect(theCase.process).toHaveBeenCalledTimes(1);
-      expect(theCase.process).toHaveBeenCalledWith(
+      expect(theCase.parse).toHaveBeenCalledTimes(1);
+      expect(theCase.parse).toHaveBeenCalledWith(
         error,
         [scopeInstance],
         null
       );
     });
 
-    it('should create a transformer with cases and scopes', () => {
+    it('should create a wrapped parser with cases and scopes', () => {
       // Given
       const globalScopeCaseName = 'someCase';
       const globalScopeCase = {
-        process: jest.fn(),
+        parse: jest.fn(),
       };
       const globalScopeInstance = {
         getCase: jest.fn(() => globalScopeCase),
@@ -795,7 +795,7 @@ describe('lib/ErrorsTransformer', () => {
       const customScopeName = 'customScope';
       const formatted = 'new error';
       const customScopeCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const customScopeInstance = {
         getCases: jest.fn(() => [customScopeCase]),
@@ -804,27 +804,27 @@ describe('lib/ErrorsTransformer', () => {
       Scope.mockImplementationOnce(() => customScopeInstance);
       const error = 'original error';
       let sut = null;
-      let transformer = null;
+      let parser = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       sut.addScope(customScopeName);
-      transformer = sut.createTransformer([globalScopeCaseName], [customScopeName]);
-      result = transformer(error);
+      parser = sut.wrap([globalScopeCaseName], [customScopeName]);
+      result = parser(error);
       // Then
-      expect(transformer).toBeFunction();
+      expect(parser).toBeFunction();
       expect(result).toBe(formatted);
       expect(globalScopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(globalScopeInstance.getCase).toHaveBeenCalledWith(globalScopeCaseName);
-      expect(globalScopeCase.process).toHaveBeenCalledTimes(1);
-      expect(globalScopeCase.process).toHaveBeenCalledWith(
+      expect(globalScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
         null
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledWith(
+      expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
         null
@@ -832,11 +832,11 @@ describe('lib/ErrorsTransformer', () => {
     });
   });
 
-  describe('createTransformerWithScopes', () => {
-    it('should create a transformer for an specific scope', () => {
+  describe('wrapForScopes', () => {
+    it('should create a wrapped parser for an specific scope', () => {
       // Given
       const globalScopeCase = {
-        process: jest.fn(),
+        parse: jest.fn(),
       };
       const globalScopeInstance = {
         getCases: jest.fn(() => [globalScopeCase]),
@@ -844,7 +844,7 @@ describe('lib/ErrorsTransformer', () => {
       const customScopeName = 'customScope';
       const formatted = 'new error';
       const customScopeCase = {
-        process: jest.fn(() => formatted),
+        parse: jest.fn(() => formatted),
       };
       const customScopeInstance = {
         getCases: jest.fn(() => [customScopeCase]),
@@ -853,21 +853,21 @@ describe('lib/ErrorsTransformer', () => {
       Scope.mockImplementationOnce(() => customScopeInstance);
       const error = 'original error';
       let sut = null;
-      let transformer = null;
+      let parser = null;
       let result = null;
       // When
-      sut = new ErrorsTransformer();
+      sut = new Parserror();
       sut.addScope(customScopeName);
-      transformer = sut.createTransformerWithScopes([customScopeName]);
-      result = transformer(error);
+      parser = sut.wrapForScopes([customScopeName]);
+      result = parser(error);
       // Then
-      expect(transformer).toBeFunction();
+      expect(parser).toBeFunction();
       expect(result).toBe(formatted);
       expect(globalScopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(globalScopeCase.process).toHaveBeenCalledTimes(0);
+      expect(globalScopeCase.parse).toHaveBeenCalledTimes(0);
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledTimes(1);
-      expect(customScopeCase.process).toHaveBeenCalledWith(
+      expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
         null

@@ -112,7 +112,7 @@ describe('lib/ErrorCase', () => {
     });
   });
 
-  describe('process:list', () => {
+  describe('parse:list', () => {
     it('should ignore an error that doesn\'t match its condition', () => {
       // Given
       Utils.escapeForRegExp.mockImplementationOnce(() => /condition/);
@@ -126,14 +126,14 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeNull();
       expect(Utils.escapeForRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.escapeForRegExp).toHaveBeenCalledWith(definition.condition);
     });
 
-    it('should process a message', () => {
+    it('should parse a message', () => {
       // Given
       Utils.execRegExp.mockImplementationOnce((exp, txt) => exp.exec(txt));
       const definition = {
@@ -146,7 +146,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(FormattedError).toHaveBeenCalledTimes(1);
@@ -155,7 +155,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with a custom error class', () => {
+    it('should parse a message with a custom error class', () => {
       // Given
       Utils.execRegExp.mockImplementationOnce((exp, txt) => exp.exec(txt));
       const definition = {
@@ -177,7 +177,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition, options);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedErrorClass);
       expect(formattedError).toHaveBeenCalledTimes(1);
@@ -186,7 +186,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with optional parameters', () => {
+    it('should parse a message with optional parameters', () => {
       // Given
       Utils.execRegExp.mockImplementationOnce((exp, txt) => exp.exec(txt));
       const formattedMessage = 'nop';
@@ -200,7 +200,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(definition.message).toHaveBeenCalledTimes(1);
@@ -215,7 +215,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with parameters', () => {
+    it('should parse a message with parameters', () => {
       // Given
       Utils.execRegExp.mockImplementationOnce((exp, txt) => exp.exec(txt));
       const parameter = 'Batman';
@@ -229,7 +229,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(definition.message).toHaveBeenCalledTimes(1);
@@ -244,7 +244,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with parameters and context information', () => {
+    it('should parse a message with parameters and context information', () => {
       // Given
       Utils.execRegExp.mockImplementationOnce((exp, txt) => exp.exec(txt));
       const parameter = 'Batman';
@@ -259,7 +259,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error, [], context);
+      result = sut.parse(error, [], context);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(definition.message).toHaveBeenCalledTimes(1);
@@ -274,7 +274,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with parameters and an `inline` parser', () => {
+    it('should parse a message with parameters and an `inline` parser', () => {
       // Given
       const parameter = 'Batman';
       const formattedParameter = 'Bruce Wayne';
@@ -297,7 +297,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(parser).toHaveBeenCalledTimes(1);
@@ -318,7 +318,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with parameters and a parser', () => {
+    it('should parse a message with parameters and a parser', () => {
       // Given
       const parameter = 'Batman';
       const formattedParameter = 'Bruce Wayne';
@@ -345,7 +345,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(parser).toHaveBeenCalledTimes(1);
@@ -366,7 +366,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with multiple parameters and parsers', () => {
+    it('should parse a message with multiple parameters and parsers', () => {
       // Given
       const parameterOne = 'Batman';
       const formattedParameterOne = 'The dark knight';
@@ -429,7 +429,7 @@ describe('lib/ErrorCase', () => {
       const expectedParameterTwo = 4; // Grayson, Drake, Todd and Wayne.
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(renameParser).toHaveBeenCalledTimes(1);
@@ -472,7 +472,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with parameters and a parser from the scope', () => {
+    it('should parse a message with parameters and a parser from the scope', () => {
       // Given
       const parameter = 'Batman';
       const formattedParameter = 'Bruce Wayne';
@@ -500,7 +500,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error, scopes);
+      result = sut.parse(error, scopes);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(parser).toHaveBeenCalledTimes(1);
@@ -521,7 +521,7 @@ describe('lib/ErrorCase', () => {
       expect(scope.getParser).toHaveBeenCalledWith(parserName, false);
     });
 
-    it('should process a message with parameters and a parser class', () => {
+    it('should parse a message with parameters and a parser class', () => {
       // Given
       const parameter = 'Batman';
       const formattedParameter = 'Bruce Wayne';
@@ -553,7 +553,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition, options);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(parserFn).toHaveBeenCalledTimes(1);
@@ -603,7 +603,7 @@ describe('lib/ErrorCase', () => {
       let sut = null;
       // When/Then
       sut = new ErrorCase(definition);
-      expect(() => sut.process(error)).toThrow(
+      expect(() => sut.parse(error)).toThrow(
         /The condition for the case '\w+' didn't return groups, but the 'parse' instructions were set on an 'object' format/i
       );
       // Then
@@ -638,7 +638,7 @@ describe('lib/ErrorCase', () => {
       let sut = null;
       // When/Then
       sut = new ErrorCase(definition);
-      expect(() => sut.process(error, scopes)).toThrow(
+      expect(() => sut.parse(error, scopes)).toThrow(
         /No parser with the name of '\w+' could be found for the case '\w+'/i
       );
       // Then
@@ -649,8 +649,8 @@ describe('lib/ErrorCase', () => {
     });
   });
 
-  describe('process:groups', () => {
-    it('should process a message with optional groups', () => {
+  describe('parse:groups', () => {
+    it('should parse a message with optional groups', () => {
       // Given
       const groups = {};
       const matches = [];
@@ -672,7 +672,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(definition.message).toHaveBeenCalledTimes(1);
@@ -710,7 +710,7 @@ describe('lib/ErrorCase', () => {
       let sut = null;
       // When/Then
       sut = new ErrorCase(definition);
-      expect(() => sut.process(error)).toThrow(
+      expect(() => sut.parse(error)).toThrow(
         /The condition for the case '\w+' is trying to extract parameters as named and unnamed groups, only one method is allowed/i
       );
       // Then
@@ -743,7 +743,7 @@ describe('lib/ErrorCase', () => {
       let sut = null;
       // When/Then
       sut = new ErrorCase(definition);
-      expect(() => sut.process(error)).toThrow(
+      expect(() => sut.parse(error)).toThrow(
         /The condition for the case '\w+' returned groups, but the 'parse' instructions were set on an 'array' format/i
       );
       // Then
@@ -753,7 +753,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with parameters', () => {
+    it('should parse a message with parameters', () => {
       // Given
       const parameterName = 'name';
       const parameter = 'Batman';
@@ -778,7 +778,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(definition.message).toHaveBeenCalledTimes(1);
@@ -797,7 +797,7 @@ describe('lib/ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should process a message with parameters and an `inline` parser', () => {
+    it('should parse a message with parameters and an `inline` parser', () => {
       // Given
       const parameterName = 'name';
       const parameter = 'Batman';
@@ -834,7 +834,7 @@ describe('lib/ErrorCase', () => {
       let result = null;
       // When
       sut = new ErrorCase(definition);
-      result = sut.process(error);
+      result = sut.parse(error);
       // Then
       expect(result).toBeInstanceOf(FormattedError);
       expect(parser).toHaveBeenCalledTimes(1);
