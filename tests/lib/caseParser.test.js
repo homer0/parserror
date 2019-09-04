@@ -4,7 +4,7 @@ require('jasmine-expect');
 const CaseParser = require('/src/lib/caseParser');
 const Utils = require('/src/lib/utils');
 
-describe('case-parser', () => {
+describe('lib/CaseParser', () => {
   beforeEach(() => {
     Utils.isObject.mockReset();
   });

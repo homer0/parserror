@@ -3,7 +3,7 @@ const ErrorCase = require('./errorCase');
 
 class Scope {
   constructor(name) {
-    this._name = name;
+    this._name = this._validateName(name);
     this._cases = [];
     this._parsers = {};
   }
@@ -12,7 +12,7 @@ class Scope {
     this._validateCase(theCase);
     if (this.hasCase(theCase.name)) {
       throw new Error(
-        `The name '${theCase.name}' is already being used on the ` +
+        `The case name '${theCase.name}' is already being used on the ` +
         `scope '${this._name}'`
       );
     }
@@ -63,7 +63,7 @@ class Scope {
     this._validateParser(parser);
     if (this.hasParser(parser.name)) {
       throw new Error(
-        `The name '${parser.name}' is already being used on the ` +
+        `The parser name '${parser.name}' is already being used on the ` +
         `scope '${this._name}'`
       );
     }
@@ -111,6 +111,18 @@ class Scope {
     return this.getParser(name, false) !== null;
   }
 
+  get name() {
+    return this._name;
+  }
+
+  _validateName(name) {
+    if (typeof name !== 'string') {
+      throw new Error('The \'name\' can only be a \'string\'');
+    }
+
+    return name;
+  }
+
   _validateCase(theCase) {
     if (!(theCase instanceof ErrorCase)) {
       throw new TypeError('The received case is not an instance of \'ErrorCase\'');
@@ -119,7 +131,7 @@ class Scope {
 
   _validateParser(parser) {
     if (!(parser instanceof CaseParser)) {
-      throw new TypeError('The received parsed is not an instance of \'ErrorCase\'');
+      throw new TypeError('The received parser is not an instance of \'CaseParser\'');
     }
   }
 }

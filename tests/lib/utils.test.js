@@ -3,7 +3,7 @@ jest.unmock('/src/lib/utils');
 require('jasmine-expect');
 const Utils = require('/src/lib/utils');
 
-describe('utils', () => {
+describe('lib/Utils', () => {
   describe('escapeForRegExp', () => {
     it('should escape a text to be used inside a RegExp', () => {
       // Given

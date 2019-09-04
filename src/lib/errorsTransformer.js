@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 const CaseParser = require('./caseParser');
 const ErrorCase = require('./errorCase');
 const FormattedError = require('./formattedError');
@@ -19,14 +20,23 @@ class ErrorsTransformer {
     this._globalScopeName = 'global';
     this._scopes = {};
 
-    this._addScope(this._globalScopeName);
+    this.addScope(this._globalScopeName);
   }
 
   addCase(definition, scope = null) {
     const scopeName = definition.scope || scope || this._globalScopeName;
     const useScope = this.getScope(scopeName);
-    const { ErrorCaseClass } = this._options;
-    useScope.addCase(new ErrorCaseClass(definition, useScope));
+    const {
+      ErrorCaseClass,
+      CaseParserClass,
+      FormattedErrorClass,
+    } = this._options;
+
+    useScope.addCase(new ErrorCaseClass(definition, {
+      CaseParserClass,
+      FormattedErrorClass,
+    }));
+
     return this;
   }
 
@@ -38,6 +48,14 @@ class ErrorsTransformer {
     return this;
   }
 
+  addParser(name, parser, scope = null) {
+    const scopeName = scope || this._globalScopeName;
+    const useScope = this.getScope(scopeName);
+    const { CaseParserClass } = this._options;
+    useScope.addParser(new CaseParserClass(name, parser));
+    return this;
+  }
+
   getScope(name, create = true) {
     let scope = this._scopes[name];
     if (!scope) {
@@ -45,11 +63,11 @@ class ErrorsTransformer {
         this.addScope(name);
         scope = this._scopes[name];
       } else {
-        throw new Error(`The scope '${scope}' doesn't exist`);
+        throw new Error(`The scope '${name}' doesn't exist`);
       }
     }
 
-    return scope || null;
+    return scope;
   }
 
   addScope(name, cases = [], overwrite = false) {
@@ -64,7 +82,9 @@ class ErrorsTransformer {
       }
     }
 
-    this._addScope(name);
+    const { ScopeClass } = this._options;
+    this._scopes[name] = new ScopeClass(name);
+
     if (cases.length) {
       this.addCases(cases, name);
     }
@@ -80,14 +100,6 @@ class ErrorsTransformer {
     delete this._scopes[name];
   }
 
-  addParser(name, parser, scope = null) {
-    const scopeName = scope || this._globalScopeName;
-    const useScope = this.getScope(scopeName);
-    const { CaseParserClass } = this._options;
-    useScope.addParser(new CaseParserClass(name, parser));
-    return this;
-  }
-
   transform(error, options = {}) {
     const useOptions = Object.assign(
       {
@@ -101,10 +113,6 @@ class ErrorsTransformer {
       throw new TypeError('The \'cases\' option can only be an \'array\'');
     } else if (!Array.isArray(useOptions.scopes)) {
       throw new TypeError('The \'scopes\' option can only be an \'array\'');
-    }
-
-    if (!useOptions.scopes.includes(this._globalScopeName)) {
-      useOptions.scopes.push(this._globalScopeName);
     }
 
     let context;
@@ -129,18 +137,42 @@ class ErrorsTransformer {
       );
     }
 
-    const scopesCases = useOptions.scopes
+    const globalScope = this.getScope(this._globalScopeName);
+    let includesGlobalScope = useOptions.scopes.includes(this._globalScopeName);
+    let useCases;
+    if (useOptions.cases.length) {
+      if (includesGlobalScope) {
+        useCases = [];
+      } else {
+        useCases = useOptions.cases.map((name) => globalScope.getCase(name));
+      }
+    } else {
+      if (!includesGlobalScope) {
+        includesGlobalScope = true;
+        useOptions.scopes.push(this._globalScopeName);
+      }
+
+      useCases = [];
+    }
+
+    const scopes = useOptions.scopes.map((scope) => this.getScope(scope));
+
+    const scopesCases = scopes
     .map((scope) => scope.getCases())
     .reduce((newList, cases) => [...newList, ...cases], []);
 
     const cases = [
-      ...options.cases,
+      ...useCases,
       ...scopesCases,
     ];
 
+    const scopesForCases = includesGlobalScope ?
+      scopes :
+      [...scopes, globalScope];
+
     let newError;
     cases.some((theCase) => {
-      newError = theCase.process(message, useOptions.scopes, context);
+      newError = theCase.process(message, scopesForCases, context);
       return newError;
     });
 
@@ -155,28 +187,21 @@ class ErrorsTransformer {
     return result;
   }
 
-  createTransformer(cases, scopes = []) {
-    const useCases = Utils.ensureArray(cases);
+  createTransformer(cases = [], scopes = []) {
     return (error) => this.transform(error, ({
-      cases: useCases,
+      cases,
       scopes,
     }));
   }
 
   createTransformerWithScopes(scopes) {
-    const useScopes = Utils.ensureArray(scopes);
     return (error) => this.transform(error, {
-      scopes: useScopes,
+      scopes,
     });
   }
 
-  _addScope(name) {
-    if (!this._scopes[name]) {
-      const { ScopeClass } = this._options;
-      this._scopes[name] = new ScopeClass(name);
-    }
-
-    return this._scopes[name];
+  get globalScopeName() {
+    return this._globalScopeName;
   }
 
   _searchForContext(error) {

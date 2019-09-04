@@ -6,7 +6,7 @@ const ErrorCase = require('/src/lib/errorCase');
 const FormattedError = require('/src/lib/formattedError');
 const Utils = require('/src/lib/utils');
 
-describe('error-case', () => {
+describe('lib/ErrorCase', () => {
   beforeEach(() => {
     CaseParser.mockReset();
     FormattedError.mockReset();
