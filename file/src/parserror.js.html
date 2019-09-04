@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/parserror.js | parserror</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Parse errors and generate more human messages"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="parserror"><meta property="twitter:description" content="Parse errors and generate more human messages"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/homer0/parserror"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/caseParser.js~CaseParser.html">CaseParser</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errorCase.js~ErrorCase.html">ErrorCase</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/formattedError.js~FormattedError.html">FormattedError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/parserror.js~Parserror.html">Parserror</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/scope.js~Scope.html">Scope</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CaseParserType">CaseParserType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ErrorCaseDefinition">ErrorCaseDefinition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ErrorCaseOptions">ErrorCaseOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ParserrorOptions">ParserrorOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ParserrorParseOptions">ParserrorParseOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ParserrorWrapper">ParserrorWrapper</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">Class</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/parserror.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const CaseParser = require(&apos;./caseParser&apos;);
+const ErrorCase = require(&apos;./errorCase&apos;);
+const FormattedError = require(&apos;./formattedError&apos;);
+const Scope = require(&apos;./scope&apos;);
+const Utils = require(&apos;./utils&apos;);
+
+/**
+ * @typedef {Object} ParserrorOptions
+ * @description The options to customize how the class behaves.
+ * @property {Class&lt;CaseParser&gt;}     CaseParserClass        The class that will be used to create
+ *                                                          parsers. It will also be sent down to
+ *                                                          every case that gets created, on its
+ *                                                          `option` parameter.
+ * @property {Class&lt;ErrorCase&gt;}      ErrorCaseClass         The class that will be used to create
+ *                                                          cases.
+ * @property {Class&lt;FormattedError&gt;} FormattedErrorClass    The class that will be used to create
+ *                                                          formatted errors. It will also be sent
+ *                                                          down to every case that gets created,
+ *                                                          on its `options` parameter.
+ * @property {Class&lt;Scope&gt;}          ScopeClass             The class that will be used to create
+ *                                                          scopes.
+ * @property {Array&lt;String&gt;}         errorContextProperties A list of properties the class will try
+ *                                                          to find on given errors in order to use
+ *                                                          as context information for
+ *                                                          {@link ErrorCase} and
+ *                                                          {@link FormattedError}.
+ */
+
+/**
+ * @typdef {Object} ParserrorErrorObject
+ * @description An object with a signature similar to an {@link Error} that {@link Parserror}
+ *              can parse.
+ * @property {String} message The error message.
+ */
+
+/**
+ * @typedef {Object} ParserrorParseOptions
+ * @description The options that can be used to customize how {@link Parserror#parse} works.
+ * @property {Array&lt;String&gt;} cases  A list of specific cases it should validated against.
+ * @property {Array&lt;String&gt;} scopes A list of specific scopes it should use to valdiate the error.
+ */
+
+/**
+ * @typedef {function} ParserrorWrapper
+ * @description A pre configured parser to format errors with specific cases and/or scopes.
+ * @param {Error|String|ParserrorErrorObject} error The error to parse.
+ * @return {FormattedError}
+ */
+
+/**
+ * The main class of the library. It allows you to create cases, parsers and scopes.
+ */
+class Parserror {
+  /**
+   * Create a new instance of {@link Parserror}.
+   * @param {ParserrorOptions} [options] The options to customize how the class behaves.
+   * @return {Parserror}
+   */
+  static new(options) {
+    return new Parserror(options);
+  }
+  /**
+   * @param {ParserrorOptions} [options={}] The options to customize how the class behaves.
+   */
+  constructor(options = {}) {
+    /**
+     * The options to customize how the class behaves.
+     * @type {ParserrorOptions}
+     * @access protected
+     * @ignore
+     */
+    this._options = Object.assign(
+      {
+        CaseParserClass: CaseParser,
+        ErrorCaseClass: ErrorCase,
+        FormattedErrorClass: FormattedError,
+        ScopeClass: Scope,
+        errorContextProperties: [&apos;context&apos;, &apos;response&apos;, &apos;data&apos;],
+      },
+      options
+    );
+    /**
+     * The name of the global scope where the cases and parsers are added by default.
+     * @type {String}
+     * @access protected
+     * @ignore
+     */
+    this._globalScopeName = &apos;global&apos;;
+    /**
+     * A dictionary with the available scopes.
+     * @type {Object}
+     * @access protected
+     * @ignore
+     */
+    this._scopes = {};
+
+    this.addScope(this._globalScopeName);
+  }
+  /**
+   * Add a new error case.
+   * @param {ErrorCaseDefinition} definition The case definition settings.
+   * @param {?String}             scope      The name of the scope where the case should be added.
+   *                                         If not defined, it will be added to the global scope.
+   * @return {Parserror} For chaining purposes.
+   */
+  addCase(definition, scope = null) {
+    const scopeName = definition.scope || scope || this._globalScopeName;
+    const useScope = this.getScope(scopeName);
+    const {
+      ErrorCaseClass,
+      CaseParserClass,
+      FormattedErrorClass,
+    } = this._options;
+
+    useScope.addCase(new ErrorCaseClass(definition, {
+      CaseParserClass,
+      FormattedErrorClass,
+    }));
+
+    return this;
+  }
+  /**
+   * Adds a list of error cases.
+   * @param {Array&lt;ErrorCaseDefinition&gt;} definitions The cases&apos; definitions.
+   * @param {?String}                    scope       The name of the scope where the cases should
+   *                                                 be added. If not defined, they will be added
+   *                                                 to the global scope.
+   * @return {Parserror} For chaining purposes.
+   */
+  addCases(definitions, scope = null) {
+    Utils.ensureArray(definitions).forEach((definition) =&gt; {
+      this.addCase(definition, scope);
+    });
+
+    return this;
+  }
+  /**
+   * Adds a reusable parser.
+   * @param {String}           name   The name of the parser.
+   * @param {Object|Function}  parser The parser function or map (see {@link CaseParser}).
+   * @param {?String}          scope  The name of the scope where the parser should be added. If
+   *                                  not defined, it will be added to the global scope.
+   * @return {Parserror} For chaining purposes.
+   */
+  addParser(name, parser, scope = null) {
+    const scopeName = scope || this._globalScopeName;
+    const useScope = this.getScope(scopeName);
+    const { CaseParserClass } = this._options;
+    useScope.addParser(new CaseParserClass(name, parser));
+    return this;
+  }
+  /**
+   * Gets a scope by its name.
+   * @param {String} name          The name of the scope.
+   * @param {[type]} [create=true] If `true` and the scope doesn&apos;t exist, it will try to create it.
+   * @return {Scope}
+   * @throws {Error} If `create` is `false` and the scope doesn&apos;t exist.
+   */
+  getScope(name, create = true) {
+    let scope = this._scopes[name];
+    if (!scope) {
+      if (create) {
+        this.addScope(name);
+        scope = this._scopes[name];
+      } else {
+        throw new Error(`The scope &apos;${name}&apos; doesn&apos;t exist`);
+      }
+    }
+
+    return scope;
+  }
+  /**
+   * Creates a new scope.
+   * @param {String}                      name              The name of the scope.
+   * @param {Array&lt;ErrorCaseDefinition&gt;}  cases             A list of cases&apos; defintions to add.
+   * @param {Boolean}                     [overwrite=false] If there&apos;s a scope with the same name
+   *                                                        already, using this flag allows you to
+   *                                                        overwrite it.
+   * @return {Parserror} For chaining purposes.
+   * @throws {Error} If `overwrite` is `false` and there&apos;s already a scope with the same name.
+   */
+  addScope(name, cases = [], overwrite = false) {
+    if (this._scopes[name]) {
+      if (overwrite) {
+        this.removeScope(name);
+      } else {
+        throw new Error(
+          `The scope &apos;${name}&apos; already exists. You can use &apos;removeScope&apos; ` +
+          &apos;to remove it first, or set the \&apos;overwrite\&apos; parameter to \&apos;true\&apos;&apos;
+        );
+      }
+    }
+
+    const { ScopeClass } = this._options;
+    this._scopes[name] = new ScopeClass(name);
+
+    if (cases.length) {
+      this.addCases(cases, name);
+    }
+
+    return this;
+  }
+  /**
+   * Removes a scope.
+   * @param {String} name The name of the scope to remove.
+   * @throws {Error} If you try to remove the global scope.
+   */
+  removeScope(name) {
+    if (name === this._globalScopeName) {
+      throw new Error(&apos;You can\&apos;t delete the global scope&apos;);
+    }
+
+    delete this._scopes[name];
+  }
+  /**
+   * Parses and formats an error.
+   * @param {Error|String|ParserrorErrorObject} error        The error to parse.
+   * @param {ParserrorParseOptions}             [options={}] Options to customize how the parsing
+   *                                                         is done.
+   * @return {FormattedError}
+   * @throws {TypeError} If `error` is not an {@link Error}, a string or a
+   *                     {@link ParserrorErrorObject}.
+   */
+  parse(error, options = {}) {
+    const useOptions = Object.assign(
+      {
+        cases: [],
+        scopes: [],
+      },
+      options
+    );
+
+    this._validateParseOptions(useOptions);
+
+    let context;
+    let message;
+    if (typeof error === &apos;string&apos;) {
+      message = error;
+      context = null;
+    } else if (
+      error instanceof Error ||
+      (
+        Utils.isObject(error) &amp;&amp;
+        typeof error.message === &apos;string&apos;
+      )
+    ) {
+      ({ message } = error);
+      context = this._searchForContext(error);
+    } else {
+      throw new TypeError(
+        &apos;\&apos;parse\&apos; can only handle error messages (\&apos;string\&apos;), &apos; +
+        &apos;native errors (\&apos;Error\&apos;) or literal objects (\&apos;object\&apos;) with a &apos; +
+        &apos;\&apos;message\&apos; property\&apos;&apos;
+      );
+    }
+
+    const globalScope = this.getScope(this._globalScopeName);
+    let includesGlobalScope = useOptions.scopes.includes(this._globalScopeName);
+    let useCases;
+    if (useOptions.cases.length) {
+      if (includesGlobalScope) {
+        useCases = [];
+      } else {
+        useCases = useOptions.cases.map((name) =&gt; globalScope.getCase(name));
+      }
+    } else {
+      if (!includesGlobalScope) {
+        includesGlobalScope = true;
+        useOptions.scopes.push(this._globalScopeName);
+      }
+
+      useCases = [];
+    }
+
+    const scopes = useOptions.scopes.map((scope) =&gt; this.getScope(scope));
+
+    const scopesCases = scopes
+    .map((scope) =&gt; scope.getCases())
+    .reduce((newList, cases) =&gt; [...newList, ...cases], []);
+
+    const cases = [
+      ...useCases,
+      ...scopesCases,
+    ];
+
+    const scopesForCases = includesGlobalScope ?
+      scopes :
+      [...scopes, globalScope];
+
+    let newError;
+    cases.some((theCase) =&gt; {
+      newError = theCase.parse(message, scopesForCases, context);
+      return newError;
+    });
+
+    let result;
+    if (newError) {
+      result = newError;
+    } else {
+      const { FormattedErrorClass } = this._options;
+      result = new FormattedErrorClass(message, {}, { original: true });
+    }
+
+    return result;
+  }
+  /**
+   * Creates a wrapper: a pre configured parser to format errors with specific cases and/or
+   * scopes.
+   * @param {Array&lt;String&gt;} cases  A list of cases&apos; names.
+   * @param {Array&lt;String&gt;} scopes A list of scopes&apos; names.
+   * @return {ParserrorWrapper}
+   */
+  wrap(cases = [], scopes = []) {
+    return (error) =&gt; this.parse(error, ({
+      cases,
+      scopes,
+    }));
+  }
+  /**
+   * Creates a wrapper for specific scopes. A wrapper is a pre configured parser to format errors
+   * with specific cases and/or scopes.
+   * @param {Array&lt;String&gt;} scopes A list of scopes&apos; names.
+   * @return {ParserrorWrapper}
+   */
+  wrapForScopes(scopes) {
+    return (error) =&gt; this.parse(error, {
+      scopes,
+    });
+  }
+  /**
+   * The name of the global scope.
+   * @type {String}
+   */
+  get globalScopeName() {
+    return this._globalScopeName;
+  }
+  /**
+   * Validates an object to ensure it can be used as {@link ParserrorParseOptions}.
+   * @param {Object} options The object to validate.
+   * @throws {TypeError} If the `cases` property is not an `array`.
+   * @throws {TypeError} If the `scopes` property is not an `array`.
+   * @access protected
+   * @ignore
+   */
+  _validateParseOptions(options) {
+    if (!Array.isArray(options.cases)) {
+      throw new TypeError(&apos;The \&apos;cases\&apos; option can only be an \&apos;array\&apos;&apos;);
+    } else if (!Array.isArray(options.scopes)) {
+      throw new TypeError(&apos;The \&apos;scopes\&apos; option can only be an \&apos;array\&apos;&apos;);
+    }
+  }
+  /**
+   * Tries to find a property inside an error to be used as context information for the parsers.
+   * @param {Error|ParserrorErrorObject} error The error where the method will look for the
+   *                                           property.
+   * @return {?Object}
+   * @access protected
+   * @ignore
+   */
+  _searchForContext(error) {
+    const useProperty = this._options.errorContextProperties
+    .find((property) =&gt; typeof error[property] !== &apos;undefined&apos;);
+
+    return useProperty ? error[useProperty] : null;
+  }
+}
+
+module.exports = Parserror;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
