@@ -32,6 +32,21 @@ describe('Parserror', () => {
       expect(Scope).toHaveBeenCalledTimes(1);
       expect(Scope).toHaveBeenCalledWith(sut.globalScopeName);
     });
+
+    it('should create a instance using the static method `new`', () => {
+      // Given
+      let sut = null;
+      let result = null;
+      // When
+      sut = Parserror.new();
+      result = sut.getScope(sut.globalScopeName);
+      // Then
+      expect(sut).toBeInstanceOf(Parserror);
+      expect(sut.globalScopeName).toBe('global');
+      expect(result).toBeInstanceOf(Scope);
+      expect(Scope).toHaveBeenCalledTimes(1);
+      expect(Scope).toHaveBeenCalledWith(sut.globalScopeName);
+    });
   });
 
   describe('addCase', () => {

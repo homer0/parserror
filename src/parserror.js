@@ -4,7 +4,6 @@ const FormattedError = require('./formattedError');
 const Scope = require('./scope');
 const Utils = require('./utils');
 
-
 /**
  * @typedef {Object} ParserrorOptions
  * @description The options to customize how the class behaves.
@@ -53,9 +52,17 @@ const Utils = require('./utils');
  */
 class Parserror {
   /**
-   * @param {ParserrorOptions} options The options to customize how the class behaves.
+   * Create a new instance of {@link Parserror}.
+   * @param {ParserrorOptions} [options] The options to customize how the class behaves.
+   * @return {Parserror}
    */
-  constructor(options) {
+  static new(options) {
+    return new Parserror(options);
+  }
+  /**
+   * @param {ParserrorOptions} [options={}] The options to customize how the class behaves.
+   */
+  constructor(options = {}) {
     /**
      * The options to customize how the class behaves.
      * @type {ParserrorOptions}
