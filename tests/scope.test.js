@@ -79,6 +79,31 @@ describe('Scope', () => {
       expect(result).toBe(myCase);
     });
 
+    it('should return all saved cases', () => {
+      // Given
+      class MyCase extends ErrorCase {}
+      const myFirstCase = new MyCase({
+        name: 'nameOne',
+        condition: 'conditionOne',
+        message: 'messageOne',
+      });
+      const mySecondCase = new MyCase({
+        name: 'nameTwo',
+        condition: 'conditionTwo',
+        message: 'messageTwo',
+      });
+      let sut = null;
+      let result = null;
+      // When
+      sut = new Scope('myScope');
+      sut
+      .addCase(myFirstCase)
+      .addCase(mySecondCase);
+      result = sut.getCases();
+      // Then
+      expect(result).toEqual([myFirstCase, mySecondCase]);
+    });
+
     it('should remove a saved case by its name', () => {
       // Given
       class MyCase extends ErrorCase {}
