@@ -99,7 +99,7 @@ class Scope {
   }
   /**
    * Returns all available cases for this scope.
-   * @return {Array[ErrorCase]}
+   * @return {Array<ErrorCase>}
    */
   getCases() {
     return this._cases;
