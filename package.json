@@ -6,6 +6,13 @@
   "repository": "homer0/parserror",
   "author": "Leonardo Apiwan (@homer0) <me@homer0.com>",
   "license": "MIT",
+  "keywords": [
+    "parse",
+    "error",
+    "errors",
+    "normalize",
+    "format"
+  ],
   "dependencies": {},
   "devDependencies": {
     "@babel/preset-env": "7.6.0",
