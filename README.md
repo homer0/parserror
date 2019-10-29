@@ -362,6 +362,59 @@ The only thing weird there is that if you are not using cases, having to define 
 const formatUserErrors = parserror.wrapForScopes(['userValidationScope']);
 ``` 
 
+### Fallback
+
+In the case you don't want the original message reaching the user even if no case matched it, maybe it's a 50x error or something like that, you can use a fallback message.
+
+You can send it as the `fallback` option on the parse method:
+
+```js
+try {
+  await saveProduct();
+} catch (error) {
+  // Send the received error to the parser.
+  const formatted = parserror.parse(error, {
+    // Define the fallback message
+    fallback: 'There was an error saving the product, please try again',
+  });
+  // Get a new error with the formatted message.
+  showNotification(formatted.message);
+}
+```
+
+Or, if you are using wrappers, you can send it as the second parameter of the wrapped function:
+
+```js
+const parserror = Parserror
+.new()
+.addCases([
+  {
+    name: 'duplicatedEmail',
+    condition: /email_address already exists/i,
+    message: 'This email address is already in use, please choose another',
+  },
+  ...
+);
+
+const formatUserErrors = parserror.wrap(['duplicatedEmail', ...]);
+
+...
+
+try {
+  await saveProduct();
+} catch (error) {
+  // Send the received error to the wrapper, and define a fallback message.
+  const formatted = formatUserErrors(
+    error,
+    'There was an error saving the product, please try again'
+  );
+  // Get a new error with the formatted message.
+  showNotification(formatted.message);
+}
+```
+
+> `fallback` as the second parameter applies to wrappers created with both `wrap` and `wrapForScopes`
+
 ## Development
 
 ### NPM/Yarn tasks
