@@ -36,14 +36,23 @@ const Utils = require('./utils');
 /**
  * @typedef {Object} ParserrorParseOptions
  * @description The options that can be used to customize how {@link Parserror#parse} works.
- * @property {Array<String>} cases  A list of specific cases it should validated against.
- * @property {Array<String>} scopes A list of specific scopes it should use to valdiate the error.
+ * @property {Array<String>} cases    A list of specific cases it should validated
+ *                                    against.
+ * @property {Array<String>} scopes   A list of specific scopes it should use to
+ *                                    valdiate the error.
+ * @property {?String}       fallback A fallback message in case the error is can't be
+ *                                    parsed. If not specified, the returned error will
+ *                                    maintain the original message.
  */
 
 /**
  * @typedef {function} ParserrorWrapper
  * @description A pre configured parser to format errors with specific cases and/or scopes.
- * @param {Error|String|ParserrorErrorObject} error The error to parse.
+ * @param {Error|String|ParserrorErrorObject} error
+ * The error to parse.
+ * @param {?String} [fallback=null]
+ * A fallback message in case the error is can't be parsed. If not specified, the
+ * returned error will maintain the original message.
  * @return {FormattedError}
  */
 
@@ -214,9 +223,10 @@ class Parserror {
   }
   /**
    * Parses and formats an error.
-   * @param {Error|String|ParserrorErrorObject} error        The error to parse.
-   * @param {ParserrorParseOptions}             [options={}] Options to customize how the parsing
-   *                                                         is done.
+   * @param {Error|String|ParserrorErrorObject} error
+   * The error to parse.
+   * @param {ParserrorParseOptions} [options={}]
+   * Options to customize how the parsing is done.
    * @return {FormattedError}
    * @throws {TypeError} If `error` is not an {@link Error}, a string or a
    *                     {@link ParserrorErrorObject}.
@@ -226,6 +236,7 @@ class Parserror {
       {
         cases: [],
         scopes: [],
+        fallback: null,
       },
       options
     );
@@ -298,7 +309,9 @@ class Parserror {
       result = newError;
     } else {
       const { FormattedErrorClass } = this._options;
-      result = new FormattedErrorClass(message, {}, { original: true });
+      result = useOptions.fallback ?
+        new FormattedErrorClass(useOptions.fallback, {}, { fallback: true }) :
+        new FormattedErrorClass(message, {}, { original: true });
     }
 
     return result;
@@ -311,9 +324,10 @@ class Parserror {
    * @return {ParserrorWrapper}
    */
   wrap(cases = [], scopes = []) {
-    return (error) => this.parse(error, ({
+    return (error, fallback = null) => this.parse(error, ({
       cases,
       scopes,
+      fallback,
     }));
   }
   /**
@@ -323,8 +337,9 @@ class Parserror {
    * @return {ParserrorWrapper}
    */
   wrapForScopes(scopes) {
-    return (error) => this.parse(error, {
+    return (error, fallback = null) => this.parse(error, {
       scopes,
+      fallback,
     });
   }
   /**
