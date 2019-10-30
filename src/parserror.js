@@ -40,8 +40,8 @@ const Utils = require('./utils');
  *                                    against.
  * @property {Array<String>} scopes   A list of specific scopes it should use to
  *                                    valdiate the error.
- * @property {?String}       fallback A fallback message in case the error is can't be
- *                                    parsed. If not specified, the returned error will
+ * @property {?String}       fallback A fallback message in case the error can't be parsed.
+ *                                    If not specified, the returned error will
  *                                    maintain the original message.
  */
 
@@ -51,8 +51,8 @@ const Utils = require('./utils');
  * @param {Error|String|ParserrorErrorObject} error
  * The error to parse.
  * @param {?String} [fallback=null]
- * A fallback message in case the error is can't be parsed. If not specified, the
- * returned error will maintain the original message.
+ * A fallback message in case the error can't be parsed. If not specified, the returned
+ * error will maintain the original message.
  * @return {FormattedError}
  */
 
@@ -319,8 +319,11 @@ class Parserror {
   /**
    * Creates a wrapper: a pre configured parser to format errors with specific cases and/or
    * scopes.
-   * @param {Array<String>} cases  A list of cases' names.
-   * @param {Array<String>} scopes A list of scopes' names.
+   * @param {Array<String>} cases           A list of cases' names.
+   * @param {Array<String>} scopes          A list of scopes' names.
+   * @param {?String}       [fallback=null] A fallback message in case the error can't be parsed.
+   *                                        If not specified, the returned error will maintain the
+   *                                        original message.
    * @return {ParserrorWrapper}
    */
   wrap(cases = [], scopes = [], fallback = null) {
@@ -333,7 +336,10 @@ class Parserror {
   /**
    * Creates a wrapper for specific scopes. A wrapper is a pre configured parser to format errors
    * with specific cases and/or scopes.
-   * @param {Array<String>} scopes A list of scopes' names.
+   * @param {Array<String>} scopes          A list of scopes' names.
+   * @param {?String}       [fallback=null] A fallback message in case the error can't be parsed.
+   *                                        If not specified, the returned error will maintain the
+   *                                        original message.
    * @return {ParserrorWrapper}
    */
   wrapForScopes(scopes, fallback = null) {
