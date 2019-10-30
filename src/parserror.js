@@ -323,11 +323,11 @@ class Parserror {
    * @param {Array<String>} scopes A list of scopes' names.
    * @return {ParserrorWrapper}
    */
-  wrap(cases = [], scopes = []) {
-    return (error, fallback = null) => this.parse(error, ({
+  wrap(cases = [], scopes = [], fallback = null) {
+    return (error, fallbackMessage = null) => this.parse(error, ({
       cases,
       scopes,
-      fallback,
+      fallback: fallbackMessage || fallback,
     }));
   }
   /**
@@ -336,10 +336,10 @@ class Parserror {
    * @param {Array<String>} scopes A list of scopes' names.
    * @return {ParserrorWrapper}
    */
-  wrapForScopes(scopes) {
-    return (error, fallback = null) => this.parse(error, {
+  wrapForScopes(scopes, fallback = null) {
+    return (error, fallbackMessage = null) => this.parse(error, {
       scopes,
-      fallback,
+      fallback: fallbackMessage || fallback,
     });
   }
   /**

@@ -876,7 +876,49 @@ describe('Parserror', () => {
       );
     });
 
-    it('should create a wrapped parser with fallback support', () => {
+    it('should create a wrapped parser with a defined fallback', () => {
+      // Given
+      const theCaseName = 'myCase';
+      const theCase = {
+        parse: jest.fn(() => false),
+      };
+      const scopeInstance = {
+        getCase: jest.fn(() => theCase),
+      };
+      Scope.mockImplementationOnce(() => scopeInstance);
+      const errorInstance = {
+        name: 'error-instance',
+      };
+      FormattedError.mockImplementationOnce(() => errorInstance);
+      const error = 'original error';
+      const fallback = 'fallback error';
+      let sut = null;
+      let parser = null;
+      let result = null;
+      // When
+      sut = new Parserror();
+      parser = sut.wrap([theCaseName], [], fallback);
+      result = parser(error);
+      // Then
+      expect(parser).toBeFunction();
+      expect(result).toBe(errorInstance);
+      expect(scopeInstance.getCase).toHaveBeenCalledTimes(1);
+      expect(scopeInstance.getCase).toHaveBeenCalledWith(theCaseName);
+      expect(theCase.parse).toHaveBeenCalledTimes(1);
+      expect(theCase.parse).toHaveBeenCalledWith(
+        error,
+        [scopeInstance],
+        null
+      );
+      expect(FormattedError).toHaveBeenCalledTimes(1);
+      expect(FormattedError).toHaveBeenCalledWith(
+        fallback,
+        {},
+        { fallback: true }
+      );
+    });
+
+    it('should create a wrapped parser and support a custom fallback', () => {
       // Given
       const theCaseName = 'myCase';
       const theCase = {
@@ -961,7 +1003,63 @@ describe('Parserror', () => {
       );
     });
 
-    it('should create a wrapped parser for an specific scope with fallback support', () => {
+    it('should create a wrapped parser for an specific scope with a defined fallback', () => {
+      // Given
+      const globalScopeCase = {
+        parse: jest.fn(),
+      };
+      const globalScopeInstance = {
+        getCases: jest.fn(() => [globalScopeCase]),
+      };
+      const customScopeName = 'customScope';
+      const customScopeCase = {
+        parse: jest.fn(() => false),
+      };
+      const customScopeInstance = {
+        getCases: jest.fn(() => [customScopeCase]),
+      };
+      Scope.mockImplementationOnce(() => globalScopeInstance);
+      Scope.mockImplementationOnce(() => customScopeInstance);
+      const errorInstance = {
+        name: 'error-instance',
+      };
+      FormattedError.mockImplementationOnce(() => errorInstance);
+      const error = 'original error';
+      const fallback = 'fallback error';
+      let sut = null;
+      let parser = null;
+      let result = null;
+      // When
+      sut = new Parserror();
+      sut.addScope(customScopeName);
+      parser = sut.wrapForScopes([customScopeName], fallback);
+      result = parser(error);
+      // Then
+      expect(parser).toBeFunction();
+      expect(result).toBe(errorInstance);
+      expect(globalScopeInstance.getCases).toHaveBeenCalledTimes(1);
+      expect(globalScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(globalScopeCase.parse).toHaveBeenCalledWith(
+        error,
+        [customScopeInstance, globalScopeInstance],
+        null
+      );
+      expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
+      expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
+      expect(customScopeCase.parse).toHaveBeenCalledWith(
+        error,
+        [customScopeInstance, globalScopeInstance],
+        null
+      );
+      expect(FormattedError).toHaveBeenCalledTimes(1);
+      expect(FormattedError).toHaveBeenCalledWith(
+        fallback,
+        {},
+        { fallback: true }
+      );
+    });
+
+    it('should create a wrapped parser for an specific scope and support a custom fallback', () => {
       // Given
       const globalScopeCase = {
         parse: jest.fn(),

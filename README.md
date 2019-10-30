@@ -366,7 +366,11 @@ const formatUserErrors = parserror.wrapForScopes(['userValidationScope']);
 
 In the case you don't want the original message reaching the user even if no case matched it, maybe it's a 50x error or something like that, you can use a fallback message.
 
-You can send it as the `fallback` option on the parse method:
+There are a few different ways to define fallback messages:
+
+#### Add a fallback when parsing an error
+
+You can send it as the `fallback` option on the `parse` method:
 
 ```js
 try {
@@ -382,7 +386,23 @@ try {
 }
 ```
 
-Or, if you are using wrappers, you can send it as the second parameter of the wrapped function:
+#### Add a fallback when creating a wrapper
+
+You can create wrappers with a defined fallback message so all the errors parsed can make use of.
+
+```js
+const formatUserErrors = parserror.wrap(
+  ['duplicatedEmail', ...],
+  [...],
+  'There was an error saving the product, please try again'
+);
+```
+
+Both `wrap` and `wrapForScopes` support the fallback message as their last parameter.
+
+#### Add a fallback message for an specific error parsed by a wrapper
+
+If you are using the same wrapper for multiple tasks and the fallback message should be different depending on the task that failed, instead of sending it as the last parameter of `wrap` or `wrapForScopes`, you can send it as the second parameter of the created wrapper:
 
 ```js
 const parserror = Parserror
@@ -412,8 +432,6 @@ try {
   showNotification(formatted.message);
 }
 ```
-
-> `fallback` as the second parameter applies to wrappers created with both `wrap` and `wrapForScopes`
 
 ## Development
 
