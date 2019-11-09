@@ -146,6 +146,13 @@ class Scope {
     return theCase || null;
   }
   /**
+   * Returns all available cases for this scope.
+   * @return {Array&lt;ErrorCase&gt;}
+   */
+  getCases() {
+    return this._cases;
+  }
+  /**
    * Checks whether or not there&apos;s a case based on its name.
    * @param {String} name The case&apos;s name.
    * @return {Boolean}

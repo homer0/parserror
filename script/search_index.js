@@ -450,6 +450,18 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/parserror.js~parserror#alloworiginal",
+    "class/src/parserror.js~Parserror.html#instance-method-allowOriginal",
+    "src/parserror.js~Parserror#allowOriginal",
+    "method"
+  ],
+  [
+    "src/parserror.js~parserror#alloworiginals",
+    "class/src/parserror.js~Parserror.html#instance-method-allowOriginals",
+    "src/parserror.js~Parserror#allowOriginals",
+    "method"
+  ],
+  [
     "src/parserror.js~parserror#constructor",
     "class/src/parserror.js~Parserror.html#instance-constructor-constructor",
     "src/parserror.js~Parserror#constructor",
@@ -543,6 +555,12 @@ window.esdocSearchIndex = [
     "src/scope.js~scope#getcase",
     "class/src/scope.js~Scope.html#instance-method-getCase",
     "src/scope.js~Scope#getCase",
+    "method"
+  ],
+  [
+    "src/scope.js~scope#getcases",
+    "class/src/scope.js~Scope.html#instance-method-getCases",
+    "src/scope.js~Scope#getCases",
     "method"
   ],
   [

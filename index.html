@@ -298,6 +298,96 @@ try {
 <p>The only thing weird there is that if you are not using cases, having to define an empty array as first parameter doesn&apos;t look very nice... so you could just use <code>wrapForScopes</code>:</p>
 <pre><code class="lang-js"><code class="source-code prettyprint">const formatUserErrors = parserror.wrapForScopes([&apos;userValidationScope&apos;]);</code>
 </code></pre>
+<h3 id="fallback">Fallback</h3><p>In the case you don&apos;t want the original message reaching the user even if no case matched it, maybe it&apos;s a 50x error or something like that, you can use a fallback message.</p>
+<p>There are a few different ways to define fallback messages:</p>
+<h4 id="add-a-fallback-when-parsing-an-error">Add a fallback when parsing an error</h4><p>You can send it as the <code>fallback</code> option on the <code>parse</code> method:</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">try {
+  await saveProduct();
+} catch (error) {
+  // Send the received error to the parser.
+  const formatted = parserror.parse(error, {
+    // Define the fallback message
+    fallback: &apos;There was an error saving the product, please try again&apos;,
+  });
+  // Get a new error with the formatted message.
+  showNotification(formatted.message);
+}</code>
+</code></pre>
+<h4 id="add-a-fallback-when-creating-a-wrapper">Add a fallback when creating a wrapper</h4><p>You can create wrappers with a defined fallback message so all the errors parsed can make use of.</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const formatUserErrors = parserror.wrap(
+  [&apos;duplicatedEmail&apos;, ...],
+  [...],
+  &apos;There was an error saving the product, please try again&apos;
+);</code>
+</code></pre>
+<p>Both <code>wrap</code> and <code>wrapForScopes</code> support the fallback message as their last parameter.</p>
+<h4 id="add-a-fallback-message-for-an-specific-error-parsed-by-a-wrapper">Add a fallback message for an specific error parsed by a wrapper</h4><p>If you are using the same wrapper for multiple tasks and the fallback message should be different depending on the task that failed, instead of sending it as the last parameter of <code>wrap</code> or <code>wrapForScopes</code>, you can send it as the second parameter of the created wrapper:</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+.new()
+.addCases([
+  {
+    name: &apos;duplicatedEmail&apos;,
+    condition: /email_address already exists/i,
+    message: &apos;This email address is already in use, please choose another&apos;,
+  },
+  ...
+);
+
+const formatUserErrors = parserror.wrap([&apos;duplicatedEmail&apos;, ...]);
+
+...
+
+try {
+  await saveProduct();
+} catch (error) {
+  // Send the received error to the wrapper, and define a fallback message.
+  const formatted = formatUserErrors(
+    error,
+    &apos;There was an error saving the product, please try again&apos;
+  );
+  // Get a new error with the formatted message.
+  showNotification(formatted.message);
+}</code>
+</code></pre>
+<h3 id="keep-original-messages">Keep original messages</h3><p>Let&apos;s say some of the errors you receive are actually useful, you don&apos;t want to create a case to just return the same message... and to make it worst, you want a fallback for some messages that still don&apos;t have a case for. The easiest way to solve this is to &quot;allow the original&quot; message to be matched but not parsed/formatted, and that&apos;s done with the <code>allowOriginal</code> method:</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+.new()
+.addCases([
+  {
+    name: &apos;duplicatedEmail&apos;,
+    condition: /email_address already exists/i,
+    message: &apos;This email address is already in use, please choose another&apos;,
+  },
+  ...
+)
+.allowOriginal(/a message that is actually useful/);
+
+const formatUserErrors = parserror.wrap([&apos;duplicatedEmail&apos;, ...]);
+
+...
+
+try {
+  await saveProduct();
+} catch (error) {
+  // Send the received error to the parser.
+  const formatted = parserror.parse(error, {
+    // Define the fallback message
+    fallback: &apos;There was an error saving the product, please try again&apos;,
+  });
+  // Get a new error with the formatted message.
+  showNotification(formatted.message);
+}</code>
+</code></pre>
+<p>If the error matches the condition sent on <code>allowOriginal</code>, it will keep it as it is and avoid the fallback.</p>
+<p>Internally, <code>allowOriginal</code> creates a new error case but with a flag to keep the original message, so instead of sending a regular expression (or a string), you can send a case definition and even give it a name, so it can be used on <code>parse</code> and <code>wrap</code>.</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+.allowOriginal({
+  condition: /a message that is actually useful/,
+  name: &apos;thatUsefulMessage&apos;,
+  scope: &apos;someCustomScope&apos;,
+});</code>
+</code></pre>
+<p>And just like <code>addCase</code> and <code>addCases</code>, you also have <code>allowOriginals</code> to define multiple conditions at once.</p>
 <h2 id="development">Development</h2><h3 id="npm-yarn-tasks">NPM/Yarn tasks</h3><table>
 <thead>
 <tr>

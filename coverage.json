@@ -1,7 +1,7 @@
 {
   "coverage": "100%",
-  "expectCount": 75,
-  "actualCount": 75,
+  "expectCount": 79,
+  "actualCount": 79,
   "files": {
     "src/caseParser.js": {
       "expectCount": 11,
@@ -9,8 +9,8 @@
       "undocumentLines": []
     },
     "src/errorCase.js": {
-      "expectCount": 25,
-      "actualCount": 25,
+      "expectCount": 26,
+      "actualCount": 26,
       "undocumentLines": []
     },
     "src/formattedError.js": {
@@ -19,13 +19,13 @@
       "undocumentLines": []
     },
     "src/parserror.js": {
-      "expectCount": 18,
-      "actualCount": 18,
+      "expectCount": 20,
+      "actualCount": 20,
       "undocumentLines": []
     },
     "src/scope.js": {
-      "expectCount": 17,
-      "actualCount": 17,
+      "expectCount": 18,
+      "actualCount": 18,
       "undocumentLines": []
     }
   }

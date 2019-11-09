@@ -937,7 +937,7 @@
     "__docId__": 63,
     "kind": "file",
     "name": "src/errorCase.js",
-    "content": "const Utils = require('./utils');\nconst CaseParser = require('./caseParser');\nconst FormattedError = require('./formattedError');\n\n/**\n * @type {function} ErrorCaseMessage\n * @description A function that generates a formatted message for an error.\n * @return {String}\n */\n\n/**\n * @typedef {Object} ErrorCaseDefinition\n * @description The required properties to create a new {@link ErrorCase}.\n * @property {String}                     name      The name of the case.\n * @property {ErrorCaseDefinition|String} message   The formatted message or the `function` that\n *                                                  generates one.\n * @property {RegExp|String}              condition A `string` or a expression to match against an\n *                                                  error that could be parsed.\n * @property {?Object}                    parsers   A map of reusable parsers. Each parser can be\n *                                                  an `object` map, a `function` or an instance of\n *                                                  {@link CaseParser}.\n * @property {?Array}                     parse     A list of parsers the case should use on\n *                                                  extracted parameters. Each item of the list can\n *                                                  be either the name of a parser defined on\n *                                                  `parsers`, the name of a parser on the scope,\n *                                                  a `function` to parse a value, or an `array` of\n *                                                  all the thing previously mentioned.\n */\n\n/**\n * @typedef {Object} ErrorCaseOptions\n * @description The options to customize how the class behaves.\n * @property {Class<CaseParser>}     CaseParserClass     The class to be used to create a parser.\n * @property {Class<FormattedError>} FormattedErrorClass The class to be used to create a custom\n *                                                       error after a message is parsed.\n */\n\n/**\n * The core object of Parserror. A case is like a \"service\" that validates if an error message\n * matches its `condition` and, if defined, runs multiple parsers in order to generate a new\n * error.\n */\nclass ErrorCase {\n  /**\n   * @param {ErrorCaseDefinition} definition   The case definition settings.\n   * @param {ErrorCaseOptions}    [options={}] The options to customize how the class behaves.\n   * @throws {Error}     If the definition is missing the `name`, the `condition` or the `message`.\n   * @throws {TypeError} If the definition `message` is not a string nor a function.\n   * @throws {TypeError} If the definition `condition` is not a RegExp nor a string.\n   * @throws {TypeError} If the definition includes `parsers` and it's not an object.\n   * @throws {TypeError} If a parser is not an object, a function or an instance of\n   *                     {@link CaseParserClass}.\n   * @throws {TypeError} If the definition includes `parse` and it's not an `array` nor an object.\n   * @throws {TypeError} If the definition includes `parse` and an item is not an `array`, a\n   *                     function or an object.\n   */\n  constructor(definition, options = {}) {\n    /**\n     * The options to customize how the class behaves.\n     * @type {ErrorCaseOptions}\n     * @access protected\n     * @ignore\n     */\n    this._options = Object.assign(\n      {\n        CaseParserClass: CaseParser,\n        FormattedErrorClass: FormattedError,\n      },\n      options\n    );\n\n    this._validateMissingProperties(definition);\n    /**\n     * The case name.\n     * @type {String}\n     * @access protected\n     * @ignore\n     */\n    this._name = this._validateName(definition.name);\n    /**\n     * The function that generates the formatted message.\n     * @type {ErrorCaseMessage}\n     * @access protected\n     * @ignore\n     */\n    this._message = this._validateMessage(definition.message);\n    /**\n     * The expression to validate if an error matches the case.\n     * @type {RegExp}\n     * @access protected\n     * @ignore\n     */\n    this._condition = this._validateCondition(definition.condition);\n    /**\n     * An object with all the parsers the case can make use of.\n     * @type {Object}\n     * @access protected\n     * @ignore\n     */\n    this._parsers = this._validateParsers(definition.parsers);\n    /**\n     * A list of the parse instructions the case can use on extracted parameters.\n     * @type {Array}\n     * @access protected\n     * @ignore\n     */\n    this._parse = this._validateParseInstructions(definition.parse);\n    /**\n     * A flag to know whether the parse instructions where defined as an object (`true`) or\n     * an array (`false`). This is for when the condition uses named groups to extract\n     * parameters.\n     * @type {Boolean}\n     * @access protected\n     * @ignore\n     */\n    this._parseAsGroups = Utils.isObject(this._parse);\n  }\n  /**\n   * Validates an error message against the case condition and if it matches, it parses it in\n   * order to return a formatted error.\n   * @param {String}       errorMessage   The error message to validate and, possibly, parse.\n   * @param {Array<Scope>} [scopes=[]]    A list of scopes from where the case can try to find\n   *                                      reusable parsers.\n   * @param {?Object}      [context=null] Custom context information about the error that can be\n   *                                      sent to the formatted error.\n   * @return {?FormattedError} If the condition doesn't match, it will return `null`.\n   * @throws {Error} If the condition matches, parameters are extracted as named groups but the\n   *                 case's `parse` instructions were defined as an array.\n   * @throws {Error} If the condition matches, parameters are extracted as a list but the case's\n   *                 `parse` instructions were defined as an object.\n   * @throws {Error} If the condition matches, one of the parsers the case wants to use is\n   *                 suppoused to be on one of the scopes but it can't be found.\n   * @throws {Error} If the condition has a mix of named and unnamed groups.\n   */\n  parse(errorMessage, scopes = [], context = null) {\n    let result;\n    if (errorMessage.match(this._condition)) {\n      result = this._parseError(errorMessage, scopes, context);\n    } else {\n      result = null;\n    }\n\n    return result;\n  }\n  /**\n   * The case name.\n   * @type {String}\n   */\n  get name() {\n    return this._name;\n  }\n  /**\n   * The actual method that parses an error message once it matches the case condition.\n   * @param {String}       errorMessage The error message to validate and, possibly, parse.\n   * @param {Array<Scope>} scopes       A list of scopes from where the case can try to find\n   *                                    reusable parsers.\n   * @param {?Object}      context      Custom context information about the error that can be sent\n   *                                    to the formatted error.\n   * @return {FormattedError}\n   * @throws {Error} If the parameters are extracted as named groups but the case's `parse`\n   *                 instructions were defined as an array.\n   * @throws {Error} If the parameters are extracted as a list but the case's `parse` instructions\n   *                 were defined as an object.\n   * @throws {Error} If the condition has a mix of named and unnamed groups.\n   * @access protected\n   * @ignore\n   */\n  _parseError(errorMessage, scopes, context) {\n    let result;\n    const extracted = this._extractParameters(errorMessage);\n    if (extracted.groups) {\n      if (this._parseAsGroups) {\n        result = this._parseGroups(extracted.groups, scopes, context);\n      } else {\n        throw new Error(\n          `The condition for the case '${this._name}' returned groups, but the 'parse' ` +\n          'instructions were set on an \\'array\\' format'\n        );\n      }\n    } else if (extracted.matches.length) {\n      if (this._parseAsGroups) {\n        throw new Error(\n          `The condition for the case '${this._name}' didn't return groups, but the 'parse' ` +\n          'instructions were set on an \\'object\\' format'\n        );\n      } else {\n        result = this._parseList(extracted.matches, scopes, context);\n      }\n    } else {\n      result = this._createError(this._message(), [], context);\n    }\n\n    return result;\n  }\n  /**\n   * Parses named groups extracted from the case condition expression.\n   * @param {Object}       groups  The named groups.\n   * @param {Array<Scope>} scopes  A list of scopes from where the case can try to find\n   *                               reusable parsers.\n   * @param {?Object}      context Custom context information about the error that can be sent\n   *                               to the formatted error.\n   *\n   * @return {Object} The new parameters, also named.\n   * @access protected\n   * @ignore\n   */\n  _parseGroups(groups, scopes, context) {\n    const params = Object.keys(groups).reduce(\n      (newParams, name) => {\n        const value = groups[name];\n        const parsers = this._parse[name];\n        let newValue;\n        if (parsers) {\n          newValue = parsers.reduce(\n            (currentValue, parser) => this._parseValue(parser, currentValue, scopes),\n            value\n          );\n        } else {\n          newValue = value;\n        }\n\n        return Object.assign({}, newParams, {\n          [name]: newValue,\n        });\n      },\n      {}\n    );\n\n    const message = this._message(params);\n    return this._createError(message, params, context);\n  }\n  /**\n   * Parses a list of parameters extracted from the case condition expression.\n   * @param {Array<String>}  list   The list of parameters to parse.\n   * @param {Array<Scope>}   scopes A list of scopes from where the case can try to find\n   *                                reusable parsers.\n   * @param {?Object}      context  Custom context information about the error that can be sent\n   *                                to the formatted error.\n   *\n   * @return {Array}\n   * @access protected\n   * @ignore\n   */\n  _parseList(list, scopes, context) {\n    const params = list.map((value, index) => {\n      const parsers = this._parse[index];\n      let newValue;\n      if (parsers) {\n        newValue = parsers.reduce(\n          (currentValue, parser) => this._parseValue(parser, currentValue, scopes),\n          value\n        );\n      } else {\n        newValue = value;\n      }\n\n      return newValue;\n    });\n\n    const message = this._message(...params);\n    return this._createError(message, params, context);\n  }\n  /**\n   * Parses a single value using a given parser. The reason this is wrapped in a method is\n   * because this functionality is independant of the type of parameters extracted (named or\n   * unnamed groups).\n   * @param {String|CaseParser} parser The name of a parser the needs to be found on the scopes or\n   *                                   an actual parser to format the value.\n   * @param {*}                 value  The value to parse.\n   * @param {Array<Scope>}      scopes A list of scopes where parsers can be found.\n   * @return {*} The parsed value.\n   * @throws {Error} If the parser is a `string` and a parser with that name can't be found in any\n   *                 of the scopes.\n   * @access protected\n   * @ignore\n   */\n  _parseValue(parser, value, scopes) {\n    let result;\n    if (typeof parser === 'string') {\n      let scopeParser;\n      scopes.some((scope) => {\n        scopeParser = scope.getParser(parser, false);\n        return scopeParser;\n      });\n\n      if (scopeParser) {\n        result = scopeParser.parse(value);\n      } else {\n        throw new Error(\n          `No parser with the name of '${parser}' could be found for the ` +\n          `case '${this._name}'`\n        );\n      }\n    } else {\n      result = parser.parse(value);\n    }\n\n    return result;\n  }\n  /**\n   * Creates a new instance of the {@link FormattedError} using the class sent on the case's\n   * `constructor` options.\n   * @param {String}       message  The error message.\n   * @param {Object|Array} params   The parsed parameters Parserror found. When parsing a\n   *                                case that uses named groups, the parameters are stored\n   *                                on an `object`; otherwise, they'll be an `array`.\n   * @param {?Object}      context  Any extra context information for the error.\n   * @return {FormattedError}\n   * @access protected\n   * @ignore\n   */\n  _createError(message, params, context) {\n    const { FormattedErrorClass } = this._options;\n    return new FormattedErrorClass(message, params, context);\n  }\n  /**\n   * Validates if one on the case's definition required properties is missing.\n   * @param {ErrorCaseDefinition} definition The case definition settings.\n   * @throws {Error} If one of the properties is missing.\n   * @access protected\n   * @ignore\n   */\n  _validateMissingProperties(definition) {\n    const missing = [\n      'name',\n      'condition',\n      'message',\n    ]\n    .find((property) => typeof definition[property] === 'undefined');\n    if (missing) {\n      throw new Error(`The '${missing}' property is required on a case definition`);\n    }\n  }\n  /**\n   * Validates that the name the class intends to use is a `string`.\n   * @param {String} name The name to validate.\n   * @return {String}\n   * @throws {TypeError} If the `name` is not a string.\n   * @access protected\n   * @ignore\n   */\n  _validateName(name) {\n    if (typeof name !== 'string') {\n      throw new TypeError('The \\'name\\' can only be a \\'string\\'');\n    }\n\n    return name;\n  }\n  /**\n   * Validates whether something can be used as the case's message.\n   * @param {String|ErrorCaseMessage} message The value intended to be the case's message.\n   * @return {ErrorCaseMessage}\n   * @throws {Error} If the message is not a `function` nor a `string`.\n   * @access protected\n   * @ignore\n   */\n  _validateMessage(message) {\n    let result;\n    const type = typeof message;\n    if (type === 'string') {\n      result = () => message;\n    } else if (type === 'function') {\n      result = message;\n    } else {\n      throw new TypeError(\n        `'${this._name}': 'message' can only be a 'string' or a 'function'`\n      );\n    }\n\n    return result;\n  }\n  /**\n   * Validates whether something can be used as the case's condition.\n   * @param {String|RegExp} condition The value intended to be the case's condition.\n   * @return {RegExp}\n   * @throws {Error} If the condition is not a `string` nor a `RegExp`.\n   * @access protected\n   * @ignore\n   */\n  _validateCondition(condition) {\n    let result;\n    if (typeof condition === 'string') {\n      result = new RegExp(Utils.escapeForRegExp(condition));\n    } else if (condition instanceof RegExp) {\n      result = condition;\n    } else {\n      throw new TypeError(\n        `'${this._name}': 'condition' can only be a 'string' or a 'RegExp'`\n      );\n    }\n\n    return result;\n  }\n  /**\n   * Validates a dictionary of parsers so it can be used by the case.\n   * @param {?Object} parsers A dictionary of reusable parsers.\n   * @return {Object}\n   * @throws {Error} If `parsers` is not an object.\n   * @throws {Error} If a a value insde a parser is not an instance of {@link CaseParserClass},\n   *                 an `object` nor a `function`.\n   * @access protected\n   * @ignore\n   */\n  _validateParsers(parsers) {\n    let result;\n    if (parsers) {\n      if (!Utils.isObject(parsers)) {\n        throw new TypeError(`'${this._name}': 'parsers' can only be an 'object'`);\n      }\n\n      const { CaseParserClass } = this._options;\n      result = Object.keys(parsers).reduce(\n        (newParsers, name) => Object.assign({}, newParsers, {\n          [name]: this._validateParser(name, parsers[name], CaseParserClass),\n        }),\n        {}\n      );\n    } else {\n      result = {};\n    }\n\n    return result;\n  }\n  /**\n   * Validates and normalizes a parser intended to be used in the case.\n   * @param {String}                          name             The name of the parser.\n   * @param {CaseParserClass|Object|Function} parser           The parser definition.\n   * @param {Class<CaseParser>}               CaseParserClass  To compare if the parser definition\n   *                                                           is `instaceof`.\n   * @return {CaseParserClass}\n   * @throws {Error} If the `parser` is not an instance of {@link CaseParserClass}, an `object`\n   *                 nor a `function`.\n   * @access protected\n   * @ignore\n   */\n  _validateParser(name, parser, CaseParserClass) {\n    let result;\n    if (parser instanceof CaseParserClass) {\n      result = parser;\n    } else {\n      const isObject = Utils.isObject(parser);\n      if (isObject || typeof parser === 'function') {\n        result = new CaseParserClass(name, parser);\n      } else {\n        throw new TypeError(\n          `'${this._name}' - '${name}': a parser can only be a 'function' or an 'object'`\n        );\n      }\n    }\n\n    return result;\n  }\n  /**\n   * Validates and normalizes the parse instructions for the case.\n   * @param {?Array|?Object} parse The list/map of instructions to validate.\n   * @return {Array|Object}\n   * @throws {Error} If the instructions are not an `array` nor an `object`.\n   * @throws {Error} If an instruction is not a `function`, a `string` or an `array`.\n   * @access protected\n   * @ignore\n   */\n  _validateParseInstructions(parse) {\n    let result;\n    if (parse) {\n      const { CaseParserClass } = this._options;\n      if (Array.isArray(parse)) {\n        result = parse.map((instruction, index) => Utils.ensureArray(\n          this._validateParseInstruction(\n            `${this._name}-parser-${index}`,\n            instruction,\n            CaseParserClass\n          )\n        ));\n      } else if (Utils.isObject(parse)) {\n        result = Object.keys(parse).reduce(\n          (newParse, parameterName) => Object.assign({}, newParse, {\n            [parameterName]: Utils.ensureArray(\n              this._validateParseInstruction(\n                `${this._name}-parser-${parameterName}`,\n                parse[parameterName],\n                CaseParserClass\n              )\n            ),\n          }),\n          {}\n        );\n      } else {\n        throw new TypeError(\n          `'${this._name}': 'parse' can only be an 'array' or an 'object'`\n        );\n      }\n    } else {\n      result = [];\n    }\n\n    return result;\n  }\n  /**\n   * Validates and normalizes a single parse instruction.\n   * @param {String}                id              The ID of the instruction. Internally generated\n   *                                                by the case in order to have some reference\n   *                                                for error messages.\n   * @param {function|String|Array} instruction     The instruction to validate.\n   * @param {Class<CaseParser>}     CaseParserClass The class used to create new parsers. If the\n   *                                                instruction is a function, it will be converted\n   *                                                into a parser.\n   * @return {function|String|Array}\n   * @throws {Error} If the instruction is not a `function`, a `string` or an `array`.\n   * @access protected\n   * @ignore\n   */\n  _validateParseInstruction(id, instruction, CaseParserClass) {\n    let result;\n    const type = typeof instruction;\n    if (type === 'function') {\n      result = new CaseParserClass(id, instruction);\n    } else if (type === 'string') {\n      if (this._parsers[instruction]) {\n        result = this._parsers[instruction];\n      } else {\n        result = instruction;\n      }\n    } else if (Array.isArray(instruction)) {\n      result = instruction.map((item, index) => this._validateParseInstruction(\n        `${id}-sub-${index}`,\n        item,\n        CaseParserClass\n      ));\n    } else {\n      throw new TypeError(\n        `'${this._name}': a 'parse' instruction can only be ` +\n        'an \\'array\\', a \\'function\\' or a \\'string\\''\n      );\n    }\n\n    return result;\n  }\n  /**\n   * Extracts the parameters from an error message using the case condition.\n   * @param {String} errorMessage The message from where the parameters will be extracted.\n   * @return {Object}           Only one of the properties will be returned\n   * @property {?Array} matches If the expression extracted unnamed groups, this will be a list of\n   *                            them.\n   * @property {?Object} groups If the expression extracted named groups, this will be the\n   *                            dictionary with them.\n   * @throws {Error} If there's a mix of named and unnamed groups on the condition.\n   * @access protected\n   * @ignore\n   */\n  _extractParameters(errorMessage) {\n    const match = Utils.execRegExp(this._condition, errorMessage);\n    let result;\n    const matches = match.slice().filter((item) => typeof item !== 'undefined');\n    matches.shift();\n    if (match.groups) {\n      const groups = Object.assign({}, match.groups);\n      const groupsLength = Object.keys(groups).length;\n      if (groupsLength) {\n        if (groupsLength !== matches.length) {\n          throw new Error(\n            `The condition for the case '${this._name}' is trying to extract parameters as ` +\n            'named and unnamed groups, only one method is allowed'\n          );\n        } else {\n          result = { groups };\n        }\n      } else {\n        result = { matches };\n      }\n    } else {\n      result = { matches };\n    }\n\n    return result;\n  }\n}\n\nmodule.exports = ErrorCase;\n",
+    "content": "const Utils = require('./utils');\nconst CaseParser = require('./caseParser');\nconst FormattedError = require('./formattedError');\n\n/**\n * @type {function} ErrorCaseMessage\n * @description A function that generates a formatted message for an error.\n * @return {String}\n */\n\n/**\n * @typedef {Object} ErrorCaseDefinition\n * @description The required properties to create a new {@link ErrorCase}.\n * @property {String} name\n * The name of the case.\n * @property {ErrorCaseDefinition|String} message\n * The formatted message or the `function` that generates one.\n * @property {RegExp|String} condition\n * A `string` or a expression to match against an error that could be parsed.\n * @property {?Object} parsers\n * A map of reusable parsers. Each parser can be an `object` map, a `function` or an instance of\n * {@link CaseParser}.\n * @property {?Array} parse\n * A list of parsers the case should use on extracted parameters. Each item of the list can be\n * either the name of a parser defined on `parsers`, the name of a parser on the scope, a\n * `function` to parse a value, or an `array` of all the thing previously mentioned.\n * @property {?Boolean} useOriginal\n * Whether or not the case should use the original message when matched.\n */\n\n/**\n * @typedef {Object} ErrorCaseOptions\n * @description The options to customize how the class behaves.\n * @property {Class<CaseParser>}     CaseParserClass     The class to be used to create a parser.\n * @property {Class<FormattedError>} FormattedErrorClass The class to be used to create a custom\n *                                                       error after a message is parsed.\n */\n\n/**\n * The core object of Parserror. A case is like a \"service\" that validates if an error message\n * matches its `condition` and, if defined, runs multiple parsers in order to generate a new\n * error.\n */\nclass ErrorCase {\n  /**\n   * @param {ErrorCaseDefinition} definition   The case definition settings.\n   * @param {ErrorCaseOptions}    [options={}] The options to customize how the class behaves.\n   * @throws {Error}     If the definition is missing the `name`, the `condition` or the `message`.\n   * @throws {TypeError} If the definition `message` is not a string nor a function.\n   * @throws {TypeError} If the definition `condition` is not a RegExp nor a string.\n   * @throws {TypeError} If the definition includes `parsers` and it's not an object.\n   * @throws {TypeError} If a parser is not an object, a function or an instance of\n   *                     {@link CaseParserClass}.\n   * @throws {TypeError} If the definition includes `parse` and it's not an `array` nor an object.\n   * @throws {TypeError} If the definition includes `parse` and an item is not an `array`, a\n   *                     function or an object.\n   */\n  constructor(definition, options = {}) {\n    /**\n     * The options to customize how the class behaves.\n     * @type {ErrorCaseOptions}\n     * @access protected\n     * @ignore\n     */\n    this._options = Object.assign(\n      {\n        CaseParserClass: CaseParser,\n        FormattedErrorClass: FormattedError,\n      },\n      options\n    );\n\n    this._validateMissingProperties(definition);\n    /**\n     * The case name.\n     * @type {String}\n     * @access protected\n     * @ignore\n     */\n    this._name = this._validateName(definition.name);\n    /**\n     * Whether or not the case should use the original message when matched.\n     * @type {Boolean}\n     * @access protected\n     * @ignore\n     */\n    this._useOriginal = !!definition.useOriginal;\n    /**\n     * The function that generates the formatted message. If the case should use the original\n     * message, then the property will be `null`.\n     * @type {?ErrorCaseMessage}\n     * @access protected\n     * @ignore\n     */\n    this._message = this._useOriginal ? null : this._validateMessage(definition.message);\n    /**\n     * The expression to validate if an error matches the case.\n     * @type {RegExp}\n     * @access protected\n     * @ignore\n     */\n    this._condition = this._validateCondition(definition.condition);\n    /**\n     * An object with all the parsers the case can make use of.\n     * @type {Object}\n     * @access protected\n     * @ignore\n     */\n    this._parsers = this._validateParsers(definition.parsers);\n    /**\n     * A list of the parse instructions the case can use on extracted parameters.\n     * @type {Array}\n     * @access protected\n     * @ignore\n     */\n    this._parse = this._validateParseInstructions(definition.parse);\n    /**\n     * A flag to know whether the parse instructions where defined as an object (`true`) or\n     * an array (`false`). This is for when the condition uses named groups to extract\n     * parameters.\n     * @type {Boolean}\n     * @access protected\n     * @ignore\n     */\n    this._parseAsGroups = Utils.isObject(this._parse);\n  }\n  /**\n   * Validates an error message against the case condition and if it matches, it parses it in\n   * order to return a formatted error.\n   * @param {String}       errorMessage   The error message to validate and, possibly, parse.\n   * @param {Array<Scope>} [scopes=[]]    A list of scopes from where the case can try to find\n   *                                      reusable parsers.\n   * @param {?Object}      [context=null] Custom context information about the error that can be\n   *                                      sent to the formatted error.\n   * @return {?FormattedError} If the condition doesn't match, it will return `null`.\n   * @throws {Error} If the condition matches, parameters are extracted as named groups but the\n   *                 case's `parse` instructions were defined as an array.\n   * @throws {Error} If the condition matches, parameters are extracted as a list but the case's\n   *                 `parse` instructions were defined as an object.\n   * @throws {Error} If the condition matches, one of the parsers the case wants to use is\n   *                 suppoused to be on one of the scopes but it can't be found.\n   * @throws {Error} If the condition has a mix of named and unnamed groups.\n   */\n  parse(errorMessage, scopes = [], context = null) {\n    let result;\n    if (errorMessage.match(this._condition)) {\n      result = this._useOriginal ?\n        this._createError(errorMessage, [], Object.assign({}, context, { original: true })) :\n        this._parseError(errorMessage, scopes, context);\n    } else {\n      result = null;\n    }\n\n    return result;\n  }\n  /**\n   * The case name.\n   * @type {String}\n   */\n  get name() {\n    return this._name;\n  }\n  /**\n   * The actual method that parses an error message once it matches the case condition.\n   * @param {String}       errorMessage The error message to validate and, possibly, parse.\n   * @param {Array<Scope>} scopes       A list of scopes from where the case can try to find\n   *                                    reusable parsers.\n   * @param {?Object}      context      Custom context information about the error that can be sent\n   *                                    to the formatted error.\n   * @return {FormattedError}\n   * @throws {Error} If the parameters are extracted as named groups but the case's `parse`\n   *                 instructions were defined as an array.\n   * @throws {Error} If the parameters are extracted as a list but the case's `parse` instructions\n   *                 were defined as an object.\n   * @throws {Error} If the condition has a mix of named and unnamed groups.\n   * @access protected\n   * @ignore\n   */\n  _parseError(errorMessage, scopes, context) {\n    let result;\n    const extracted = this._extractParameters(errorMessage);\n    if (extracted.groups) {\n      if (this._parseAsGroups) {\n        result = this._parseGroups(extracted.groups, scopes, context);\n      } else {\n        throw new Error(\n          `The condition for the case '${this._name}' returned groups, but the 'parse' ` +\n          'instructions were set on an \\'array\\' format'\n        );\n      }\n    } else if (extracted.matches.length) {\n      if (this._parseAsGroups) {\n        throw new Error(\n          `The condition for the case '${this._name}' didn't return groups, but the 'parse' ` +\n          'instructions were set on an \\'object\\' format'\n        );\n      } else {\n        result = this._parseList(extracted.matches, scopes, context);\n      }\n    } else {\n      result = this._createError(this._message(), [], context);\n    }\n\n    return result;\n  }\n  /**\n   * Parses named groups extracted from the case condition expression.\n   * @param {Object}       groups  The named groups.\n   * @param {Array<Scope>} scopes  A list of scopes from where the case can try to find\n   *                               reusable parsers.\n   * @param {?Object}      context Custom context information about the error that can be sent\n   *                               to the formatted error.\n   *\n   * @return {Object} The new parameters, also named.\n   * @access protected\n   * @ignore\n   */\n  _parseGroups(groups, scopes, context) {\n    const params = Object.keys(groups).reduce(\n      (newParams, name) => {\n        const value = groups[name];\n        const parsers = this._parse[name];\n        let newValue;\n        if (parsers) {\n          newValue = parsers.reduce(\n            (currentValue, parser) => this._parseValue(parser, currentValue, scopes),\n            value\n          );\n        } else {\n          newValue = value;\n        }\n\n        return Object.assign({}, newParams, {\n          [name]: newValue,\n        });\n      },\n      {}\n    );\n\n    const message = this._message(params);\n    return this._createError(message, params, context);\n  }\n  /**\n   * Parses a list of parameters extracted from the case condition expression.\n   * @param {Array<String>}  list   The list of parameters to parse.\n   * @param {Array<Scope>}   scopes A list of scopes from where the case can try to find\n   *                                reusable parsers.\n   * @param {?Object}      context  Custom context information about the error that can be sent\n   *                                to the formatted error.\n   *\n   * @return {Array}\n   * @access protected\n   * @ignore\n   */\n  _parseList(list, scopes, context) {\n    const params = list.map((value, index) => {\n      const parsers = this._parse[index];\n      let newValue;\n      if (parsers) {\n        newValue = parsers.reduce(\n          (currentValue, parser) => this._parseValue(parser, currentValue, scopes),\n          value\n        );\n      } else {\n        newValue = value;\n      }\n\n      return newValue;\n    });\n\n    const message = this._message(...params);\n    return this._createError(message, params, context);\n  }\n  /**\n   * Parses a single value using a given parser. The reason this is wrapped in a method is\n   * because this functionality is independant of the type of parameters extracted (named or\n   * unnamed groups).\n   * @param {String|CaseParser} parser The name of a parser the needs to be found on the scopes or\n   *                                   an actual parser to format the value.\n   * @param {*}                 value  The value to parse.\n   * @param {Array<Scope>}      scopes A list of scopes where parsers can be found.\n   * @return {*} The parsed value.\n   * @throws {Error} If the parser is a `string` and a parser with that name can't be found in any\n   *                 of the scopes.\n   * @access protected\n   * @ignore\n   */\n  _parseValue(parser, value, scopes) {\n    let result;\n    if (typeof parser === 'string') {\n      let scopeParser;\n      scopes.some((scope) => {\n        scopeParser = scope.getParser(parser, false);\n        return scopeParser;\n      });\n\n      if (scopeParser) {\n        result = scopeParser.parse(value);\n      } else {\n        throw new Error(\n          `No parser with the name of '${parser}' could be found for the ` +\n          `case '${this._name}'`\n        );\n      }\n    } else {\n      result = parser.parse(value);\n    }\n\n    return result;\n  }\n  /**\n   * Creates a new instance of the {@link FormattedError} using the class sent on the case's\n   * `constructor` options.\n   * @param {String}       message  The error message.\n   * @param {Object|Array} params   The parsed parameters Parserror found. When parsing a\n   *                                case that uses named groups, the parameters are stored\n   *                                on an `object`; otherwise, they'll be an `array`.\n   * @param {?Object}      context  Any extra context information for the error.\n   * @return {FormattedError}\n   * @access protected\n   * @ignore\n   */\n  _createError(message, params, context) {\n    const { FormattedErrorClass } = this._options;\n    return new FormattedErrorClass(message, params, context);\n  }\n  /**\n   * Validates if one on the case's definition required properties is missing.\n   * @param {ErrorCaseDefinition} definition The case definition settings.\n   * @throws {Error} If one of the properties is missing.\n   * @access protected\n   * @ignore\n   */\n  _validateMissingProperties(definition) {\n    const missing = [\n      'name',\n      'condition',\n      'message',\n    ]\n    .find((property) => typeof definition[property] === 'undefined');\n    if (missing && (missing !== 'message' || !definition.useOriginal)) {\n      throw new Error(`The '${missing}' property is required on a case definition`);\n    }\n  }\n  /**\n   * Validates that the name the class intends to use is a `string`.\n   * @param {String} name The name to validate.\n   * @return {String}\n   * @throws {TypeError} If the `name` is not a string.\n   * @access protected\n   * @ignore\n   */\n  _validateName(name) {\n    if (typeof name !== 'string') {\n      throw new TypeError('The \\'name\\' can only be a \\'string\\'');\n    }\n\n    return name;\n  }\n  /**\n   * Validates whether something can be used as the case's message.\n   * @param {String|ErrorCaseMessage} message The value intended to be the case's message.\n   * @return {ErrorCaseMessage}\n   * @throws {Error} If the message is not a `function` nor a `string`.\n   * @access protected\n   * @ignore\n   */\n  _validateMessage(message) {\n    let result;\n    const type = typeof message;\n    if (type === 'string') {\n      result = () => message;\n    } else if (type === 'function') {\n      result = message;\n    } else {\n      throw new TypeError(\n        `'${this._name}': 'message' can only be a 'string' or a 'function'`\n      );\n    }\n\n    return result;\n  }\n  /**\n   * Validates whether something can be used as the case's condition.\n   * @param {String|RegExp} condition The value intended to be the case's condition.\n   * @return {RegExp}\n   * @throws {Error} If the condition is not a `string` nor a `RegExp`.\n   * @access protected\n   * @ignore\n   */\n  _validateCondition(condition) {\n    let result;\n    if (typeof condition === 'string') {\n      result = new RegExp(Utils.escapeForRegExp(condition));\n    } else if (condition instanceof RegExp) {\n      result = condition;\n    } else {\n      throw new TypeError(\n        `'${this._name}': 'condition' can only be a 'string' or a 'RegExp'`\n      );\n    }\n\n    return result;\n  }\n  /**\n   * Validates a dictionary of parsers so it can be used by the case.\n   * @param {?Object} parsers A dictionary of reusable parsers.\n   * @return {Object}\n   * @throws {Error} If `parsers` is not an object.\n   * @throws {Error} If a a value insde a parser is not an instance of {@link CaseParserClass},\n   *                 an `object` nor a `function`.\n   * @access protected\n   * @ignore\n   */\n  _validateParsers(parsers) {\n    let result;\n    if (parsers) {\n      if (!Utils.isObject(parsers)) {\n        throw new TypeError(`'${this._name}': 'parsers' can only be an 'object'`);\n      }\n\n      const { CaseParserClass } = this._options;\n      result = Object.keys(parsers).reduce(\n        (newParsers, name) => Object.assign({}, newParsers, {\n          [name]: this._validateParser(name, parsers[name], CaseParserClass),\n        }),\n        {}\n      );\n    } else {\n      result = {};\n    }\n\n    return result;\n  }\n  /**\n   * Validates and normalizes a parser intended to be used in the case.\n   * @param {String}                          name             The name of the parser.\n   * @param {CaseParserClass|Object|Function} parser           The parser definition.\n   * @param {Class<CaseParser>}               CaseParserClass  To compare if the parser definition\n   *                                                           is `instaceof`.\n   * @return {CaseParserClass}\n   * @throws {Error} If the `parser` is not an instance of {@link CaseParserClass}, an `object`\n   *                 nor a `function`.\n   * @access protected\n   * @ignore\n   */\n  _validateParser(name, parser, CaseParserClass) {\n    let result;\n    if (parser instanceof CaseParserClass) {\n      result = parser;\n    } else {\n      const isObject = Utils.isObject(parser);\n      if (isObject || typeof parser === 'function') {\n        result = new CaseParserClass(name, parser);\n      } else {\n        throw new TypeError(\n          `'${this._name}' - '${name}': a parser can only be a 'function' or an 'object'`\n        );\n      }\n    }\n\n    return result;\n  }\n  /**\n   * Validates and normalizes the parse instructions for the case.\n   * @param {?Array|?Object} parse The list/map of instructions to validate.\n   * @return {Array|Object}\n   * @throws {Error} If the instructions are not an `array` nor an `object`.\n   * @throws {Error} If an instruction is not a `function`, a `string` or an `array`.\n   * @access protected\n   * @ignore\n   */\n  _validateParseInstructions(parse) {\n    let result;\n    if (parse) {\n      const { CaseParserClass } = this._options;\n      if (Array.isArray(parse)) {\n        result = parse.map((instruction, index) => Utils.ensureArray(\n          this._validateParseInstruction(\n            `${this._name}-parser-${index}`,\n            instruction,\n            CaseParserClass\n          )\n        ));\n      } else if (Utils.isObject(parse)) {\n        result = Object.keys(parse).reduce(\n          (newParse, parameterName) => Object.assign({}, newParse, {\n            [parameterName]: Utils.ensureArray(\n              this._validateParseInstruction(\n                `${this._name}-parser-${parameterName}`,\n                parse[parameterName],\n                CaseParserClass\n              )\n            ),\n          }),\n          {}\n        );\n      } else {\n        throw new TypeError(\n          `'${this._name}': 'parse' can only be an 'array' or an 'object'`\n        );\n      }\n    } else {\n      result = [];\n    }\n\n    return result;\n  }\n  /**\n   * Validates and normalizes a single parse instruction.\n   * @param {String}                id              The ID of the instruction. Internally generated\n   *                                                by the case in order to have some reference\n   *                                                for error messages.\n   * @param {function|String|Array} instruction     The instruction to validate.\n   * @param {Class<CaseParser>}     CaseParserClass The class used to create new parsers. If the\n   *                                                instruction is a function, it will be converted\n   *                                                into a parser.\n   * @return {function|String|Array}\n   * @throws {Error} If the instruction is not a `function`, a `string` or an `array`.\n   * @access protected\n   * @ignore\n   */\n  _validateParseInstruction(id, instruction, CaseParserClass) {\n    let result;\n    const type = typeof instruction;\n    if (type === 'function') {\n      result = new CaseParserClass(id, instruction);\n    } else if (type === 'string') {\n      if (this._parsers[instruction]) {\n        result = this._parsers[instruction];\n      } else {\n        result = instruction;\n      }\n    } else if (Array.isArray(instruction)) {\n      result = instruction.map((item, index) => this._validateParseInstruction(\n        `${id}-sub-${index}`,\n        item,\n        CaseParserClass\n      ));\n    } else {\n      throw new TypeError(\n        `'${this._name}': a 'parse' instruction can only be ` +\n        'an \\'array\\', a \\'function\\' or a \\'string\\''\n      );\n    }\n\n    return result;\n  }\n  /**\n   * Extracts the parameters from an error message using the case condition.\n   * @param {String} errorMessage The message from where the parameters will be extracted.\n   * @return {Object}           Only one of the properties will be returned\n   * @property {?Array} matches If the expression extracted unnamed groups, this will be a list of\n   *                            them.\n   * @property {?Object} groups If the expression extracted named groups, this will be the\n   *                            dictionary with them.\n   * @throws {Error} If there's a mix of named and unnamed groups on the condition.\n   * @access protected\n   * @ignore\n   */\n  _extractParameters(errorMessage) {\n    const match = Utils.execRegExp(this._condition, errorMessage);\n    let result;\n    const matches = match.slice().filter((item) => typeof item !== 'undefined');\n    matches.shift();\n    if (match.groups) {\n      const groups = Object.assign({}, match.groups);\n      const groupsLength = Object.keys(groups).length;\n      if (groupsLength) {\n        if (groupsLength !== matches.length) {\n          throw new Error(\n            `The condition for the case '${this._name}' is trying to extract parameters as ` +\n            'named and unnamed groups, only one method is allowed'\n          );\n        } else {\n          result = { groups };\n        }\n      } else {\n        result = { matches };\n      }\n    } else {\n      result = { matches };\n    }\n\n    return result;\n  }\n}\n\nmodule.exports = ErrorCase;\n",
     "static": true,
     "longname": "/Users/homer0/CODE/shared/parserror/src/errorCase.js",
     "access": "public",
@@ -979,7 +979,7 @@
         "spread": false,
         "optional": false,
         "name": "message",
-        "description": "The formatted message or the `function` that\n                                                 generates one."
+        "description": "The formatted message or the `function` that generates one."
       },
       {
         "nullable": null,
@@ -990,7 +990,7 @@
         "spread": false,
         "optional": false,
         "name": "condition",
-        "description": "A `string` or a expression to match against an\n                                                 error that could be parsed."
+        "description": "A `string` or a expression to match against an error that could be parsed."
       },
       {
         "nullable": true,
@@ -1000,7 +1000,7 @@
         "spread": false,
         "optional": false,
         "name": "parsers",
-        "description": "A map of reusable parsers. Each parser can be\n                                                 an `object` map, a `function` or an instance of\n                                                 {@link CaseParser}."
+        "description": "A map of reusable parsers. Each parser can be an `object` map, a `function` or an instance of\n{@link CaseParser}."
       },
       {
         "nullable": true,
@@ -1010,7 +1010,17 @@
         "spread": false,
         "optional": false,
         "name": "parse",
-        "description": "A list of parsers the case should use on\n                                                 extracted parameters. Each item of the list can\n                                                 be either the name of a parser defined on\n                                                 `parsers`, the name of a parser on the scope,\n                                                 a `function` to parse a value, or an `array` of\n                                                 all the thing previously mentioned."
+        "description": "A list of parsers the case should use on extracted parameters. Each item of the list can be\neither the name of a parser defined on `parsers`, the name of a parser on the scope, a\n`function` to parse a value, or an `array` of all the thing previously mentioned."
+      },
+      {
+        "nullable": true,
+        "types": [
+          "Boolean"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "useOriginal",
+        "description": "Whether or not the case should use the original message when matched."
       }
     ],
     "type": {
@@ -1078,7 +1088,7 @@
     "importPath": "parserror/src/errorCase.js",
     "importStyle": "ErrorCase",
     "description": "The core object of Parserror. A case is like a \"service\" that validates if an error message\nmatches its `condition` and, if defined, runs multiple parsers in order to generate a new\nerror.",
-    "lineNumber": 43,
+    "lineNumber": 44,
     "interface": false
   },
   {
@@ -1092,7 +1102,7 @@
     "longname": "src/errorCase.js~ErrorCase#constructor",
     "access": "public",
     "description": "",
-    "lineNumber": 57,
+    "lineNumber": 58,
     "params": [
       {
         "nullable": null,
@@ -1171,7 +1181,7 @@
     "longname": "src/errorCase.js~ErrorCase#_options",
     "access": "protected",
     "description": "The options to customize how the class behaves.",
-    "lineNumber": 64,
+    "lineNumber": 65,
     "ignore": true,
     "type": {
       "nullable": null,
@@ -1191,7 +1201,7 @@
     "longname": "src/errorCase.js~ErrorCase#_name",
     "access": "protected",
     "description": "The case name.",
-    "lineNumber": 79,
+    "lineNumber": 80,
     "ignore": true,
     "type": {
       "nullable": null,
@@ -1205,93 +1215,13 @@
   {
     "__docId__": 70,
     "kind": "member",
-    "name": "_message",
+    "name": "_useOriginal",
     "memberof": "src/errorCase.js~ErrorCase",
     "static": false,
-    "longname": "src/errorCase.js~ErrorCase#_message",
+    "longname": "src/errorCase.js~ErrorCase#_useOriginal",
     "access": "protected",
-    "description": "The function that generates the formatted message.",
-    "lineNumber": 86,
-    "ignore": true,
-    "type": {
-      "nullable": null,
-      "types": [
-        "ErrorCaseMessage"
-      ],
-      "spread": false,
-      "description": null
-    }
-  },
-  {
-    "__docId__": 71,
-    "kind": "member",
-    "name": "_condition",
-    "memberof": "src/errorCase.js~ErrorCase",
-    "static": false,
-    "longname": "src/errorCase.js~ErrorCase#_condition",
-    "access": "protected",
-    "description": "The expression to validate if an error matches the case.",
-    "lineNumber": 93,
-    "ignore": true,
-    "type": {
-      "nullable": null,
-      "types": [
-        "RegExp"
-      ],
-      "spread": false,
-      "description": null
-    }
-  },
-  {
-    "__docId__": 72,
-    "kind": "member",
-    "name": "_parsers",
-    "memberof": "src/errorCase.js~ErrorCase",
-    "static": false,
-    "longname": "src/errorCase.js~ErrorCase#_parsers",
-    "access": "protected",
-    "description": "An object with all the parsers the case can make use of.",
-    "lineNumber": 100,
-    "ignore": true,
-    "type": {
-      "nullable": null,
-      "types": [
-        "Object"
-      ],
-      "spread": false,
-      "description": null
-    }
-  },
-  {
-    "__docId__": 73,
-    "kind": "member",
-    "name": "_parse",
-    "memberof": "src/errorCase.js~ErrorCase",
-    "static": false,
-    "longname": "src/errorCase.js~ErrorCase#_parse",
-    "access": "protected",
-    "description": "A list of the parse instructions the case can use on extracted parameters.",
-    "lineNumber": 107,
-    "ignore": true,
-    "type": {
-      "nullable": null,
-      "types": [
-        "Array"
-      ],
-      "spread": false,
-      "description": null
-    }
-  },
-  {
-    "__docId__": 74,
-    "kind": "member",
-    "name": "_parseAsGroups",
-    "memberof": "src/errorCase.js~ErrorCase",
-    "static": false,
-    "longname": "src/errorCase.js~ErrorCase#_parseAsGroups",
-    "access": "protected",
-    "description": "A flag to know whether the parse instructions where defined as an object (`true`) or\nan array (`false`). This is for when the condition uses named groups to extract\nparameters.",
-    "lineNumber": 116,
+    "description": "Whether or not the case should use the original message when matched.",
+    "lineNumber": 87,
     "ignore": true,
     "type": {
       "nullable": null,
@@ -1303,7 +1233,107 @@
     }
   },
   {
+    "__docId__": 71,
+    "kind": "member",
+    "name": "_message",
+    "memberof": "src/errorCase.js~ErrorCase",
+    "static": false,
+    "longname": "src/errorCase.js~ErrorCase#_message",
+    "access": "protected",
+    "description": "The function that generates the formatted message. If the case should use the original\nmessage, then the property will be `null`.",
+    "lineNumber": 95,
+    "ignore": true,
+    "type": {
+      "nullable": true,
+      "types": [
+        "ErrorCaseMessage"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 72,
+    "kind": "member",
+    "name": "_condition",
+    "memberof": "src/errorCase.js~ErrorCase",
+    "static": false,
+    "longname": "src/errorCase.js~ErrorCase#_condition",
+    "access": "protected",
+    "description": "The expression to validate if an error matches the case.",
+    "lineNumber": 102,
+    "ignore": true,
+    "type": {
+      "nullable": null,
+      "types": [
+        "RegExp"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 73,
+    "kind": "member",
+    "name": "_parsers",
+    "memberof": "src/errorCase.js~ErrorCase",
+    "static": false,
+    "longname": "src/errorCase.js~ErrorCase#_parsers",
+    "access": "protected",
+    "description": "An object with all the parsers the case can make use of.",
+    "lineNumber": 109,
+    "ignore": true,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Object"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 74,
+    "kind": "member",
+    "name": "_parse",
+    "memberof": "src/errorCase.js~ErrorCase",
+    "static": false,
+    "longname": "src/errorCase.js~ErrorCase#_parse",
+    "access": "protected",
+    "description": "A list of the parse instructions the case can use on extracted parameters.",
+    "lineNumber": 116,
+    "ignore": true,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Array"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
     "__docId__": 75,
+    "kind": "member",
+    "name": "_parseAsGroups",
+    "memberof": "src/errorCase.js~ErrorCase",
+    "static": false,
+    "longname": "src/errorCase.js~ErrorCase#_parseAsGroups",
+    "access": "protected",
+    "description": "A flag to know whether the parse instructions where defined as an object (`true`) or\nan array (`false`). This is for when the condition uses named groups to extract\nparameters.",
+    "lineNumber": 125,
+    "ignore": true,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Boolean"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 76,
     "kind": "method",
     "name": "parse",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1313,7 +1343,7 @@
     "longname": "src/errorCase.js~ErrorCase#parse",
     "access": "public",
     "description": "Validates an error message against the case condition and if it matches, it parses it in\norder to return a formatted error.",
-    "lineNumber": 135,
+    "lineNumber": 144,
     "params": [
       {
         "nullable": null,
@@ -1386,7 +1416,7 @@
     ]
   },
   {
-    "__docId__": 76,
+    "__docId__": 77,
     "kind": "get",
     "name": "name",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1396,7 +1426,7 @@
     "longname": "src/errorCase.js~ErrorCase#name",
     "access": "public",
     "description": "The case name.",
-    "lineNumber": 149,
+    "lineNumber": 160,
     "type": {
       "nullable": null,
       "types": [
@@ -1407,7 +1437,7 @@
     }
   },
   {
-    "__docId__": 77,
+    "__docId__": 78,
     "kind": "method",
     "name": "_parseError",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1417,7 +1447,7 @@
     "longname": "src/errorCase.js~ErrorCase#_parseError",
     "access": "protected",
     "description": "The actual method that parses an error message once it matches the case condition.",
-    "lineNumber": 168,
+    "lineNumber": 179,
     "ignore": true,
     "params": [
       {
@@ -1481,7 +1511,7 @@
     ]
   },
   {
-    "__docId__": 78,
+    "__docId__": 79,
     "kind": "method",
     "name": "_parseGroups",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1491,7 +1521,7 @@
     "longname": "src/errorCase.js~ErrorCase#_parseGroups",
     "access": "protected",
     "description": "Parses named groups extracted from the case condition expression.",
-    "lineNumber": 207,
+    "lineNumber": 218,
     "ignore": true,
     "params": [
       {
@@ -1535,7 +1565,7 @@
     }
   },
   {
-    "__docId__": 79,
+    "__docId__": 80,
     "kind": "method",
     "name": "_parseList",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1545,7 +1575,7 @@
     "longname": "src/errorCase.js~ErrorCase#_parseList",
     "access": "protected",
     "description": "Parses a list of parameters extracted from the case condition expression.",
-    "lineNumber": 244,
+    "lineNumber": 255,
     "ignore": true,
     "params": [
       {
@@ -1589,7 +1619,7 @@
     }
   },
   {
-    "__docId__": 80,
+    "__docId__": 81,
     "kind": "method",
     "name": "_parseValue",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1599,7 +1629,7 @@
     "longname": "src/errorCase.js~ErrorCase#_parseValue",
     "access": "protected",
     "description": "Parses a single value using a given parser. The reason this is wrapped in a method is\nbecause this functionality is independant of the type of parameters extracted (named or\nunnamed groups).",
-    "lineNumber": 277,
+    "lineNumber": 288,
     "ignore": true,
     "params": [
       {
@@ -1652,7 +1682,7 @@
     ]
   },
   {
-    "__docId__": 81,
+    "__docId__": 82,
     "kind": "method",
     "name": "_createError",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1662,7 +1692,7 @@
     "longname": "src/errorCase.js~ErrorCase#_createError",
     "access": "protected",
     "description": "Creates a new instance of the {@link FormattedError} using the class sent on the case's\n`constructor` options.",
-    "lineNumber": 312,
+    "lineNumber": 323,
     "ignore": true,
     "params": [
       {
@@ -1707,7 +1737,7 @@
     }
   },
   {
-    "__docId__": 82,
+    "__docId__": 83,
     "kind": "method",
     "name": "_validateMissingProperties",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1717,7 +1747,7 @@
     "longname": "src/errorCase.js~ErrorCase#_validateMissingProperties",
     "access": "protected",
     "description": "Validates if one on the case's definition required properties is missing.",
-    "lineNumber": 323,
+    "lineNumber": 334,
     "ignore": true,
     "params": [
       {
@@ -1742,7 +1772,7 @@
     "return": null
   },
   {
-    "__docId__": 83,
+    "__docId__": 84,
     "kind": "method",
     "name": "_validateName",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1752,7 +1782,7 @@
     "longname": "src/errorCase.js~ErrorCase#_validateName",
     "access": "protected",
     "description": "Validates that the name the class intends to use is a `string`.",
-    "lineNumber": 342,
+    "lineNumber": 353,
     "ignore": true,
     "params": [
       {
@@ -1784,7 +1814,7 @@
     ]
   },
   {
-    "__docId__": 84,
+    "__docId__": 85,
     "kind": "method",
     "name": "_validateMessage",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1794,7 +1824,7 @@
     "longname": "src/errorCase.js~ErrorCase#_validateMessage",
     "access": "protected",
     "description": "Validates whether something can be used as the case's message.",
-    "lineNumber": 357,
+    "lineNumber": 368,
     "ignore": true,
     "params": [
       {
@@ -1827,7 +1857,7 @@
     ]
   },
   {
-    "__docId__": 85,
+    "__docId__": 86,
     "kind": "method",
     "name": "_validateCondition",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1837,7 +1867,7 @@
     "longname": "src/errorCase.js~ErrorCase#_validateCondition",
     "access": "protected",
     "description": "Validates whether something can be used as the case's condition.",
-    "lineNumber": 380,
+    "lineNumber": 391,
     "ignore": true,
     "params": [
       {
@@ -1870,7 +1900,7 @@
     ]
   },
   {
-    "__docId__": 86,
+    "__docId__": 87,
     "kind": "method",
     "name": "_validateParsers",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1880,7 +1910,7 @@
     "longname": "src/errorCase.js~ErrorCase#_validateParsers",
     "access": "protected",
     "description": "Validates a dictionary of parsers so it can be used by the case.",
-    "lineNumber": 404,
+    "lineNumber": 415,
     "ignore": true,
     "params": [
       {
@@ -1918,7 +1948,7 @@
     ]
   },
   {
-    "__docId__": 87,
+    "__docId__": 88,
     "kind": "method",
     "name": "_validateParser",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1928,7 +1958,7 @@
     "longname": "src/errorCase.js~ErrorCase#_validateParser",
     "access": "protected",
     "description": "Validates and normalizes a parser intended to be used in the case.",
-    "lineNumber": 436,
+    "lineNumber": 447,
     "ignore": true,
     "params": [
       {
@@ -1982,7 +2012,7 @@
     ]
   },
   {
-    "__docId__": 88,
+    "__docId__": 89,
     "kind": "method",
     "name": "_validateParseInstructions",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -1992,7 +2022,7 @@
     "longname": "src/errorCase.js~ErrorCase#_validateParseInstructions",
     "access": "protected",
     "description": "Validates and normalizes the parse instructions for the case.",
-    "lineNumber": 462,
+    "lineNumber": 473,
     "ignore": true,
     "params": [
       {
@@ -2032,7 +2062,7 @@
     ]
   },
   {
-    "__docId__": 89,
+    "__docId__": 90,
     "kind": "method",
     "name": "_validateParseInstruction",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -2042,7 +2072,7 @@
     "longname": "src/errorCase.js~ErrorCase#_validateParseInstruction",
     "access": "protected",
     "description": "Validates and normalizes a single parse instruction.",
-    "lineNumber": 512,
+    "lineNumber": 523,
     "ignore": true,
     "params": [
       {
@@ -2098,7 +2128,7 @@
     ]
   },
   {
-    "__docId__": 90,
+    "__docId__": 91,
     "kind": "method",
     "name": "_extractParameters",
     "memberof": "src/errorCase.js~ErrorCase",
@@ -2108,7 +2138,7 @@
     "longname": "src/errorCase.js~ErrorCase#_extractParameters",
     "access": "protected",
     "description": "Extracts the parameters from an error message using the case condition.",
-    "lineNumber": 550,
+    "lineNumber": 561,
     "ignore": true,
     "params": [
       {
@@ -2162,7 +2192,7 @@
     ]
   },
   {
-    "__docId__": 91,
+    "__docId__": 92,
     "kind": "file",
     "name": "src/formattedError.js",
     "content": "/**\n * A custom version of `Error` so the Parserror can store the parsing parameters and some\n * context information.\n * @extends {Error}\n */\nclass FormattedError extends Error {\n  /**\n   * @param {String}       message        The error message.\n   * @param {Object|Array} [params={}]    The parsed parameters Parserror found. When parsing a\n   *                                      case that uses named groups, the parameters are stored\n   *                                      on an `object`; otherwise, they'll be an `array`.\n   * @param {?Object}      [context=null] Any extra context information for the error.\n   */\n  constructor(message, params = {}, context = null) {\n    super(message);\n    /**\n     * The parsed parameters Parserror found. When parsing a case that uses named groups, the\n     * parameters are stored on an `object`; otherwise, they'll be an `array`\n     * @type {Object|Array}\n     */\n    this.params = Object.freeze(params);\n    /**\n     * Any extra context information for the error.\n     * @type {Object}\n     */\n    this.context = Object.freeze(context || {});\n\n    if (Error.captureStackTrace) {\n      Error.captureStackTrace(this, this.constructor);\n    }\n  }\n}\n\nmodule.exports = FormattedError;\n",
@@ -2173,7 +2203,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 92,
+    "__docId__": 93,
     "kind": "class",
     "name": "FormattedError",
     "memberof": "src/formattedError.js",
@@ -2191,7 +2221,7 @@
     ]
   },
   {
-    "__docId__": 93,
+    "__docId__": 94,
     "kind": "constructor",
     "name": "constructor",
     "memberof": "src/formattedError.js~FormattedError",
@@ -2241,7 +2271,7 @@
     ]
   },
   {
-    "__docId__": 94,
+    "__docId__": 95,
     "kind": "member",
     "name": "params",
     "memberof": "src/formattedError.js~FormattedError",
@@ -2261,7 +2291,7 @@
     }
   },
   {
-    "__docId__": 95,
+    "__docId__": 96,
     "kind": "member",
     "name": "context",
     "memberof": "src/formattedError.js~FormattedError",
@@ -2280,7 +2310,7 @@
     }
   },
   {
-    "__docId__": 96,
+    "__docId__": 97,
     "kind": "file",
     "name": "src/index.js",
     "content": "module.exports = require('./parserror');\n",
@@ -2291,7 +2321,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 97,
+    "__docId__": 98,
     "kind": "file",
     "name": "src/lib.js",
     "content": "const CaseParser = require('./caseParser');\nconst ErrorCase = require('./errorCase');\nconst FormattedError = require('./formattedError');\nconst Parserror = require('./parserror');\nconst Scope = require('./scope');\nconst Utils = require('./utils');\n\nmodule.exports = {\n  CaseParser,\n  ErrorCase,\n  FormattedError,\n  Parserror,\n  Scope,\n  Utils,\n};\n",
@@ -2302,10 +2332,10 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 98,
+    "__docId__": 99,
     "kind": "file",
     "name": "src/parserror.js",
-    "content": "const CaseParser = require('./caseParser');\nconst ErrorCase = require('./errorCase');\nconst FormattedError = require('./formattedError');\nconst Scope = require('./scope');\nconst Utils = require('./utils');\n\n/**\n * @typedef {Object} ParserrorOptions\n * @description The options to customize how the class behaves.\n * @property {Class<CaseParser>}     CaseParserClass        The class that will be used to create\n *                                                          parsers. It will also be sent down to\n *                                                          every case that gets created, on its\n *                                                          `option` parameter.\n * @property {Class<ErrorCase>}      ErrorCaseClass         The class that will be used to create\n *                                                          cases.\n * @property {Class<FormattedError>} FormattedErrorClass    The class that will be used to create\n *                                                          formatted errors. It will also be sent\n *                                                          down to every case that gets created,\n *                                                          on its `options` parameter.\n * @property {Class<Scope>}          ScopeClass             The class that will be used to create\n *                                                          scopes.\n * @property {Array<String>}         errorContextProperties A list of properties the class will try\n *                                                          to find on given errors in order to use\n *                                                          as context information for\n *                                                          {@link ErrorCase} and\n *                                                          {@link FormattedError}.\n */\n\n/**\n * @typdef {Object} ParserrorErrorObject\n * @description An object with a signature similar to an {@link Error} that {@link Parserror}\n *              can parse.\n * @property {String} message The error message.\n */\n\n/**\n * @typedef {Object} ParserrorParseOptions\n * @description The options that can be used to customize how {@link Parserror#parse} works.\n * @property {Array<String>} cases  A list of specific cases it should validated against.\n * @property {Array<String>} scopes A list of specific scopes it should use to valdiate the error.\n */\n\n/**\n * @typedef {function} ParserrorWrapper\n * @description A pre configured parser to format errors with specific cases and/or scopes.\n * @param {Error|String|ParserrorErrorObject} error The error to parse.\n * @return {FormattedError}\n */\n\n/**\n * The main class of the library. It allows you to create cases, parsers and scopes.\n */\nclass Parserror {\n  /**\n   * Create a new instance of {@link Parserror}.\n   * @param {ParserrorOptions} [options] The options to customize how the class behaves.\n   * @return {Parserror}\n   */\n  static new(options) {\n    return new Parserror(options);\n  }\n  /**\n   * @param {ParserrorOptions} [options={}] The options to customize how the class behaves.\n   */\n  constructor(options = {}) {\n    /**\n     * The options to customize how the class behaves.\n     * @type {ParserrorOptions}\n     * @access protected\n     * @ignore\n     */\n    this._options = Object.assign(\n      {\n        CaseParserClass: CaseParser,\n        ErrorCaseClass: ErrorCase,\n        FormattedErrorClass: FormattedError,\n        ScopeClass: Scope,\n        errorContextProperties: ['context', 'response', 'data'],\n      },\n      options\n    );\n    /**\n     * The name of the global scope where the cases and parsers are added by default.\n     * @type {String}\n     * @access protected\n     * @ignore\n     */\n    this._globalScopeName = 'global';\n    /**\n     * A dictionary with the available scopes.\n     * @type {Object}\n     * @access protected\n     * @ignore\n     */\n    this._scopes = {};\n\n    this.addScope(this._globalScopeName);\n  }\n  /**\n   * Add a new error case.\n   * @param {ErrorCaseDefinition} definition The case definition settings.\n   * @param {?String}             scope      The name of the scope where the case should be added.\n   *                                         If not defined, it will be added to the global scope.\n   * @return {Parserror} For chaining purposes.\n   */\n  addCase(definition, scope = null) {\n    const scopeName = definition.scope || scope || this._globalScopeName;\n    const useScope = this.getScope(scopeName);\n    const {\n      ErrorCaseClass,\n      CaseParserClass,\n      FormattedErrorClass,\n    } = this._options;\n\n    useScope.addCase(new ErrorCaseClass(definition, {\n      CaseParserClass,\n      FormattedErrorClass,\n    }));\n\n    return this;\n  }\n  /**\n   * Adds a list of error cases.\n   * @param {Array<ErrorCaseDefinition>} definitions The cases' definitions.\n   * @param {?String}                    scope       The name of the scope where the cases should\n   *                                                 be added. If not defined, they will be added\n   *                                                 to the global scope.\n   * @return {Parserror} For chaining purposes.\n   */\n  addCases(definitions, scope = null) {\n    Utils.ensureArray(definitions).forEach((definition) => {\n      this.addCase(definition, scope);\n    });\n\n    return this;\n  }\n  /**\n   * Adds a reusable parser.\n   * @param {String}           name   The name of the parser.\n   * @param {Object|Function}  parser The parser function or map (see {@link CaseParser}).\n   * @param {?String}          scope  The name of the scope where the parser should be added. If\n   *                                  not defined, it will be added to the global scope.\n   * @return {Parserror} For chaining purposes.\n   */\n  addParser(name, parser, scope = null) {\n    const scopeName = scope || this._globalScopeName;\n    const useScope = this.getScope(scopeName);\n    const { CaseParserClass } = this._options;\n    useScope.addParser(new CaseParserClass(name, parser));\n    return this;\n  }\n  /**\n   * Gets a scope by its name.\n   * @param {String} name          The name of the scope.\n   * @param {[type]} [create=true] If `true` and the scope doesn't exist, it will try to create it.\n   * @return {Scope}\n   * @throws {Error} If `create` is `false` and the scope doesn't exist.\n   */\n  getScope(name, create = true) {\n    let scope = this._scopes[name];\n    if (!scope) {\n      if (create) {\n        this.addScope(name);\n        scope = this._scopes[name];\n      } else {\n        throw new Error(`The scope '${name}' doesn't exist`);\n      }\n    }\n\n    return scope;\n  }\n  /**\n   * Creates a new scope.\n   * @param {String}                      name              The name of the scope.\n   * @param {Array<ErrorCaseDefinition>}  cases             A list of cases' defintions to add.\n   * @param {Boolean}                     [overwrite=false] If there's a scope with the same name\n   *                                                        already, using this flag allows you to\n   *                                                        overwrite it.\n   * @return {Parserror} For chaining purposes.\n   * @throws {Error} If `overwrite` is `false` and there's already a scope with the same name.\n   */\n  addScope(name, cases = [], overwrite = false) {\n    if (this._scopes[name]) {\n      if (overwrite) {\n        this.removeScope(name);\n      } else {\n        throw new Error(\n          `The scope '${name}' already exists. You can use 'removeScope' ` +\n          'to remove it first, or set the \\'overwrite\\' parameter to \\'true\\''\n        );\n      }\n    }\n\n    const { ScopeClass } = this._options;\n    this._scopes[name] = new ScopeClass(name);\n\n    if (cases.length) {\n      this.addCases(cases, name);\n    }\n\n    return this;\n  }\n  /**\n   * Removes a scope.\n   * @param {String} name The name of the scope to remove.\n   * @throws {Error} If you try to remove the global scope.\n   */\n  removeScope(name) {\n    if (name === this._globalScopeName) {\n      throw new Error('You can\\'t delete the global scope');\n    }\n\n    delete this._scopes[name];\n  }\n  /**\n   * Parses and formats an error.\n   * @param {Error|String|ParserrorErrorObject} error        The error to parse.\n   * @param {ParserrorParseOptions}             [options={}] Options to customize how the parsing\n   *                                                         is done.\n   * @return {FormattedError}\n   * @throws {TypeError} If `error` is not an {@link Error}, a string or a\n   *                     {@link ParserrorErrorObject}.\n   */\n  parse(error, options = {}) {\n    const useOptions = Object.assign(\n      {\n        cases: [],\n        scopes: [],\n      },\n      options\n    );\n\n    this._validateParseOptions(useOptions);\n\n    let context;\n    let message;\n    if (typeof error === 'string') {\n      message = error;\n      context = null;\n    } else if (\n      error instanceof Error ||\n      (\n        Utils.isObject(error) &&\n        typeof error.message === 'string'\n      )\n    ) {\n      ({ message } = error);\n      context = this._searchForContext(error);\n    } else {\n      throw new TypeError(\n        '\\'parse\\' can only handle error messages (\\'string\\'), ' +\n        'native errors (\\'Error\\') or literal objects (\\'object\\') with a ' +\n        '\\'message\\' property\\''\n      );\n    }\n\n    const globalScope = this.getScope(this._globalScopeName);\n    let includesGlobalScope = useOptions.scopes.includes(this._globalScopeName);\n    let useCases;\n    if (useOptions.cases.length) {\n      if (includesGlobalScope) {\n        useCases = [];\n      } else {\n        useCases = useOptions.cases.map((name) => globalScope.getCase(name));\n      }\n    } else {\n      if (!includesGlobalScope) {\n        includesGlobalScope = true;\n        useOptions.scopes.push(this._globalScopeName);\n      }\n\n      useCases = [];\n    }\n\n    const scopes = useOptions.scopes.map((scope) => this.getScope(scope));\n\n    const scopesCases = scopes\n    .map((scope) => scope.getCases())\n    .reduce((newList, cases) => [...newList, ...cases], []);\n\n    const cases = [\n      ...useCases,\n      ...scopesCases,\n    ];\n\n    const scopesForCases = includesGlobalScope ?\n      scopes :\n      [...scopes, globalScope];\n\n    let newError;\n    cases.some((theCase) => {\n      newError = theCase.parse(message, scopesForCases, context);\n      return newError;\n    });\n\n    let result;\n    if (newError) {\n      result = newError;\n    } else {\n      const { FormattedErrorClass } = this._options;\n      result = new FormattedErrorClass(message, {}, { original: true });\n    }\n\n    return result;\n  }\n  /**\n   * Creates a wrapper: a pre configured parser to format errors with specific cases and/or\n   * scopes.\n   * @param {Array<String>} cases  A list of cases' names.\n   * @param {Array<String>} scopes A list of scopes' names.\n   * @return {ParserrorWrapper}\n   */\n  wrap(cases = [], scopes = []) {\n    return (error) => this.parse(error, ({\n      cases,\n      scopes,\n    }));\n  }\n  /**\n   * Creates a wrapper for specific scopes. A wrapper is a pre configured parser to format errors\n   * with specific cases and/or scopes.\n   * @param {Array<String>} scopes A list of scopes' names.\n   * @return {ParserrorWrapper}\n   */\n  wrapForScopes(scopes) {\n    return (error) => this.parse(error, {\n      scopes,\n    });\n  }\n  /**\n   * The name of the global scope.\n   * @type {String}\n   */\n  get globalScopeName() {\n    return this._globalScopeName;\n  }\n  /**\n   * Validates an object to ensure it can be used as {@link ParserrorParseOptions}.\n   * @param {Object} options The object to validate.\n   * @throws {TypeError} If the `cases` property is not an `array`.\n   * @throws {TypeError} If the `scopes` property is not an `array`.\n   * @access protected\n   * @ignore\n   */\n  _validateParseOptions(options) {\n    if (!Array.isArray(options.cases)) {\n      throw new TypeError('The \\'cases\\' option can only be an \\'array\\'');\n    } else if (!Array.isArray(options.scopes)) {\n      throw new TypeError('The \\'scopes\\' option can only be an \\'array\\'');\n    }\n  }\n  /**\n   * Tries to find a property inside an error to be used as context information for the parsers.\n   * @param {Error|ParserrorErrorObject} error The error where the method will look for the\n   *                                           property.\n   * @return {?Object}\n   * @access protected\n   * @ignore\n   */\n  _searchForContext(error) {\n    const useProperty = this._options.errorContextProperties\n    .find((property) => typeof error[property] !== 'undefined');\n\n    return useProperty ? error[useProperty] : null;\n  }\n}\n\nmodule.exports = Parserror;\n",
+    "content": "const CaseParser = require('./caseParser');\nconst ErrorCase = require('./errorCase');\nconst FormattedError = require('./formattedError');\nconst Scope = require('./scope');\nconst Utils = require('./utils');\n\n/**\n * @typedef {Object} ParserrorOptions\n * @description The options to customize how the class behaves.\n * @property {Class<CaseParser>}     CaseParserClass        The class that will be used to create\n *                                                          parsers. It will also be sent down to\n *                                                          every case that gets created, on its\n *                                                          `option` parameter.\n * @property {Class<ErrorCase>}      ErrorCaseClass         The class that will be used to create\n *                                                          cases.\n * @property {Class<FormattedError>} FormattedErrorClass    The class that will be used to create\n *                                                          formatted errors. It will also be sent\n *                                                          down to every case that gets created,\n *                                                          on its `options` parameter.\n * @property {Class<Scope>}          ScopeClass             The class that will be used to create\n *                                                          scopes.\n * @property {Array<String>}         errorContextProperties A list of properties the class will try\n *                                                          to find on given errors in order to use\n *                                                          as context information for\n *                                                          {@link ErrorCase} and\n *                                                          {@link FormattedError}.\n */\n\n/**\n * @typdef {Object} ParserrorErrorObject\n * @description An object with a signature similar to an {@link Error} that {@link Parserror}\n *              can parse.\n * @property {String} message The error message.\n */\n\n/**\n * @typedef {Object} ParserrorParseOptions\n * @description The options that can be used to customize how {@link Parserror#parse} works.\n * @property {Array<String>} cases    A list of specific cases it should validated\n *                                    against.\n * @property {Array<String>} scopes   A list of specific scopes it should use to\n *                                    valdiate the error.\n * @property {?String}       fallback A fallback message in case the error can't be parsed.\n *                                    If not specified, the returned error will\n *                                    maintain the original message.\n */\n\n/**\n * @typedef {function} ParserrorWrapper\n * @description A pre configured parser to format errors with specific cases and/or scopes.\n * @param {Error|String|ParserrorErrorObject} error\n * The error to parse.\n * @param {?String} [fallback=null]\n * A fallback message in case the error can't be parsed. If not specified, the returned\n * error will maintain the original message.\n * @return {FormattedError}\n */\n\n/**\n * The main class of the library. It allows you to create cases, parsers and scopes.\n */\nclass Parserror {\n  /**\n   * Create a new instance of {@link Parserror}.\n   * @param {ParserrorOptions} [options] The options to customize how the class behaves.\n   * @return {Parserror}\n   */\n  static new(options) {\n    return new Parserror(options);\n  }\n  /**\n   * @param {ParserrorOptions} [options={}] The options to customize how the class behaves.\n   */\n  constructor(options = {}) {\n    /**\n     * The options to customize how the class behaves.\n     * @type {ParserrorOptions}\n     * @access protected\n     * @ignore\n     */\n    this._options = Object.assign(\n      {\n        CaseParserClass: CaseParser,\n        ErrorCaseClass: ErrorCase,\n        FormattedErrorClass: FormattedError,\n        ScopeClass: Scope,\n        errorContextProperties: ['context', 'response', 'data'],\n      },\n      options\n    );\n    /**\n     * The name of the global scope where the cases and parsers are added by default.\n     * @type {String}\n     * @access protected\n     * @ignore\n     */\n    this._globalScopeName = 'global';\n    /**\n     * A dictionary with the available scopes.\n     * @type {Object}\n     * @access protected\n     * @ignore\n     */\n    this._scopes = {};\n\n    this.addScope(this._globalScopeName);\n  }\n  /**\n   * Add a new error case.\n   * @param {ErrorCaseDefinition} definition   The case definition settings.\n   * @param {?String}             [scope=null] The name of the scope where the case should be added.\n   *                                           If not defined, it will be added to the global scope.\n   * @return {Parserror} For chaining purposes.\n   */\n  addCase(definition, scope = null) {\n    const scopeName = definition.scope || scope || this._globalScopeName;\n    const useScope = this.getScope(scopeName);\n    const {\n      ErrorCaseClass,\n      CaseParserClass,\n      FormattedErrorClass,\n    } = this._options;\n\n    useScope.addCase(new ErrorCaseClass(definition, {\n      CaseParserClass,\n      FormattedErrorClass,\n    }));\n\n    return this;\n  }\n  /**\n   * Adds a list of error cases.\n   * @param {Array<ErrorCaseDefinition>} definitions  The cases' definitions.\n   * @param {?String}                    [scope=null] The name of the scope where the cases should\n   *                                                  be added. If not defined, they will be added\n   *                                                  to the global scope.\n   * @return {Parserror} For chaining purposes.\n   */\n  addCases(definitions, scope = null) {\n    Utils.ensureArray(definitions).forEach((definition) => {\n      this.addCase(definition, scope);\n    });\n\n    return this;\n  }\n  /**\n   * Allows a specific error message to be matched. The idea is for this feature to be used with\n   * fallback messages: If you want a message to be used as it is but at the same time you want\n   * to use a fallback message, you would use this method; the original message won't be\n   * discarded and you still have the fallback for messages that don't have a match.\n   * @param {String|RegExp|ErrorCaseDefinition} condition\n   * Internally, this method will generate a new {@link ErrorCase}, so this parameter can be a\n   * string or a regular expression to match the error message, or an actual case definition.\n   * By default, the created case will have a random string as a name, but you can use a case\n   * definition to specify the name you want.\n   * @param {?String} [scope=null]\n   * The name of the scope where the case should be added. If not defined, it will be added to\n   * the global scope.\n   * @return {Parserror} For chaining purposes.\n   */\n  allowOriginal(condition, scope = null) {\n    let definition;\n    if (typeof condition === 'string' || condition instanceof RegExp) {\n      definition = {};\n      definition.condition = condition;\n    } else {\n      definition = condition;\n    }\n\n    if (!definition.name) {\n      const nameLength = 20;\n      definition.name = Utils.getRandomString(nameLength);\n    }\n\n    definition.useOriginal = true;\n    return this.addCase(definition, scope);\n  }\n  /**\n   * Allows for multiple error messages to be matched. This is the \"bulk alias\" of\n   * {@link Parserror#allowOriginal}, so please read the documentation of that method to better\n   * understand in which case you would want to allow original messages.\n   * @param {Array<String|RegExp|ErrorCaseDefinition>} conditions\n   * The list of conditions/definitions for the cases that will match the messages.\n   * @param {?String} [scope=null] The name of the scope where the cases should be added. If not\n   * defined, they will be added to the global scope.\n   * @return {Parserror} For chaining purposes.\n   */\n  allowOriginals(conditions, scope = null) {\n    Utils.ensureArray(conditions).forEach((condition) => {\n      this.allowOriginal(condition, scope);\n    });\n\n    return this;\n  }\n  /**\n   * Adds a reusable parser.\n   * @param {String}           name   The name of the parser.\n   * @param {Object|Function}  parser The parser function or map (see {@link CaseParser}).\n   * @param {?String}          scope  The name of the scope where the parser should be added. If\n   *                                  not defined, it will be added to the global scope.\n   * @return {Parserror} For chaining purposes.\n   */\n  addParser(name, parser, scope = null) {\n    const scopeName = scope || this._globalScopeName;\n    const useScope = this.getScope(scopeName);\n    const { CaseParserClass } = this._options;\n    useScope.addParser(new CaseParserClass(name, parser));\n    return this;\n  }\n  /**\n   * Gets a scope by its name.\n   * @param {String} name          The name of the scope.\n   * @param {[type]} [create=true] If `true` and the scope doesn't exist, it will try to create it.\n   * @return {Scope}\n   * @throws {Error} If `create` is `false` and the scope doesn't exist.\n   */\n  getScope(name, create = true) {\n    let scope = this._scopes[name];\n    if (!scope) {\n      if (create) {\n        this.addScope(name);\n        scope = this._scopes[name];\n      } else {\n        throw new Error(`The scope '${name}' doesn't exist`);\n      }\n    }\n\n    return scope;\n  }\n  /**\n   * Creates a new scope.\n   * @param {String} name\n   * The name of the scope.\n   * @param {Array<ErrorCaseDefinition>} [cases=[]]\n   * A list of cases' defintions to add.\n   * @param {Array<String|RegExp|ErrorCaseDefinition>} [allowedOriginals=[]]\n   * a list of conditions/definitions for cases that allow original messages to be matched. To\n   * better understand how this work, please read the description of\n   * {@link Parserror#allowOriginal}.\n   * @param {Boolean} [overwrite=false]\n   * If there's a scope with the same name already, using this flag allows you to overwrite it.\n   * @return {Parserror} For chaining purposes.\n   * @throws {Error} If `overwrite` is `false` and there's already a scope with the same name.\n   */\n  addScope(name, cases = [], allowedOriginals = [], overwrite = false) {\n    if (this._scopes[name]) {\n      if (overwrite) {\n        this.removeScope(name);\n      } else {\n        throw new Error(\n          `The scope '${name}' already exists. You can use 'removeScope' ` +\n          'to remove it first, or set the \\'overwrite\\' parameter to \\'true\\''\n        );\n      }\n    }\n\n    const { ScopeClass } = this._options;\n    this._scopes[name] = new ScopeClass(name);\n\n    if (cases.length) {\n      this.addCases(cases, name);\n    }\n\n    if (allowedOriginals.length) {\n      this.allowOriginals(allowedOriginals, name);\n    }\n\n    return this;\n  }\n  /**\n   * Removes a scope.\n   * @param {String} name The name of the scope to remove.\n   * @throws {Error} If you try to remove the global scope.\n   */\n  removeScope(name) {\n    if (name === this._globalScopeName) {\n      throw new Error('You can\\'t delete the global scope');\n    }\n\n    delete this._scopes[name];\n  }\n  /**\n   * Parses and formats an error.\n   * @param {Error|String|ParserrorErrorObject} error\n   * The error to parse.\n   * @param {ParserrorParseOptions} [options={}]\n   * Options to customize how the parsing is done.\n   * @return {FormattedError}\n   * @throws {TypeError} If `error` is not an {@link Error}, a string or a\n   *                     {@link ParserrorErrorObject}.\n   */\n  parse(error, options = {}) {\n    const useOptions = Object.assign(\n      {\n        cases: [],\n        scopes: [],\n        fallback: null,\n      },\n      options\n    );\n\n    this._validateParseOptions(useOptions);\n\n    let context;\n    let message;\n    if (typeof error === 'string') {\n      message = error;\n      context = null;\n    } else if (\n      error instanceof Error ||\n      (\n        Utils.isObject(error) &&\n        typeof error.message === 'string'\n      )\n    ) {\n      ({ message } = error);\n      context = this._searchForContext(error);\n    } else {\n      throw new TypeError(\n        '\\'parse\\' can only handle error messages (\\'string\\'), ' +\n        'native errors (\\'Error\\') or literal objects (\\'object\\') with a ' +\n        '\\'message\\' property\\''\n      );\n    }\n\n    const globalScope = this.getScope(this._globalScopeName);\n    let includesGlobalScope = useOptions.scopes.includes(this._globalScopeName);\n    let useCases;\n    if (useOptions.cases.length) {\n      if (includesGlobalScope) {\n        useCases = [];\n      } else {\n        useCases = useOptions.cases.map((name) => globalScope.getCase(name));\n      }\n    } else {\n      if (!includesGlobalScope) {\n        includesGlobalScope = true;\n        useOptions.scopes.push(this._globalScopeName);\n      }\n\n      useCases = [];\n    }\n\n    const scopes = useOptions.scopes.map((scope) => this.getScope(scope));\n\n    const scopesCases = scopes\n    .map((scope) => scope.getCases())\n    .reduce((newList, cases) => [...newList, ...cases], []);\n\n    const cases = [\n      ...useCases,\n      ...scopesCases,\n    ];\n\n    const scopesForCases = includesGlobalScope ?\n      scopes :\n      [...scopes, globalScope];\n\n    let newError;\n    cases.some((theCase) => {\n      newError = theCase.parse(message, scopesForCases, context);\n      return newError;\n    });\n\n    let result;\n    if (newError) {\n      result = newError;\n    } else {\n      const { FormattedErrorClass } = this._options;\n      result = useOptions.fallback ?\n        new FormattedErrorClass(useOptions.fallback, {}, { fallback: true }) :\n        new FormattedErrorClass(message, {}, { original: true });\n    }\n\n    return result;\n  }\n  /**\n   * Creates a wrapper: a pre configured parser to format errors with specific cases and/or\n   * scopes.\n   * @param {Array<String>} cases           A list of cases' names.\n   * @param {Array<String>} scopes          A list of scopes' names.\n   * @param {?String}       [fallback=null] A fallback message in case the error can't be parsed.\n   *                                        If not specified, the returned error will maintain the\n   *                                        original message.\n   * @return {ParserrorWrapper}\n   */\n  wrap(cases = [], scopes = [], fallback = null) {\n    return (error, fallbackMessage = null) => this.parse(error, ({\n      cases,\n      scopes,\n      fallback: fallbackMessage || fallback,\n    }));\n  }\n  /**\n   * Creates a wrapper for specific scopes. A wrapper is a pre configured parser to format errors\n   * with specific cases and/or scopes.\n   * @param {Array<String>} scopes          A list of scopes' names.\n   * @param {?String}       [fallback=null] A fallback message in case the error can't be parsed.\n   *                                        If not specified, the returned error will maintain the\n   *                                        original message.\n   * @return {ParserrorWrapper}\n   */\n  wrapForScopes(scopes, fallback = null) {\n    return (error, fallbackMessage = null) => this.parse(error, {\n      scopes,\n      fallback: fallbackMessage || fallback,\n    });\n  }\n  /**\n   * The name of the global scope.\n   * @type {String}\n   */\n  get globalScopeName() {\n    return this._globalScopeName;\n  }\n  /**\n   * Validates an object to ensure it can be used as {@link ParserrorParseOptions}.\n   * @param {Object} options The object to validate.\n   * @throws {TypeError} If the `cases` property is not an `array`.\n   * @throws {TypeError} If the `scopes` property is not an `array`.\n   * @access protected\n   * @ignore\n   */\n  _validateParseOptions(options) {\n    if (!Array.isArray(options.cases)) {\n      throw new TypeError('The \\'cases\\' option can only be an \\'array\\'');\n    } else if (!Array.isArray(options.scopes)) {\n      throw new TypeError('The \\'scopes\\' option can only be an \\'array\\'');\n    }\n  }\n  /**\n   * Tries to find a property inside an error to be used as context information for the parsers.\n   * @param {Error|ParserrorErrorObject} error The error where the method will look for the\n   *                                           property.\n   * @return {?Object}\n   * @access protected\n   * @ignore\n   */\n  _searchForContext(error) {\n    const useProperty = this._options.errorContextProperties\n    .find((property) => typeof error[property] !== 'undefined');\n\n    return useProperty ? error[useProperty] : null;\n  }\n}\n\nmodule.exports = Parserror;\n",
     "static": true,
     "longname": "/Users/homer0/CODE/shared/parserror/src/parserror.js",
     "access": "public",
@@ -2313,7 +2343,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 99,
+    "__docId__": 100,
     "kind": "typedef",
     "name": "ParserrorOptions",
     "memberof": "src/parserror.js",
@@ -2388,7 +2418,7 @@
     }
   },
   {
-    "__docId__": 100,
+    "__docId__": 101,
     "kind": "typedef",
     "name": "ParserrorParseOptions",
     "memberof": "src/parserror.js",
@@ -2411,7 +2441,7 @@
         "spread": false,
         "optional": false,
         "name": "cases",
-        "description": "A list of specific cases it should validated against."
+        "description": "A list of specific cases it should validated\n                                   against."
       },
       {
         "nullable": null,
@@ -2421,7 +2451,17 @@
         "spread": false,
         "optional": false,
         "name": "scopes",
-        "description": "A list of specific scopes it should use to valdiate the error."
+        "description": "A list of specific scopes it should use to\n                                   valdiate the error."
+      },
+      {
+        "nullable": true,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "fallback",
+        "description": "A fallback message in case the error can't be parsed.\n                                   If not specified, the returned error will\n                                   maintain the original message."
       }
     ],
     "type": {
@@ -2433,7 +2473,7 @@
     }
   },
   {
-    "__docId__": 101,
+    "__docId__": 102,
     "kind": "typedef",
     "name": "ParserrorWrapper",
     "memberof": "src/parserror.js",
@@ -2459,6 +2499,18 @@
         "optional": false,
         "name": "error",
         "description": "The error to parse."
+      },
+      {
+        "nullable": true,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "null",
+        "defaultRaw": null,
+        "name": "fallback",
+        "description": "A fallback message in case the error can't be parsed. If not specified, the returned\nerror will maintain the original message."
       }
     ],
     "return": {
@@ -2478,7 +2530,7 @@
     }
   },
   {
-    "__docId__": 102,
+    "__docId__": 103,
     "kind": "class",
     "name": "Parserror",
     "memberof": "src/parserror.js",
@@ -2489,11 +2541,11 @@
     "importPath": "parserror/src/parserror.js",
     "importStyle": "Parserror",
     "description": "The main class of the library. It allows you to create cases, parsers and scopes.",
-    "lineNumber": 53,
+    "lineNumber": 62,
     "interface": false
   },
   {
-    "__docId__": 103,
+    "__docId__": 104,
     "kind": "method",
     "name": "new",
     "memberof": "src/parserror.js~Parserror",
@@ -2503,7 +2555,7 @@
     "longname": "src/parserror.js~Parserror.new",
     "access": "public",
     "description": "Create a new instance of {@link Parserror}.",
-    "lineNumber": 59,
+    "lineNumber": 68,
     "params": [
       {
         "nullable": null,
@@ -2526,7 +2578,7 @@
     }
   },
   {
-    "__docId__": 104,
+    "__docId__": 105,
     "kind": "constructor",
     "name": "constructor",
     "memberof": "src/parserror.js~Parserror",
@@ -2536,7 +2588,7 @@
     "longname": "src/parserror.js~Parserror#constructor",
     "access": "public",
     "description": "",
-    "lineNumber": 65,
+    "lineNumber": 74,
     "params": [
       {
         "nullable": null,
@@ -2553,7 +2605,7 @@
     ]
   },
   {
-    "__docId__": 105,
+    "__docId__": 106,
     "kind": "member",
     "name": "_options",
     "memberof": "src/parserror.js~Parserror",
@@ -2561,7 +2613,7 @@
     "longname": "src/parserror.js~Parserror#_options",
     "access": "protected",
     "description": "The options to customize how the class behaves.",
-    "lineNumber": 72,
+    "lineNumber": 81,
     "ignore": true,
     "type": {
       "nullable": null,
@@ -2573,7 +2625,7 @@
     }
   },
   {
-    "__docId__": 106,
+    "__docId__": 107,
     "kind": "member",
     "name": "_globalScopeName",
     "memberof": "src/parserror.js~Parserror",
@@ -2581,7 +2633,7 @@
     "longname": "src/parserror.js~Parserror#_globalScopeName",
     "access": "protected",
     "description": "The name of the global scope where the cases and parsers are added by default.",
-    "lineNumber": 88,
+    "lineNumber": 97,
     "ignore": true,
     "type": {
       "nullable": null,
@@ -2593,7 +2645,7 @@
     }
   },
   {
-    "__docId__": 107,
+    "__docId__": 108,
     "kind": "member",
     "name": "_scopes",
     "memberof": "src/parserror.js~Parserror",
@@ -2601,7 +2653,7 @@
     "longname": "src/parserror.js~Parserror#_scopes",
     "access": "protected",
     "description": "A dictionary with the available scopes.",
-    "lineNumber": 95,
+    "lineNumber": 104,
     "ignore": true,
     "type": {
       "nullable": null,
@@ -2613,7 +2665,7 @@
     }
   },
   {
-    "__docId__": 108,
+    "__docId__": 109,
     "kind": "method",
     "name": "addCase",
     "memberof": "src/parserror.js~Parserror",
@@ -2623,7 +2675,7 @@
     "longname": "src/parserror.js~Parserror#addCase",
     "access": "public",
     "description": "Add a new error case.",
-    "lineNumber": 106,
+    "lineNumber": 115,
     "params": [
       {
         "nullable": null,
@@ -2641,9 +2693,11 @@
           "String"
         ],
         "spread": false,
-        "optional": false,
+        "optional": true,
+        "defaultValue": "null",
+        "defaultRaw": null,
         "name": "scope",
-        "description": "The name of the scope where the case should be added.\n                                        If not defined, it will be added to the global scope."
+        "description": "The name of the scope where the case should be added.\n                                          If not defined, it will be added to the global scope."
       }
     ],
     "return": {
@@ -2656,7 +2710,7 @@
     }
   },
   {
-    "__docId__": 109,
+    "__docId__": 110,
     "kind": "method",
     "name": "addCases",
     "memberof": "src/parserror.js~Parserror",
@@ -2666,7 +2720,7 @@
     "longname": "src/parserror.js~Parserror#addCases",
     "access": "public",
     "description": "Adds a list of error cases.",
-    "lineNumber": 130,
+    "lineNumber": 139,
     "params": [
       {
         "nullable": null,
@@ -2684,9 +2738,11 @@
           "String"
         ],
         "spread": false,
-        "optional": false,
+        "optional": true,
+        "defaultValue": "null",
+        "defaultRaw": null,
         "name": "scope",
-        "description": "The name of the scope where the cases should\n                                                be added. If not defined, they will be added\n                                                to the global scope."
+        "description": "The name of the scope where the cases should\n                                                 be added. If not defined, they will be added\n                                                 to the global scope."
       }
     ],
     "return": {
@@ -2699,7 +2755,99 @@
     }
   },
   {
-    "__docId__": 110,
+    "__docId__": 111,
+    "kind": "method",
+    "name": "allowOriginal",
+    "memberof": "src/parserror.js~Parserror",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/parserror.js~Parserror#allowOriginal",
+    "access": "public",
+    "description": "Allows a specific error message to be matched. The idea is for this feature to be used with\nfallback messages: If you want a message to be used as it is but at the same time you want\nto use a fallback message, you would use this method; the original message won't be\ndiscarded and you still have the fallback for messages that don't have a match.",
+    "lineNumber": 161,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "String",
+          "RegExp",
+          "ErrorCaseDefinition"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "condition",
+        "description": "Internally, this method will generate a new {@link ErrorCase}, so this parameter can be a\nstring or a regular expression to match the error message, or an actual case definition.\nBy default, the created case will have a random string as a name, but you can use a case\ndefinition to specify the name you want."
+      },
+      {
+        "nullable": true,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "null",
+        "defaultRaw": null,
+        "name": "scope",
+        "description": "The name of the scope where the case should be added. If not defined, it will be added to\nthe global scope."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Parserror"
+      ],
+      "spread": false,
+      "description": "For chaining purposes."
+    }
+  },
+  {
+    "__docId__": 112,
+    "kind": "method",
+    "name": "allowOriginals",
+    "memberof": "src/parserror.js~Parserror",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/parserror.js~Parserror#allowOriginals",
+    "access": "public",
+    "description": "Allows for multiple error messages to be matched. This is the \"bulk alias\" of\n{@link Parserror#allowOriginal}, so please read the documentation of that method to better\nunderstand in which case you would want to allow original messages.",
+    "lineNumber": 188,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array<String|RegExp|ErrorCaseDefinition>"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "conditions",
+        "description": "The list of conditions/definitions for the cases that will match the messages."
+      },
+      {
+        "nullable": true,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "null",
+        "defaultRaw": null,
+        "name": "scope",
+        "description": "The name of the scope where the cases should be added. If not\ndefined, they will be added to the global scope."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Parserror"
+      ],
+      "spread": false,
+      "description": "For chaining purposes."
+    }
+  },
+  {
+    "__docId__": 113,
     "kind": "method",
     "name": "addParser",
     "memberof": "src/parserror.js~Parserror",
@@ -2709,7 +2857,7 @@
     "longname": "src/parserror.js~Parserror#addParser",
     "access": "public",
     "description": "Adds a reusable parser.",
-    "lineNumber": 145,
+    "lineNumber": 203,
     "params": [
       {
         "nullable": null,
@@ -2753,7 +2901,7 @@
     }
   },
   {
-    "__docId__": 111,
+    "__docId__": 114,
     "kind": "method",
     "name": "getScope",
     "memberof": "src/parserror.js~Parserror",
@@ -2763,7 +2911,7 @@
     "longname": "src/parserror.js~Parserror#getScope",
     "access": "public",
     "description": "Gets a scope by its name.",
-    "lineNumber": 159,
+    "lineNumber": 217,
     "params": [
       {
         "nullable": null,
@@ -2806,7 +2954,7 @@
     ]
   },
   {
-    "__docId__": 112,
+    "__docId__": 115,
     "kind": "method",
     "name": "addScope",
     "memberof": "src/parserror.js~Parserror",
@@ -2816,7 +2964,7 @@
     "longname": "src/parserror.js~Parserror#addScope",
     "access": "public",
     "description": "Creates a new scope.",
-    "lineNumber": 182,
+    "lineNumber": 245,
     "params": [
       {
         "nullable": null,
@@ -2834,9 +2982,23 @@
           "Array<ErrorCaseDefinition>"
         ],
         "spread": false,
-        "optional": false,
+        "optional": true,
+        "defaultValue": "[]",
+        "defaultRaw": [],
         "name": "cases",
         "description": "A list of cases' defintions to add."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<String|RegExp|ErrorCaseDefinition>"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "[]",
+        "defaultRaw": [],
+        "name": "allowedOriginals",
+        "description": "a list of conditions/definitions for cases that allow original messages to be matched. To\nbetter understand how this work, please read the description of\n{@link Parserror#allowOriginal}."
       },
       {
         "nullable": null,
@@ -2848,7 +3010,7 @@
         "defaultValue": "false",
         "defaultRaw": false,
         "name": "overwrite",
-        "description": "If there's a scope with the same name\n                                                       already, using this flag allows you to\n                                                       overwrite it."
+        "description": "If there's a scope with the same name already, using this flag allows you to overwrite it."
       }
     ],
     "return": {
@@ -2869,7 +3031,7 @@
     ]
   },
   {
-    "__docId__": 113,
+    "__docId__": 116,
     "kind": "method",
     "name": "removeScope",
     "memberof": "src/parserror.js~Parserror",
@@ -2879,7 +3041,7 @@
     "longname": "src/parserror.js~Parserror#removeScope",
     "access": "public",
     "description": "Removes a scope.",
-    "lineNumber": 208,
+    "lineNumber": 275,
     "params": [
       {
         "nullable": null,
@@ -2903,7 +3065,7 @@
     "return": null
   },
   {
-    "__docId__": 114,
+    "__docId__": 117,
     "kind": "method",
     "name": "parse",
     "memberof": "src/parserror.js~Parserror",
@@ -2913,7 +3075,7 @@
     "longname": "src/parserror.js~Parserror#parse",
     "access": "public",
     "description": "Parses and formats an error.",
-    "lineNumber": 224,
+    "lineNumber": 292,
     "params": [
       {
         "nullable": null,
@@ -2937,7 +3099,7 @@
         "defaultValue": "{}",
         "defaultRaw": {},
         "name": "options",
-        "description": "Options to customize how the parsing\n                                                        is done."
+        "description": "Options to customize how the parsing is done."
       }
     ],
     "return": {
@@ -2958,7 +3120,7 @@
     ]
   },
   {
-    "__docId__": 115,
+    "__docId__": 118,
     "kind": "method",
     "name": "wrap",
     "memberof": "src/parserror.js~Parserror",
@@ -2968,7 +3130,7 @@
     "longname": "src/parserror.js~Parserror#wrap",
     "access": "public",
     "description": "Creates a wrapper: a pre configured parser to format errors with specific cases and/or\nscopes.",
-    "lineNumber": 313,
+    "lineNumber": 387,
     "params": [
       {
         "nullable": null,
@@ -2989,6 +3151,18 @@
         "optional": false,
         "name": "scopes",
         "description": "A list of scopes' names."
+      },
+      {
+        "nullable": true,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "null",
+        "defaultRaw": null,
+        "name": "fallback",
+        "description": "A fallback message in case the error can't be parsed.\n                                       If not specified, the returned error will maintain the\n                                       original message."
       }
     ],
     "return": {
@@ -3001,7 +3175,7 @@
     }
   },
   {
-    "__docId__": 116,
+    "__docId__": 119,
     "kind": "method",
     "name": "wrapForScopes",
     "memberof": "src/parserror.js~Parserror",
@@ -3011,7 +3185,7 @@
     "longname": "src/parserror.js~Parserror#wrapForScopes",
     "access": "public",
     "description": "Creates a wrapper for specific scopes. A wrapper is a pre configured parser to format errors\nwith specific cases and/or scopes.",
-    "lineNumber": 325,
+    "lineNumber": 403,
     "params": [
       {
         "nullable": null,
@@ -3022,6 +3196,18 @@
         "optional": false,
         "name": "scopes",
         "description": "A list of scopes' names."
+      },
+      {
+        "nullable": true,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "null",
+        "defaultRaw": null,
+        "name": "fallback",
+        "description": "A fallback message in case the error can't be parsed.\n                                       If not specified, the returned error will maintain the\n                                       original message."
       }
     ],
     "return": {
@@ -3034,7 +3220,7 @@
     }
   },
   {
-    "__docId__": 117,
+    "__docId__": 120,
     "kind": "get",
     "name": "globalScopeName",
     "memberof": "src/parserror.js~Parserror",
@@ -3044,7 +3230,7 @@
     "longname": "src/parserror.js~Parserror#globalScopeName",
     "access": "public",
     "description": "The name of the global scope.",
-    "lineNumber": 334,
+    "lineNumber": 413,
     "type": {
       "nullable": null,
       "types": [
@@ -3055,7 +3241,7 @@
     }
   },
   {
-    "__docId__": 118,
+    "__docId__": 121,
     "kind": "method",
     "name": "_validateParseOptions",
     "memberof": "src/parserror.js~Parserror",
@@ -3065,7 +3251,7 @@
     "longname": "src/parserror.js~Parserror#_validateParseOptions",
     "access": "protected",
     "description": "Validates an object to ensure it can be used as {@link ParserrorParseOptions}.",
-    "lineNumber": 345,
+    "lineNumber": 424,
     "ignore": true,
     "params": [
       {
@@ -3096,7 +3282,7 @@
     "return": null
   },
   {
-    "__docId__": 119,
+    "__docId__": 122,
     "kind": "method",
     "name": "_searchForContext",
     "memberof": "src/parserror.js~Parserror",
@@ -3106,7 +3292,7 @@
     "longname": "src/parserror.js~Parserror#_searchForContext",
     "access": "protected",
     "description": "Tries to find a property inside an error to be used as context information for the parsers.",
-    "lineNumber": 360,
+    "lineNumber": 439,
     "ignore": true,
     "params": [
       {
@@ -3131,10 +3317,10 @@
     }
   },
   {
-    "__docId__": 120,
+    "__docId__": 123,
     "kind": "file",
     "name": "src/scope.js",
-    "content": "const CaseParser = require('./caseParser');\nconst ErrorCase = require('./errorCase');\n/**\n * A scope is just a group of cases and parsers Parserror can make use of.\n */\nclass Scope {\n  /**\n   * @param {String} name The name of the scope.\n   * @throws {TypeError} If the `name` is not a `string`.\n   */\n  constructor(name) {\n    /**\n     * The name of the scope.\n     * @type {String}\n     * @access protected\n     * @ignore\n     */\n    this._name = this._validateName(name);\n    /**\n     * The list of cases the scope manages.\n     * @type {Array}\n     * @access protected\n     * @ignore\n     */\n    this._cases = [];\n    /**\n     * A map of the parsers the scope has.\n     * @type {Object}\n     * @access protected\n     * @ignore\n     */\n    this._parsers = {};\n  }\n  /**\n   * Adds a new case to the scope.\n   * @param {ErrorCase} theCase The case to add.\n   * @return {Scope} For chaining purposes.\n   * @throws {Error} If there's already a case with the same name on the scope.\n   * @throws {Error} If `theCase` is not an instance of {@link ErrorCase}.\n   */\n  addCase(theCase) {\n    this._validateCase(theCase);\n    if (this.hasCase(theCase.name)) {\n      throw new Error(\n        `The case name '${theCase.name}' is already being used on the ` +\n        `scope '${this._name}'`\n      );\n    }\n\n    this._cases.push(theCase);\n    return this;\n  }\n  /**\n   * Removes a case from the scope.\n   * @param {String|ErrorCase} theCase The name or the reference for the case to remove.\n   * @return {Scope} For chaining purposes.\n   * @throws {Error} If the case doesn't exist on the scope.\n   * @throws {Error} If `theCase` is a reference but is not an instance of {@link ErrorCase}.\n   */\n  removeCase(theCase) {\n    let name;\n    if (typeof theCase === 'string') {\n      name = theCase;\n    } else {\n      this._validateCase(theCase);\n      ({ name } = theCase);\n    }\n\n    const newCases = this._cases.filter((item) => item.name !== name);\n    if (newCases.length !== this._cases.length) {\n      this._cases = newCases;\n    } else {\n      throw new Error(\n        `The case '${name}' doesn't exist on the scope ` +\n        `'${this._name}'`\n      );\n    }\n\n    return this;\n  }\n  /**\n   * Returns a case by its name.\n   * @param {String}  name                 The name of the case.\n   * @param {Boolean} [failWithError=true] Whether or not the method should throw an error if the\n   *                                       case can't be found.\n   * @return {?ErrorCase}\n   * @throws {Error} If `failWithError` is `true` and the case can't be found.\n   */\n  getCase(name, failWithError = true) {\n    const theCase = this._cases.find((item) => item.name === name);\n    if (!theCase && failWithError) {\n      throw new Error(\n        `The case '${name}' doesn't exist on the scope ` +\n        `'${this._name}'`\n      );\n    }\n\n    return theCase || null;\n  }\n  /**\n   * Checks whether or not there's a case based on its name.\n   * @param {String} name The case's name.\n   * @return {Boolean}\n   */\n  hasCase(name) {\n    return this.getCase(name, false) !== null;\n  }\n  /**\n   * Adds a reusable parser to the scope.\n   * @param {CaseParser} parser The parser to add.\n   * @return {Scope} For chaining purposes.\n   * @throws {Error} If there's already a parser with the same name on the scope.\n   * @throws {Error} If `parser` is not an instance of {@link CaseParser}.\n   */\n  addParser(parser) {\n    this._validateParser(parser);\n    if (this.hasParser(parser.name)) {\n      throw new Error(\n        `The parser name '${parser.name}' is already being used on the ` +\n        `scope '${this._name}'`\n      );\n    }\n\n    this._parsers[parser.name] = parser;\n    return this;\n  }\n  /**\n   * Removes a parser from the scope.\n   * @param {String|CaseParser} parser The name or the reference for the parser to remove.\n   * @return {Scope} For chaining purposes.\n   * @throws {Error} If the parser doesn't exist on the scope.\n   * @throws {Error} If `parser` is a reference but is not an instance of {@link CaseParser}.\n   */\n  removeParser(parser) {\n    let name;\n    if (typeof parser === 'string') {\n      name = parser;\n    } else {\n      this._validateParser(parser);\n      ({ name } = parser);\n    }\n\n    if (this._parsers[name]) {\n      const newParsers = Object.assign({}, this._parsers);\n      delete newParsers[name];\n      this._parsers = newParsers;\n    } else {\n      throw new Error(\n        `The parser '${name}' doesn't exist on the scope ` +\n        `'${this._name}'`\n      );\n    }\n\n    return this;\n  }\n  /**\n   * Returns a parser by its name.\n   * @param {String}  name                 The name of the parser.\n   * @param {Boolean} [failWithError=true] Whether or not the method should throw an error if the\n   *                                       parser can't be found.\n   * @return {?CaseParser}\n   * @throws {Error} If `failWithError` is `true` and the parser can't be found.\n   */\n  getParser(name, failWithError = true) {\n    const parser = this._parsers[name];\n    if (!parser && failWithError) {\n      throw new Error(\n        `The parser '${name}' doesn't exist on the scope ` +\n        `'${this._name}'`\n      );\n    }\n\n    return parser || null;\n  }\n  /**\n   * Checks whether or not there's a parser based on its name.\n   * @param {String} name The parser's name.\n   * @return {Boolean}\n   */\n  hasParser(name) {\n    return this.getParser(name, false) !== null;\n  }\n  /**\n   * The scope's name.\n   * @type {String}\n   */\n  get name() {\n    return this._name;\n  }\n  /**\n   * Validates that the name the class intends to use is a `string`.\n   * @param {String} name The name to validate.\n   * @return {String}\n   * @throws {TypeError} If the `name` is not a string.\n   * @access protected\n   * @ignore\n   */\n  _validateName(name) {\n    if (typeof name !== 'string') {\n      throw new TypeError('The \\'name\\' can only be a \\'string\\'');\n    }\n\n    return name;\n  }\n  /**\n   * Validates if a case is an instance of {@link ErrorCase}.\n   * @param {ErrorCase} theCase The case to validate.\n   * @throws {TypeError} If `theCase` is not an instance of {@link ErrorCase}.\n   * @access protected\n   * @ignore\n   */\n  _validateCase(theCase) {\n    if (!(theCase instanceof ErrorCase)) {\n      throw new TypeError('The received case is not an instance of \\'ErrorCase\\'');\n    }\n  }\n  /**\n   * Validates if a parser is an instance of {@link CaseParser}.\n   * @param {CaseParser} parser The case to validate.\n   * @throws {TypeError} If `parser` is not an instance of {@link CaseParser}.\n   * @access protected\n   * @ignore\n   */\n  _validateParser(parser) {\n    if (!(parser instanceof CaseParser)) {\n      throw new TypeError('The received parser is not an instance of \\'CaseParser\\'');\n    }\n  }\n}\n\nmodule.exports = Scope;\n",
+    "content": "const CaseParser = require('./caseParser');\nconst ErrorCase = require('./errorCase');\n/**\n * A scope is just a group of cases and parsers Parserror can make use of.\n */\nclass Scope {\n  /**\n   * @param {String} name The name of the scope.\n   * @throws {TypeError} If the `name` is not a `string`.\n   */\n  constructor(name) {\n    /**\n     * The name of the scope.\n     * @type {String}\n     * @access protected\n     * @ignore\n     */\n    this._name = this._validateName(name);\n    /**\n     * The list of cases the scope manages.\n     * @type {Array}\n     * @access protected\n     * @ignore\n     */\n    this._cases = [];\n    /**\n     * A map of the parsers the scope has.\n     * @type {Object}\n     * @access protected\n     * @ignore\n     */\n    this._parsers = {};\n  }\n  /**\n   * Adds a new case to the scope.\n   * @param {ErrorCase} theCase The case to add.\n   * @return {Scope} For chaining purposes.\n   * @throws {Error} If there's already a case with the same name on the scope.\n   * @throws {Error} If `theCase` is not an instance of {@link ErrorCase}.\n   */\n  addCase(theCase) {\n    this._validateCase(theCase);\n    if (this.hasCase(theCase.name)) {\n      throw new Error(\n        `The case name '${theCase.name}' is already being used on the ` +\n        `scope '${this._name}'`\n      );\n    }\n\n    this._cases.push(theCase);\n    return this;\n  }\n  /**\n   * Removes a case from the scope.\n   * @param {String|ErrorCase} theCase The name or the reference for the case to remove.\n   * @return {Scope} For chaining purposes.\n   * @throws {Error} If the case doesn't exist on the scope.\n   * @throws {Error} If `theCase` is a reference but is not an instance of {@link ErrorCase}.\n   */\n  removeCase(theCase) {\n    let name;\n    if (typeof theCase === 'string') {\n      name = theCase;\n    } else {\n      this._validateCase(theCase);\n      ({ name } = theCase);\n    }\n\n    const newCases = this._cases.filter((item) => item.name !== name);\n    if (newCases.length !== this._cases.length) {\n      this._cases = newCases;\n    } else {\n      throw new Error(\n        `The case '${name}' doesn't exist on the scope ` +\n        `'${this._name}'`\n      );\n    }\n\n    return this;\n  }\n  /**\n   * Returns a case by its name.\n   * @param {String}  name                 The name of the case.\n   * @param {Boolean} [failWithError=true] Whether or not the method should throw an error if the\n   *                                       case can't be found.\n   * @return {?ErrorCase}\n   * @throws {Error} If `failWithError` is `true` and the case can't be found.\n   */\n  getCase(name, failWithError = true) {\n    const theCase = this._cases.find((item) => item.name === name);\n    if (!theCase && failWithError) {\n      throw new Error(\n        `The case '${name}' doesn't exist on the scope ` +\n        `'${this._name}'`\n      );\n    }\n\n    return theCase || null;\n  }\n  /**\n   * Returns all available cases for this scope.\n   * @return {Array<ErrorCase>}\n   */\n  getCases() {\n    return this._cases;\n  }\n  /**\n   * Checks whether or not there's a case based on its name.\n   * @param {String} name The case's name.\n   * @return {Boolean}\n   */\n  hasCase(name) {\n    return this.getCase(name, false) !== null;\n  }\n  /**\n   * Adds a reusable parser to the scope.\n   * @param {CaseParser} parser The parser to add.\n   * @return {Scope} For chaining purposes.\n   * @throws {Error} If there's already a parser with the same name on the scope.\n   * @throws {Error} If `parser` is not an instance of {@link CaseParser}.\n   */\n  addParser(parser) {\n    this._validateParser(parser);\n    if (this.hasParser(parser.name)) {\n      throw new Error(\n        `The parser name '${parser.name}' is already being used on the ` +\n        `scope '${this._name}'`\n      );\n    }\n\n    this._parsers[parser.name] = parser;\n    return this;\n  }\n  /**\n   * Removes a parser from the scope.\n   * @param {String|CaseParser} parser The name or the reference for the parser to remove.\n   * @return {Scope} For chaining purposes.\n   * @throws {Error} If the parser doesn't exist on the scope.\n   * @throws {Error} If `parser` is a reference but is not an instance of {@link CaseParser}.\n   */\n  removeParser(parser) {\n    let name;\n    if (typeof parser === 'string') {\n      name = parser;\n    } else {\n      this._validateParser(parser);\n      ({ name } = parser);\n    }\n\n    if (this._parsers[name]) {\n      const newParsers = Object.assign({}, this._parsers);\n      delete newParsers[name];\n      this._parsers = newParsers;\n    } else {\n      throw new Error(\n        `The parser '${name}' doesn't exist on the scope ` +\n        `'${this._name}'`\n      );\n    }\n\n    return this;\n  }\n  /**\n   * Returns a parser by its name.\n   * @param {String}  name                 The name of the parser.\n   * @param {Boolean} [failWithError=true] Whether or not the method should throw an error if the\n   *                                       parser can't be found.\n   * @return {?CaseParser}\n   * @throws {Error} If `failWithError` is `true` and the parser can't be found.\n   */\n  getParser(name, failWithError = true) {\n    const parser = this._parsers[name];\n    if (!parser && failWithError) {\n      throw new Error(\n        `The parser '${name}' doesn't exist on the scope ` +\n        `'${this._name}'`\n      );\n    }\n\n    return parser || null;\n  }\n  /**\n   * Checks whether or not there's a parser based on its name.\n   * @param {String} name The parser's name.\n   * @return {Boolean}\n   */\n  hasParser(name) {\n    return this.getParser(name, false) !== null;\n  }\n  /**\n   * The scope's name.\n   * @type {String}\n   */\n  get name() {\n    return this._name;\n  }\n  /**\n   * Validates that the name the class intends to use is a `string`.\n   * @param {String} name The name to validate.\n   * @return {String}\n   * @throws {TypeError} If the `name` is not a string.\n   * @access protected\n   * @ignore\n   */\n  _validateName(name) {\n    if (typeof name !== 'string') {\n      throw new TypeError('The \\'name\\' can only be a \\'string\\'');\n    }\n\n    return name;\n  }\n  /**\n   * Validates if a case is an instance of {@link ErrorCase}.\n   * @param {ErrorCase} theCase The case to validate.\n   * @throws {TypeError} If `theCase` is not an instance of {@link ErrorCase}.\n   * @access protected\n   * @ignore\n   */\n  _validateCase(theCase) {\n    if (!(theCase instanceof ErrorCase)) {\n      throw new TypeError('The received case is not an instance of \\'ErrorCase\\'');\n    }\n  }\n  /**\n   * Validates if a parser is an instance of {@link CaseParser}.\n   * @param {CaseParser} parser The case to validate.\n   * @throws {TypeError} If `parser` is not an instance of {@link CaseParser}.\n   * @access protected\n   * @ignore\n   */\n  _validateParser(parser) {\n    if (!(parser instanceof CaseParser)) {\n      throw new TypeError('The received parser is not an instance of \\'CaseParser\\'');\n    }\n  }\n}\n\nmodule.exports = Scope;\n",
     "static": true,
     "longname": "/Users/homer0/CODE/shared/parserror/src/scope.js",
     "access": "public",
@@ -3142,7 +3328,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 121,
+    "__docId__": 124,
     "kind": "class",
     "name": "Scope",
     "memberof": "src/scope.js",
@@ -3157,7 +3343,7 @@
     "interface": false
   },
   {
-    "__docId__": 122,
+    "__docId__": 125,
     "kind": "constructor",
     "name": "constructor",
     "memberof": "src/scope.js~Scope",
@@ -3190,7 +3376,7 @@
     ]
   },
   {
-    "__docId__": 123,
+    "__docId__": 126,
     "kind": "member",
     "name": "_name",
     "memberof": "src/scope.js~Scope",
@@ -3210,7 +3396,7 @@
     }
   },
   {
-    "__docId__": 124,
+    "__docId__": 127,
     "kind": "member",
     "name": "_cases",
     "memberof": "src/scope.js~Scope",
@@ -3230,7 +3416,7 @@
     }
   },
   {
-    "__docId__": 125,
+    "__docId__": 128,
     "kind": "member",
     "name": "_parsers",
     "memberof": "src/scope.js~Scope",
@@ -3250,7 +3436,7 @@
     }
   },
   {
-    "__docId__": 126,
+    "__docId__": 129,
     "kind": "method",
     "name": "addCase",
     "memberof": "src/scope.js~Scope",
@@ -3297,7 +3483,7 @@
     ]
   },
   {
-    "__docId__": 127,
+    "__docId__": 130,
     "kind": "method",
     "name": "removeCase",
     "memberof": "src/scope.js~Scope",
@@ -3345,7 +3531,7 @@
     ]
   },
   {
-    "__docId__": 129,
+    "__docId__": 132,
     "kind": "method",
     "name": "getCase",
     "memberof": "src/scope.js~Scope",
@@ -3398,7 +3584,29 @@
     ]
   },
   {
-    "__docId__": 130,
+    "__docId__": 133,
+    "kind": "method",
+    "name": "getCases",
+    "memberof": "src/scope.js~Scope",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/scope.js~Scope#getCases",
+    "access": "public",
+    "description": "Returns all available cases for this scope.",
+    "lineNumber": 104,
+    "return": {
+      "nullable": null,
+      "types": [
+        "Array<ErrorCase>"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
+  },
+  {
+    "__docId__": 134,
     "kind": "method",
     "name": "hasCase",
     "memberof": "src/scope.js~Scope",
@@ -3408,7 +3616,7 @@
     "longname": "src/scope.js~Scope#hasCase",
     "access": "public",
     "description": "Checks whether or not there's a case based on its name.",
-    "lineNumber": 105,
+    "lineNumber": 112,
     "params": [
       {
         "nullable": null,
@@ -3431,7 +3639,7 @@
     }
   },
   {
-    "__docId__": 131,
+    "__docId__": 135,
     "kind": "method",
     "name": "addParser",
     "memberof": "src/scope.js~Scope",
@@ -3441,7 +3649,7 @@
     "longname": "src/scope.js~Scope#addParser",
     "access": "public",
     "description": "Adds a reusable parser to the scope.",
-    "lineNumber": 115,
+    "lineNumber": 122,
     "params": [
       {
         "nullable": null,
@@ -3478,7 +3686,7 @@
     ]
   },
   {
-    "__docId__": 132,
+    "__docId__": 136,
     "kind": "method",
     "name": "removeParser",
     "memberof": "src/scope.js~Scope",
@@ -3488,7 +3696,7 @@
     "longname": "src/scope.js~Scope#removeParser",
     "access": "public",
     "description": "Removes a parser from the scope.",
-    "lineNumber": 134,
+    "lineNumber": 141,
     "params": [
       {
         "nullable": null,
@@ -3526,7 +3734,7 @@
     ]
   },
   {
-    "__docId__": 134,
+    "__docId__": 138,
     "kind": "method",
     "name": "getParser",
     "memberof": "src/scope.js~Scope",
@@ -3536,7 +3744,7 @@
     "longname": "src/scope.js~Scope#getParser",
     "access": "public",
     "description": "Returns a parser by its name.",
-    "lineNumber": 164,
+    "lineNumber": 171,
     "params": [
       {
         "nullable": null,
@@ -3579,7 +3787,7 @@
     ]
   },
   {
-    "__docId__": 135,
+    "__docId__": 139,
     "kind": "method",
     "name": "hasParser",
     "memberof": "src/scope.js~Scope",
@@ -3589,7 +3797,7 @@
     "longname": "src/scope.js~Scope#hasParser",
     "access": "public",
     "description": "Checks whether or not there's a parser based on its name.",
-    "lineNumber": 180,
+    "lineNumber": 187,
     "params": [
       {
         "nullable": null,
@@ -3612,7 +3820,7 @@
     }
   },
   {
-    "__docId__": 136,
+    "__docId__": 140,
     "kind": "get",
     "name": "name",
     "memberof": "src/scope.js~Scope",
@@ -3622,7 +3830,7 @@
     "longname": "src/scope.js~Scope#name",
     "access": "public",
     "description": "The scope's name.",
-    "lineNumber": 187,
+    "lineNumber": 194,
     "type": {
       "nullable": null,
       "types": [
@@ -3633,7 +3841,7 @@
     }
   },
   {
-    "__docId__": 137,
+    "__docId__": 141,
     "kind": "method",
     "name": "_validateName",
     "memberof": "src/scope.js~Scope",
@@ -3643,7 +3851,7 @@
     "longname": "src/scope.js~Scope#_validateName",
     "access": "protected",
     "description": "Validates that the name the class intends to use is a `string`.",
-    "lineNumber": 198,
+    "lineNumber": 205,
     "ignore": true,
     "params": [
       {
@@ -3675,7 +3883,7 @@
     ]
   },
   {
-    "__docId__": 138,
+    "__docId__": 142,
     "kind": "method",
     "name": "_validateCase",
     "memberof": "src/scope.js~Scope",
@@ -3685,7 +3893,7 @@
     "longname": "src/scope.js~Scope#_validateCase",
     "access": "protected",
     "description": "Validates if a case is an instance of {@link ErrorCase}.",
-    "lineNumber": 212,
+    "lineNumber": 219,
     "ignore": true,
     "params": [
       {
@@ -3710,7 +3918,7 @@
     "return": null
   },
   {
-    "__docId__": 139,
+    "__docId__": 143,
     "kind": "method",
     "name": "_validateParser",
     "memberof": "src/scope.js~Scope",
@@ -3720,7 +3928,7 @@
     "longname": "src/scope.js~Scope#_validateParser",
     "access": "protected",
     "description": "Validates if a parser is an instance of {@link CaseParser}.",
-    "lineNumber": 224,
+    "lineNumber": 231,
     "ignore": true,
     "params": [
       {
@@ -3745,7 +3953,7 @@
     "return": null
   },
   {
-    "__docId__": 140,
+    "__docId__": 144,
     "kind": "file",
     "name": "src/typedef.js",
     "content": "/**\n * @external {Class} https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes\n */\n",
@@ -3756,7 +3964,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 141,
+    "__docId__": 145,
     "kind": "external",
     "name": "Class",
     "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes",
@@ -3768,7 +3976,7 @@
   },
   {
     "kind": "index",
-    "content": "# Parserror\n\n[![Travis](https://img.shields.io/travis/homer0/parserror.svg?style=flat-square)](https://travis-ci.org/homer0/parserror)\n[![Coveralls github](https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square)](https://coveralls.io/github/homer0/parserror?branch=master)\n[![David](https://img.shields.io/david/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)\n[![David](https://img.shields.io/david/dev/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)\n\nParse errors and generate more human messages\n\n## Introduction\n\n> If you are wondering why I built this, go to the [Motivation](#motivation) section.\n\nParserror allows you parse errors from external resources by defining simple (or complex) cases in order to be able to use them in the context of your project:\n\n```js\nconst Parserror = require('parserror');\n\n// Define the cases\nconst parserror = Parserror\n.new()\n.addCases([\n  {\n    // A simple name to use as reference.\n    name: 'duplicatedEmail',\n    // An expression the error message must match.\n    condition: /email_address already exists/i,\n    // A new, more human friendly, error message for your project to use.\n    message: 'This email address is already in use, please choose another',\n  }\n]);\n\n// Use the case\n\ntry {\n  await registerUser();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error);\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\n## Usage\n\n### Cases\n\nAs demonstrated in the introduction's example, the way you match and parse your errors is by defining \"cases\".\n\nYou add new cases using the `addCases` method, and they can be as simple as the one we already saw, with a basic condition and a `string` message, or they can be a little more complex.\n\n\n#### Using specific cases\n\nThe reason cases have a name is that when you call `parse`, you can specify a limited list of cases that you want to use for an error.\n\nKeeping with the example from above:\n\n```js\ntry {\n  await registerUser();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error, {\n    // You can the cases list on the options parameter.\n    cases: ['duplicatedEmail'],\n  });\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\nThen, no matter how many cases you have, the error will validate only against the `duplicatedEmail` case.\n\n#### Case parameters\n\nLet's say you have an error that is triggered when you send a `string` with more than `300` characters, and this is what the message says:\n\n```\nInvalid message: the text exceeds the limit of 300\n```\n\n> Yes, I'm using pretty horrible errors to show my point.\n\nYou could extract the `300` from there so it can be used on the formatted message:\n\n```js\n{\n  name: 'messageLimitValidation',\n  condition: /Invalid message: the text exceeds the limit of (\\d+)/i,\n  message: (limit) => `Your message can't exceeds the ${limit} characters`,\n}\n```\n\nYou just need to use a group on your expression. If the library detects that you have groups, it will use `message` as a `function` and send the group as parameters in the order they were found.\n\n#### Case parsers\n\nBut what if you want to transformed and extracted parameter before using it your message? Well, that's what the parsers are for.\n\nLet's say you have a library that performs image optimization, it has a size limit of 1mb for the files it can handle and you send a ~3.5MB photo, you could get something like this:\n\n```\nSize Violation - The file is to large (3584KB)\n```\n\nYou could use a parser to make that value into MB:\n\n```js\n{\n  name: 'fileLimitValidation',\n  condition: /Size Violation - The file is to large \\((\\d+)\\w+\\)/i,\n  parse: [(size) => prettysize(size)],\n  message: (size) => `Your image is too big (${size})`,\n}\n```\n\nYou can use the `parse` property to send functions that will allow you to transform the parameters before using them on the `message`. The order of the list is the same as the parameters.\n\nAnd you can also use multiple parsers for the same parameters, just use and `array`:\n\n```js\n{\n  name: 'fileLimitValidation',\n  condition: /Size Violation - The file is to large \\((\\d+)\\w+\\)/i,\n  parse: [Number, (size) => prettysize(size)],\n  message: (size) => `Your image is too big (${size})`,\n}\n```\n\nIn this case, before getting to the `prettysize` parameter, `Number` will act as a parser and transform the value into a proper number (as values extracted from expressions are always `string`).\n\n##### Reusable parsers\n\nBut that's not all parsers can do; Let's say the error also shows the limit:\n\n```\nSize Violation - The file is to large (3584KB) - limit is 1024KB\n```\n\nAnd you want to extract and format both sizes for your message, you can define reusable parsers:\n\n```js\n{\n  name: 'fileLimitValidation',\n  condition: /Size Violation - The file is to large \\((\\d+)\\w+\\) - limit is (\\d+)\\w+/i,\n  parsers: {\n    sizeParser: (size) => prettysize(Number(size)),\n  },\n  parse: ['sizeParser', 'sizeParser'],\n  message: (size, limit) => `Your image is too big: ${size} - The limit size is ${limit}`,\n}\n```\n\nYou can define an object on the `parsers` property with named parsers, that you can later reference on the `parse` list.\n\n##### Map parsers\n\nFinally, the last \"feature\" here is that, instead of defining a function, you can also define an \"object map\" to match with the value of a parameter.\n\nEverything is easier with an example!\n\nLet's imagine a form to create products, with fields for name, description, price; and on the service you are using save the data, each field has specific rules to validate invalid characters: The name and the description can't have special symbols, just regular text, and the price can only have numbers.\n\nThen, the fields on the service are called `product_name`, `product_description` and `product_price`, so it's not uncommon that you'll get errors like this:\n\n```\nValidation Error: product_description has invalid characters\n```\n\nYes, if you paid attention, you could use a parameter for the name and parser function to map it to a name the end user will understand (like `product_description` to `description`).\n\nWell, you could do that, or you can create a simple map parser:\n\n```js\n{\n  name: 'charactersValidation',\n  condition: /Validation Error: (\\w+) has invalid characters/i,\n  parsers: {\n    fieldParser: {\n      'product_name': {\n        label: 'product\\'s name',\n        field: 'input_name',\n      },\n      'product_description': {\n        label: 'product\\'s description',\n        field: 'input_description',\n      },\n      'product_price': {\n        label: 'product\\'s price',\n        field: 'input_price',\n      }\n    }\n  },\n  parse: ['fieldParser'],\n  message: (property) => `The ${property.label} has invalid characters`,\n};\n```\n\nAnd if you are wondering what are the `field` properties for, there's a \"sub feature\" here: all parameters are saved on a `parameters` property, so you could use the map to store metadata that you can later use. For this case, imagine that `field` could be the name of the UI controller you want to highlight for the user to identify where the error is:\n\n```js\ntry {\n  await saveProduct();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error);\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n  \n  // Extract the formatted parameter metadata.\n  const [property] = formatted.parameters;\n  highlightUIController(property.field);\n}\n```\n\n### Scopes\n\nBy default, when you add cases, they are added to a \"global scope\", so they are all available every time you call `parse`. This \"global scope\" is automatically created when Parserror is instantiated.\n\nScopes are groups of cases and parsers that you can use to limit the number of cases that parse an error, and to share reusable parsers between different cases.\n\nThere are three ways you can create a scope:\n\n1 - With `addScope`:\n\n```js\nconst parserror = Parserror\n.new()\n.addScope('userValidationScope', [\n  {\n    name: 'duplicatedEmail',\n    condition: /email_address already exists/i,\n    message: 'This email address is already in use, please choose another',\n  }\n]);\n```\n\n2 - With `addCase`/`addCases`:\n\n```js\nconst parserror = Parserror\n.new()\n.addCase(\n  {\n    name: 'duplicatedEmail',\n    condition: /email_address already exists/i,\n    message: 'This email address is already in use, please choose another',\n  },\n  'userValidationScope'\n);\n```\n\nYou just send it as a second parameter, and if the scope doesn't exist, it will be created.\n\n3 - As a property of a case definition:\n\n```js\nconst parserror = Parserror\n.new()\n.addCase({\n  name: 'duplicatedEmail',\n  condition: /email_address already exists/i,\n  message: 'This email address is already in use, please choose another',\n  scope: 'userValidationScope',\n});\n```\n\nAnd yes, this works for both `addCase` and `addCases`.\n\n#### Using scopes\n\nOnce you have your scopes defined, you can specify them when you call `parse`:\n\n```js\ntry {\n  await saveProduct();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error, {\n    // You can the scopes list on the options parameter.\n    scopes: ['userValidationScope'],\n  });\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\nIn this case, Parserror will try to match against the cases of `userValidationScope` before trying with the global scope.\n\n#### Scope parsers\n\nOn the parsers section we saw that we can define a reusable parser inside a case definition, but Parserror also allows you to define a parser on a scope and reuse it across multiple cases:\n\n```js\nconst parserror = Parserror\n.new()\n.addParser('sizeParser', (size) => prettysize(Number(size))\n.addCases([\n  {\n    name: 'fileLimitValidation',\n    condition: /Size Violation - The file is to large \\((\\d+)\\w+\\) - limit is (\\d+)\\w+/i,\n    parse: ['sizeParser', 'sizeParser'],\n    message: (size, limit) => `Your image is too big: ${size} - The limit size is ${limit}`,\n  },\n  {\n    name: 'compressionValidation',\n    condition: /The file size is to big to be compressed, the limit is \\(\\d+)\\w+/i,\n    parse: ['sizeParser'],\n    message: (limit) => `You can't compress a file over ${limit}`,\n  },\n]);\n```\n\nWe first added the parser to the global scope and then we just referenced it from the cases, that's all.\n\nA few things you should know:\n\n- The example uses the global scope, but you can achieve the same for a custom scope by using the `scope` parameter on `addParser` and `addCase`/`addCases`.\n- If you add the case to a custom scope, you can still reference parsers from the global scope, as Parserror automatically adds the global scope as the last item of the list of scopes to use.\n\n### Wrappers\n\nWrappers are little helpers that allow you to create functions with scopes and/or cases already pre configured:\n\n```js\nconst parserror = Parserror\n.new()\n.addCases([\n  {\n    name: 'duplicatedEmail',\n    condition: /email_address already exists/i,\n    message: 'This email address is already in use, please choose another',\n  },\n  ...\n);\n\nconst formatUserErrors = parserror.wrap(['duplicatedEmail', ...]);\n\n...\n\ntry {\n  await saveProduct();\n} catch (error) {\n  // Send the received error to the wrapper.\n  const formatted = formatUserErrors(error);\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\nYou can also create a wrapper for a scope or a list of them:\n\n```js\nconst formatUserErrors = parserror.wrap([], ['userValidationScope']);\n``` \n\nThe only thing weird there is that if you are not using cases, having to define an empty array as first parameter doesn't look very nice... so you could just use `wrapForScopes`:\n\n```js\nconst formatUserErrors = parserror.wrapForScopes(['userValidationScope']);\n``` \n\n## Development\n\n### NPM/Yarn tasks\n\n| Task       | Description                         |\n|------------|-------------------------------------|\n| `test`     | Run the project unit tests.         |\n| `lint`     | Lint the modified files.            |\n| `lint:all` | Lint the entire project code.       |\n| `docs`     | Generate the project documentation. |\n| `todo`     | List all the pending to-do's.       |\n\n### Repository hooks\n\nI use [husky](https://yarnpkg.com/en/package/husky) to automatically install the repository hooks so the code will be tested and linted before any commit and the dependencies updated after every merge. The configuration is on the `husky` property of the `package.json` and the hooks' files are on `./utils/hooks`.\n\n### Testing\n\nI use [Jest](https://facebook.github.io/jest/) with [Jest-Ex](https://yarnpkg.com/en/package/jest-ex) to test the project. The configuration file is on `./.jestrc.json`, the tests are on `./tests` and the script that runs it is on `./utils/scripts/test`.\n\n### Linting\n\nI use [ESlint](http://eslint.org) with [my own custom configuration](http://yarnpkg.com/en/package/eslint-plugin-homer0) to validate all the JS code. The configuration file for the project code is on `./.eslintrc` and the one for the tests is on `./tests/.eslintrc`. There's also an `./.eslintignore` to exclude some files on the process. The script that runs it is on `./utils/scripts/lint`.\n\n### Documentation\n\nI use [ESDoc](http://esdoc.org) to generate HTML documentation for the project. The configuration file is on `./.esdoc.json` and the script that runs it is on `./utils/scripts/docs`.\n\n### To-Dos\n\nI use `@todo` comments to write all the pending improvements and fixes, and [Leasot](https://yarnpkg.com/en/package/leasot) to generate a report. The script that runs it is on `./utils/scripts/todo`.\n\n## Motivation\n\n> I put this at the end because no one usually reads it :P.\n\nNowadays it's pretty common to be working with APIs/services/libraries (we'll call them \"resources\") external to your projects, and those resources are **almost never** aware of what kind of project you are building, so whenever they throw/emit errors, they lack context.\n\nErrors without context are hard to handle, most of the times you just can't just show them to the end user, whether the resource is a library or an API, errors tend to be specific to the its own context.\n\nFor example:\n\nLet's say you have a web app that connects to an API that manages users. You create a UI with a form to enter a new user and email address; on the other side, the API implements some sort of ORM with out-of-the-box validations and the email address is a unique field.\n\nWhen the user submits the form with an email that is already being used, the API may respond with something like this:\n\n```\nThe field 'email' must be unique\n```\n\nWhat do you do?\n\n1. Do you show that error to the user?\n2. Check if the error matches against a `RegExp` or a `string` in order to rewrite it for the user?\n3. If you have control of the API, do you get rid of the validations in order to write better errors?\n\nMy answers are:\n\n1. No\n2. That won't scale if I have a lot of errors to parse.\n3. Even if that were the case, \"no, thanks\".\n\n> If you have other answers, this library may not be of interest to you.\n\nOk, so there weren't other alternatives, so I took the \"possible solution\" I could have more control over and created a library that would help me handle it on a more simple and organized way.\n",
+    "content": "# Parserror\n\n[![Travis](https://img.shields.io/travis/homer0/parserror.svg?style=flat-square)](https://travis-ci.org/homer0/parserror)\n[![Coveralls github](https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square)](https://coveralls.io/github/homer0/parserror?branch=master)\n[![David](https://img.shields.io/david/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)\n[![David](https://img.shields.io/david/dev/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)\n\nParse errors and generate more human messages\n\n## Introduction\n\n> If you are wondering why I built this, go to the [Motivation](#motivation) section.\n\nParserror allows you parse errors from external resources by defining simple (or complex) cases in order to be able to use them in the context of your project:\n\n```js\nconst Parserror = require('parserror');\n\n// Define the cases\nconst parserror = Parserror\n.new()\n.addCases([\n  {\n    // A simple name to use as reference.\n    name: 'duplicatedEmail',\n    // An expression the error message must match.\n    condition: /email_address already exists/i,\n    // A new, more human friendly, error message for your project to use.\n    message: 'This email address is already in use, please choose another',\n  }\n]);\n\n// Use the case\n\ntry {\n  await registerUser();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error);\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\n## Usage\n\n### Cases\n\nAs demonstrated in the introduction's example, the way you match and parse your errors is by defining \"cases\".\n\nYou add new cases using the `addCases` method, and they can be as simple as the one we already saw, with a basic condition and a `string` message, or they can be a little more complex.\n\n#### Using specific cases\n\nThe reason cases have a name is that when you call `parse`, you can specify a limited list of cases that you want to use for an error.\n\nKeeping with the example from above:\n\n```js\ntry {\n  await registerUser();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error, {\n    // You can the cases list on the options parameter.\n    cases: ['duplicatedEmail'],\n  });\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\nThen, no matter how many cases you have, the error will validate only against the `duplicatedEmail` case.\n\n#### Case parameters\n\nLet's say you have an error that is triggered when you send a `string` with more than `300` characters, and this is what the message says:\n\n```\nInvalid message: the text exceeds the limit of 300\n```\n\n> Yes, I'm using pretty horrible errors to show my point.\n\nYou could extract the `300` from there so it can be used on the formatted message:\n\n```js\n{\n  name: 'messageLimitValidation',\n  condition: /Invalid message: the text exceeds the limit of (\\d+)/i,\n  message: (limit) => `Your message can't exceeds the ${limit} characters`,\n}\n```\n\nYou just need to use a group on your expression. If the library detects that you have groups, it will use `message` as a `function` and send the group as parameters in the order they were found.\n\n#### Case parsers\n\nBut what if you want to transformed and extracted parameter before using it your message? Well, that's what the parsers are for.\n\nLet's say you have a library that performs image optimization, it has a size limit of 1mb for the files it can handle and you send a ~3.5MB photo, you could get something like this:\n\n```\nSize Violation - The file is to large (3584KB)\n```\n\nYou could use a parser to make that value into MB:\n\n```js\n{\n  name: 'fileLimitValidation',\n  condition: /Size Violation - The file is to large \\((\\d+)\\w+\\)/i,\n  parse: [(size) => prettysize(size)],\n  message: (size) => `Your image is too big (${size})`,\n}\n```\n\nYou can use the `parse` property to send functions that will allow you to transform the parameters before using them on the `message`. The order of the list is the same as the parameters.\n\nAnd you can also use multiple parsers for the same parameters, just use and `array`:\n\n```js\n{\n  name: 'fileLimitValidation',\n  condition: /Size Violation - The file is to large \\((\\d+)\\w+\\)/i,\n  parse: [Number, (size) => prettysize(size)],\n  message: (size) => `Your image is too big (${size})`,\n}\n```\n\nIn this case, before getting to the `prettysize` parameter, `Number` will act as a parser and transform the value into a proper number (as values extracted from expressions are always `string`).\n\n##### Reusable parsers\n\nBut that's not all parsers can do; Let's say the error also shows the limit:\n\n```\nSize Violation - The file is to large (3584KB) - limit is 1024KB\n```\n\nAnd you want to extract and format both sizes for your message, you can define reusable parsers:\n\n```js\n{\n  name: 'fileLimitValidation',\n  condition: /Size Violation - The file is to large \\((\\d+)\\w+\\) - limit is (\\d+)\\w+/i,\n  parsers: {\n    sizeParser: (size) => prettysize(Number(size)),\n  },\n  parse: ['sizeParser', 'sizeParser'],\n  message: (size, limit) => `Your image is too big: ${size} - The limit size is ${limit}`,\n}\n```\n\nYou can define an object on the `parsers` property with named parsers, that you can later reference on the `parse` list.\n\n##### Map parsers\n\nFinally, the last \"feature\" here is that, instead of defining a function, you can also define an \"object map\" to match with the value of a parameter.\n\nEverything is easier with an example!\n\nLet's imagine a form to create products, with fields for name, description, price; and on the service you are using save the data, each field has specific rules to validate invalid characters: The name and the description can't have special symbols, just regular text, and the price can only have numbers.\n\nThen, the fields on the service are called `product_name`, `product_description` and `product_price`, so it's not uncommon that you'll get errors like this:\n\n```\nValidation Error: product_description has invalid characters\n```\n\nYes, if you paid attention, you could use a parameter for the name and parser function to map it to a name the end user will understand (like `product_description` to `description`).\n\nWell, you could do that, or you can create a simple map parser:\n\n```js\n{\n  name: 'charactersValidation',\n  condition: /Validation Error: (\\w+) has invalid characters/i,\n  parsers: {\n    fieldParser: {\n      'product_name': {\n        label: 'product\\'s name',\n        field: 'input_name',\n      },\n      'product_description': {\n        label: 'product\\'s description',\n        field: 'input_description',\n      },\n      'product_price': {\n        label: 'product\\'s price',\n        field: 'input_price',\n      }\n    }\n  },\n  parse: ['fieldParser'],\n  message: (property) => `The ${property.label} has invalid characters`,\n};\n```\n\nAnd if you are wondering what are the `field` properties for, there's a \"sub feature\" here: all parameters are saved on a `parameters` property, so you could use the map to store metadata that you can later use. For this case, imagine that `field` could be the name of the UI controller you want to highlight for the user to identify where the error is:\n\n```js\ntry {\n  await saveProduct();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error);\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n  \n  // Extract the formatted parameter metadata.\n  const [property] = formatted.parameters;\n  highlightUIController(property.field);\n}\n```\n\n### Scopes\n\nBy default, when you add cases, they are added to a \"global scope\", so they are all available every time you call `parse`. This \"global scope\" is automatically created when Parserror is instantiated.\n\nScopes are groups of cases and parsers that you can use to limit the number of cases that parse an error, and to share reusable parsers between different cases.\n\nThere are three ways you can create a scope:\n\n1 - With `addScope`:\n\n```js\nconst parserror = Parserror\n.new()\n.addScope('userValidationScope', [\n  {\n    name: 'duplicatedEmail',\n    condition: /email_address already exists/i,\n    message: 'This email address is already in use, please choose another',\n  }\n]);\n```\n\n2 - With `addCase`/`addCases`:\n\n```js\nconst parserror = Parserror\n.new()\n.addCase(\n  {\n    name: 'duplicatedEmail',\n    condition: /email_address already exists/i,\n    message: 'This email address is already in use, please choose another',\n  },\n  'userValidationScope'\n);\n```\n\nYou just send it as a second parameter, and if the scope doesn't exist, it will be created.\n\n3 - As a property of a case definition:\n\n```js\nconst parserror = Parserror\n.new()\n.addCase({\n  name: 'duplicatedEmail',\n  condition: /email_address already exists/i,\n  message: 'This email address is already in use, please choose another',\n  scope: 'userValidationScope',\n});\n```\n\nAnd yes, this works for both `addCase` and `addCases`.\n\n#### Using scopes\n\nOnce you have your scopes defined, you can specify them when you call `parse`:\n\n```js\ntry {\n  await saveProduct();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error, {\n    // You can the scopes list on the options parameter.\n    scopes: ['userValidationScope'],\n  });\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\nIn this case, Parserror will try to match against the cases of `userValidationScope` before trying with the global scope.\n\n#### Scope parsers\n\nOn the parsers section we saw that we can define a reusable parser inside a case definition, but Parserror also allows you to define a parser on a scope and reuse it across multiple cases:\n\n```js\nconst parserror = Parserror\n.new()\n.addParser('sizeParser', (size) => prettysize(Number(size))\n.addCases([\n  {\n    name: 'fileLimitValidation',\n    condition: /Size Violation - The file is to large \\((\\d+)\\w+\\) - limit is (\\d+)\\w+/i,\n    parse: ['sizeParser', 'sizeParser'],\n    message: (size, limit) => `Your image is too big: ${size} - The limit size is ${limit}`,\n  },\n  {\n    name: 'compressionValidation',\n    condition: /The file size is to big to be compressed, the limit is \\(\\d+)\\w+/i,\n    parse: ['sizeParser'],\n    message: (limit) => `You can't compress a file over ${limit}`,\n  },\n]);\n```\n\nWe first added the parser to the global scope and then we just referenced it from the cases, that's all.\n\nA few things you should know:\n\n- The example uses the global scope, but you can achieve the same for a custom scope by using the `scope` parameter on `addParser` and `addCase`/`addCases`.\n- If you add the case to a custom scope, you can still reference parsers from the global scope, as Parserror automatically adds the global scope as the last item of the list of scopes to use.\n\n### Wrappers\n\nWrappers are little helpers that allow you to create functions with scopes and/or cases already pre configured:\n\n```js\nconst parserror = Parserror\n.new()\n.addCases([\n  {\n    name: 'duplicatedEmail',\n    condition: /email_address already exists/i,\n    message: 'This email address is already in use, please choose another',\n  },\n  ...\n);\n\nconst formatUserErrors = parserror.wrap(['duplicatedEmail', ...]);\n\n...\n\ntry {\n  await saveProduct();\n} catch (error) {\n  // Send the received error to the wrapper.\n  const formatted = formatUserErrors(error);\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\nYou can also create a wrapper for a scope or a list of them:\n\n```js\nconst formatUserErrors = parserror.wrap([], ['userValidationScope']);\n``` \n\nThe only thing weird there is that if you are not using cases, having to define an empty array as first parameter doesn't look very nice... so you could just use `wrapForScopes`:\n\n```js\nconst formatUserErrors = parserror.wrapForScopes(['userValidationScope']);\n``` \n\n### Fallback\n\nIn the case you don't want the original message reaching the user even if no case matched it, maybe it's a 50x error or something like that, you can use a fallback message.\n\nThere are a few different ways to define fallback messages:\n\n#### Add a fallback when parsing an error\n\nYou can send it as the `fallback` option on the `parse` method:\n\n```js\ntry {\n  await saveProduct();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error, {\n    // Define the fallback message\n    fallback: 'There was an error saving the product, please try again',\n  });\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\n#### Add a fallback when creating a wrapper\n\nYou can create wrappers with a defined fallback message so all the errors parsed can make use of.\n\n```js\nconst formatUserErrors = parserror.wrap(\n  ['duplicatedEmail', ...],\n  [...],\n  'There was an error saving the product, please try again'\n);\n```\n\nBoth `wrap` and `wrapForScopes` support the fallback message as their last parameter.\n\n#### Add a fallback message for an specific error parsed by a wrapper\n\nIf you are using the same wrapper for multiple tasks and the fallback message should be different depending on the task that failed, instead of sending it as the last parameter of `wrap` or `wrapForScopes`, you can send it as the second parameter of the created wrapper:\n\n```js\nconst parserror = Parserror\n.new()\n.addCases([\n  {\n    name: 'duplicatedEmail',\n    condition: /email_address already exists/i,\n    message: 'This email address is already in use, please choose another',\n  },\n  ...\n);\n\nconst formatUserErrors = parserror.wrap(['duplicatedEmail', ...]);\n\n...\n\ntry {\n  await saveProduct();\n} catch (error) {\n  // Send the received error to the wrapper, and define a fallback message.\n  const formatted = formatUserErrors(\n    error,\n    'There was an error saving the product, please try again'\n  );\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\n### Keep original messages\n\nLet's say some of the errors you receive are actually useful, you don't want to create a case to just return the same message... and to make it worst, you want a fallback for some messages that still don't have a case for. The easiest way to solve this is to \"allow the original\" message to be matched but not parsed/formatted, and that's done with the `allowOriginal` method:\n\n```js\nconst parserror = Parserror\n.new()\n.addCases([\n  {\n    name: 'duplicatedEmail',\n    condition: /email_address already exists/i,\n    message: 'This email address is already in use, please choose another',\n  },\n  ...\n)\n.allowOriginal(/a message that is actually useful/);\n\nconst formatUserErrors = parserror.wrap(['duplicatedEmail', ...]);\n\n...\n\ntry {\n  await saveProduct();\n} catch (error) {\n  // Send the received error to the parser.\n  const formatted = parserror.parse(error, {\n    // Define the fallback message\n    fallback: 'There was an error saving the product, please try again',\n  });\n  // Get a new error with the formatted message.\n  showNotification(formatted.message);\n}\n```\n\nIf the error matches the condition sent on `allowOriginal`, it will keep it as it is and avoid the fallback.\n\nInternally, `allowOriginal` creates a new error case but with a flag to keep the original message, so instead of sending a regular expression (or a string), you can send a case definition and even give it a name, so it can be used on `parse` and `wrap`.\n\n```js\nconst parserror = Parserror\n.allowOriginal({\n  condition: /a message that is actually useful/,\n  name: 'thatUsefulMessage',\n  scope: 'someCustomScope',\n});\n```\n\nAnd just like `addCase` and `addCases`, you also have `allowOriginals` to define multiple conditions at once.\n\n## Development\n\n### NPM/Yarn tasks\n\n| Task       | Description                         |\n|------------|-------------------------------------|\n| `test`     | Run the project unit tests.         |\n| `lint`     | Lint the modified files.            |\n| `lint:all` | Lint the entire project code.       |\n| `docs`     | Generate the project documentation. |\n| `todo`     | List all the pending to-do's.       |\n\n### Repository hooks\n\nI use [husky](https://yarnpkg.com/en/package/husky) to automatically install the repository hooks so the code will be tested and linted before any commit and the dependencies updated after every merge. The configuration is on the `husky` property of the `package.json` and the hooks' files are on `./utils/hooks`.\n\n### Testing\n\nI use [Jest](https://facebook.github.io/jest/) with [Jest-Ex](https://yarnpkg.com/en/package/jest-ex) to test the project. The configuration file is on `./.jestrc.json`, the tests are on `./tests` and the script that runs it is on `./utils/scripts/test`.\n\n### Linting\n\nI use [ESlint](http://eslint.org) with [my own custom configuration](http://yarnpkg.com/en/package/eslint-plugin-homer0) to validate all the JS code. The configuration file for the project code is on `./.eslintrc` and the one for the tests is on `./tests/.eslintrc`. There's also an `./.eslintignore` to exclude some files on the process. The script that runs it is on `./utils/scripts/lint`.\n\n### Documentation\n\nI use [ESDoc](http://esdoc.org) to generate HTML documentation for the project. The configuration file is on `./.esdoc.json` and the script that runs it is on `./utils/scripts/docs`.\n\n### To-Dos\n\nI use `@todo` comments to write all the pending improvements and fixes, and [Leasot](https://yarnpkg.com/en/package/leasot) to generate a report. The script that runs it is on `./utils/scripts/todo`.\n\n## Motivation\n\n> I put this at the end because no one usually reads it :P.\n\nNowadays it's pretty common to be working with APIs/services/libraries (we'll call them \"resources\") external to your projects, and those resources are **almost never** aware of what kind of project you are building, so whenever they throw/emit errors, they lack context.\n\nErrors without context are hard to handle, most of the times you just can't just show them to the end user, whether the resource is a library or an API, errors tend to be specific to the its own context.\n\nFor example:\n\nLet's say you have a web app that connects to an API that manages users. You create a UI with a form to enter a new user and email address; on the other side, the API implements some sort of ORM with out-of-the-box validations and the email address is a unique field.\n\nWhen the user submits the form with an email that is already being used, the API may respond with something like this:\n\n```\nThe field 'email' must be unique\n```\n\nWhat do you do?\n\n1. Do you show that error to the user?\n2. Check if the error matches against a `RegExp` or a `string` in order to rewrite it for the user?\n3. If you have control of the API, do you get rid of the validations in order to write better errors?\n\nMy answers are:\n\n1. No\n2. That won't scale if I have a lot of errors to parse.\n3. Even if that were the case, \"no, thanks\".\n\n> If you have other answers, this library may not be of interest to you.\n\nOk, so there weren't other alternatives, so I took the \"possible solution\" I could have more control over and created a library that would help me handle it on a more simple and organized way.\n",
     "longname": "/Users/homer0/CODE/shared/parserror/README.md",
     "name": "./README.md",
     "static": true,
@@ -3776,7 +3984,7 @@
   },
   {
     "kind": "packageJSON",
-    "content": "{\n  \"name\": \"parserror\",\n  \"description\": \"Parse errors and generate more human messages\",\n  \"homepage\": \"https://homer0.github.io/parserror/\",\n  \"version\": \"1.0.0\",\n  \"repository\": \"homer0/parserror\",\n  \"author\": \"Leonardo Apiwan (@homer0) <me@homer0.com>\",\n  \"license\": \"MIT\",\n  \"dependencies\": {},\n  \"devDependencies\": {\n    \"@babel/preset-env\": \"7.5.5\",\n    \"@babel/core\": \"7.5.5\",\n    \"@babel/plugin-transform-runtime\": \"7.5.5\",\n    \"coveralls\": \"^3.0.6\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"esdoc-node\": \"^1.0.4\",\n    \"eslint\": \"^6.3.0\",\n    \"eslint-plugin-homer0\": \"^2.0.0\",\n    \"husky\": \"^3.0.5\",\n    \"jasmine-expect\": \"^4.0.3\",\n    \"jest-ex\": \"^6.1.1\",\n    \"jest-cli\": \"^24.9.0\",\n    \"leasot\": \"^8.0.0\",\n    \"wootils\": \"^2.6.5\"\n  },\n  \"engine-strict\": true,\n  \"engines\": {\n    \"node\": \">=8.10.0\",\n    \"npm\": \">=3.0.0\"\n  },\n  \"main\": \"src/index.js\",\n  \"scripts\": {\n    \"test\": \"./utils/scripts/test\",\n    \"lint\": \"./utils/scripts/lint\",\n    \"lint:all\": \"./utils/scripts/lint-all\",\n    \"docs\": \"./utils/scripts/docs\",\n    \"todo\": \"./utils/scripts/todo\"\n  },\n  \"husky\": {\n    \"hooks\": {\n      \"pre-commit\": \"./utils/hooks/pre-commit\",\n      \"post-merge\": \"./utils/hooks/post-merge\"\n    }\n  }\n}\n",
+    "content": "{\n  \"name\": \"parserror\",\n  \"description\": \"Parse errors and generate more human messages\",\n  \"homepage\": \"https://homer0.github.io/parserror/\",\n  \"version\": \"2.0.0\",\n  \"repository\": \"homer0/parserror\",\n  \"author\": \"Leonardo Apiwan (@homer0) <me@homer0.com>\",\n  \"license\": \"MIT\",\n  \"keywords\": [\n    \"parse\",\n    \"error\",\n    \"errors\",\n    \"normalize\",\n    \"format\"\n  ],\n  \"dependencies\": {},\n  \"devDependencies\": {\n    \"@babel/preset-env\": \"7.7.1\",\n    \"@babel/core\": \"7.7.2\",\n    \"@babel/plugin-transform-runtime\": \"7.6.2\",\n    \"coveralls\": \"^3.0.7\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"esdoc-node\": \"1.0.4\",\n    \"eslint\": \"^6.6.0\",\n    \"eslint-plugin-homer0\": \"^2.0.1\",\n    \"husky\": \"^3.0.9\",\n    \"jasmine-expect\": \"^4.0.3\",\n    \"jest-ex\": \"^6.1.1\",\n    \"jest-cli\": \"^24.9.0\",\n    \"leasot\": \"^9.0.0\",\n    \"wootils\": \"^2.6.5\"\n  },\n  \"engine-strict\": true,\n  \"engines\": {\n    \"node\": \">=8.10.0\",\n    \"npm\": \">=3.0.0\"\n  },\n  \"main\": \"src/index.js\",\n  \"scripts\": {\n    \"test\": \"./utils/scripts/test\",\n    \"lint\": \"./utils/scripts/lint\",\n    \"lint:all\": \"./utils/scripts/lint-all\",\n    \"docs\": \"./utils/scripts/docs\",\n    \"todo\": \"./utils/scripts/todo\"\n  },\n  \"husky\": {\n    \"hooks\": {\n      \"pre-commit\": \"./utils/hooks/pre-commit\",\n      \"post-merge\": \"./utils/hooks/post-merge\"\n    }\n  }\n}\n",
     "longname": "/Users/homer0/CODE/shared/parserror/package.json",
     "name": "package.json",
     "static": true,

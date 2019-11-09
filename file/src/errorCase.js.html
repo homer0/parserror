@@ -59,20 +59,21 @@ const FormattedError = require(&apos;./formattedError&apos;);
 /**
  * @typedef {Object} ErrorCaseDefinition
  * @description The required properties to create a new {@link ErrorCase}.
- * @property {String}                     name      The name of the case.
- * @property {ErrorCaseDefinition|String} message   The formatted message or the `function` that
- *                                                  generates one.
- * @property {RegExp|String}              condition A `string` or a expression to match against an
- *                                                  error that could be parsed.
- * @property {?Object}                    parsers   A map of reusable parsers. Each parser can be
- *                                                  an `object` map, a `function` or an instance of
- *                                                  {@link CaseParser}.
- * @property {?Array}                     parse     A list of parsers the case should use on
- *                                                  extracted parameters. Each item of the list can
- *                                                  be either the name of a parser defined on
- *                                                  `parsers`, the name of a parser on the scope,
- *                                                  a `function` to parse a value, or an `array` of
- *                                                  all the thing previously mentioned.
+ * @property {String} name
+ * The name of the case.
+ * @property {ErrorCaseDefinition|String} message
+ * The formatted message or the `function` that generates one.
+ * @property {RegExp|String} condition
+ * A `string` or a expression to match against an error that could be parsed.
+ * @property {?Object} parsers
+ * A map of reusable parsers. Each parser can be an `object` map, a `function` or an instance of
+ * {@link CaseParser}.
+ * @property {?Array} parse
+ * A list of parsers the case should use on extracted parameters. Each item of the list can be
+ * either the name of a parser defined on `parsers`, the name of a parser on the scope, a
+ * `function` to parse a value, or an `array` of all the thing previously mentioned.
+ * @property {?Boolean} useOriginal
+ * Whether or not the case should use the original message when matched.
  */
 
 /**
@@ -126,12 +127,20 @@ class ErrorCase {
      */
     this._name = this._validateName(definition.name);
     /**
-     * The function that generates the formatted message.
-     * @type {ErrorCaseMessage}
+     * Whether or not the case should use the original message when matched.
+     * @type {Boolean}
      * @access protected
      * @ignore
      */
-    this._message = this._validateMessage(definition.message);
+    this._useOriginal = !!definition.useOriginal;
+    /**
+     * The function that generates the formatted message. If the case should use the original
+     * message, then the property will be `null`.
+     * @type {?ErrorCaseMessage}
+     * @access protected
+     * @ignore
+     */
+    this._message = this._useOriginal ? null : this._validateMessage(definition.message);
     /**
      * The expression to validate if an error matches the case.
      * @type {RegExp}
@@ -183,7 +192,9 @@ class ErrorCase {
   parse(errorMessage, scopes = [], context = null) {
     let result;
     if (errorMessage.match(this._condition)) {
-      result = this._parseError(errorMessage, scopes, context);
+      result = this._useOriginal ?
+        this._createError(errorMessage, [], Object.assign({}, context, { original: true })) :
+        this._parseError(errorMessage, scopes, context);
     } else {
       result = null;
     }
@@ -375,7 +386,7 @@ class ErrorCase {
       &apos;message&apos;,
     ]
     .find((property) =&gt; typeof definition[property] === &apos;undefined&apos;);
-    if (missing) {
+    if (missing &amp;&amp; (missing !== &apos;message&apos; || !definition.useOriginal)) {
       throw new Error(`The &apos;${missing}&apos; property is required on a case definition`);
     }
   }

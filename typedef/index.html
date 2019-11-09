@@ -204,7 +204,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="typedef/index.html#static-typedef-ParserrorWrapper">ParserrorWrapper</a></span></span><span class="code" data-ice="signature">(error: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span> | <span>ParserrorErrorObject</span>): <span><a href="class/src/formattedError.js~FormattedError.html">FormattedError</a></span>: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">function</a></span></span>
+          <span class="code" data-ice="name"><span><a href="typedef/index.html#static-typedef-ParserrorWrapper">ParserrorWrapper</a></span></span><span class="code" data-ice="signature">(error: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span> | <span>ParserrorErrorObject</span>, fallback: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span>): <span><a href="class/src/formattedError.js~FormattedError.html">FormattedError</a></span>: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">function</a></span></span>
         </p>
       </div>
       <div>
@@ -332,37 +332,38 @@
       <td data-ice="name" class="code" data-depth="0">message</td>
       <td data-ice="type" class="code"><span><a href="typedef/index.html#static-typedef-ErrorCaseDefinition">ErrorCaseDefinition</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>The formatted message or the <code>function</code> that
-                                                 generates one.</p>
+      <td data-ice="description"><p>The formatted message or the <code>function</code> that generates one.</p>
 </td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">condition</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>A <code>string</code> or a expression to match against an
-                                                 error that could be parsed.</p>
+      <td data-ice="description"><p>A <code>string</code> or a expression to match against an error that could be parsed.</p>
 </td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">parsers</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"><ul><li>nullable: true</li></ul></td>
-      <td data-ice="description"><p>A map of reusable parsers. Each parser can be
-                                                 an <code>object</code> map, a <code>function</code> or an instance of
-                                                 <span><a href="class/src/caseParser.js~CaseParser.html">CaseParser</a></span>.</p>
+      <td data-ice="description"><p>A map of reusable parsers. Each parser can be an <code>object</code> map, a <code>function</code> or an instance of
+<span><a href="class/src/caseParser.js~CaseParser.html">CaseParser</a></span>.</p>
 </td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">parse</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></td>
       <td data-ice="appendix"><ul><li>nullable: true</li></ul></td>
-      <td data-ice="description"><p>A list of parsers the case should use on
-                                                 extracted parameters. Each item of the list can
-                                                 be either the name of a parser defined on
-                                                 <code>parsers</code>, the name of a parser on the scope,
-                                                 a <code>function</code> to parse a value, or an <code>array</code> of
-                                                 all the thing previously mentioned.</p>
+      <td data-ice="description"><p>A list of parsers the case should use on extracted parameters. Each item of the list can be
+either the name of a parser defined on <code>parsers</code>, the name of a parser on the scope, a
+<code>function</code> to parse a value, or an <code>array</code> of all the thing previously mentioned.</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">useOriginal</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></span></td>
+      <td data-ice="appendix"><ul><li>nullable: true</li></ul></td>
+      <td data-ice="description"><p>Whether or not the case should use the original message when matched.</p>
 </td>
     </tr>
 </tbody>
@@ -590,14 +591,25 @@
       <td data-ice="name" class="code" data-depth="0">cases</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span>&gt;</td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>A list of specific cases it should validated against.</p>
+      <td data-ice="description"><p>A list of specific cases it should validated
+                                   against.</p>
 </td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">scopes</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span>&gt;</td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>A list of specific scopes it should use to valdiate the error.</p>
+      <td data-ice="description"><p>A list of specific scopes it should use to
+                                   valdiate the error.</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">fallback</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span></td>
+      <td data-ice="appendix"><ul><li>nullable: true</li></ul></td>
+      <td data-ice="description"><p>A fallback message in case the error can&apos;t be parsed.
+                                   If not specified, the returned error will
+                                   maintain the original message.</p>
 </td>
     </tr>
 </tbody>
@@ -630,7 +642,7 @@
     
     
     
-    <span class="code" data-ice="name">ParserrorWrapper</span><span class="code" data-ice="signature">(error: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span> | <span>ParserrorErrorObject</span>): <span><a href="class/src/formattedError.js~FormattedError.html">FormattedError</a></span>: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">function</a></span></span>
+    <span class="code" data-ice="name">ParserrorWrapper</span><span class="code" data-ice="signature">(error: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span> | <span>ParserrorErrorObject</span>, fallback: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span>): <span><a href="class/src/formattedError.js~FormattedError.html">FormattedError</a></span>: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">function</a></span></span>
     <span class="right-info">
       
       
@@ -658,6 +670,16 @@
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span> | <span>ParserrorErrorObject</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>The error to parse.</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">fallback</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: null</li>
+<li>nullable: true</li></ul></td>
+      <td data-ice="description"><p>A fallback message in case the error can&apos;t be parsed. If not specified, the returned
+error will maintain the original message.</p>
 </td>
     </tr>
 </tbody>

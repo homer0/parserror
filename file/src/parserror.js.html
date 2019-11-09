@@ -84,14 +84,23 @@ const Utils = require(&apos;./utils&apos;);
 /**
  * @typedef {Object} ParserrorParseOptions
  * @description The options that can be used to customize how {@link Parserror#parse} works.
- * @property {Array&lt;String&gt;} cases  A list of specific cases it should validated against.
- * @property {Array&lt;String&gt;} scopes A list of specific scopes it should use to valdiate the error.
+ * @property {Array&lt;String&gt;} cases    A list of specific cases it should validated
+ *                                    against.
+ * @property {Array&lt;String&gt;} scopes   A list of specific scopes it should use to
+ *                                    valdiate the error.
+ * @property {?String}       fallback A fallback message in case the error can&apos;t be parsed.
+ *                                    If not specified, the returned error will
+ *                                    maintain the original message.
  */
 
 /**
  * @typedef {function} ParserrorWrapper
  * @description A pre configured parser to format errors with specific cases and/or scopes.
- * @param {Error|String|ParserrorErrorObject} error The error to parse.
+ * @param {Error|String|ParserrorErrorObject} error
+ * The error to parse.
+ * @param {?String} [fallback=null]
+ * A fallback message in case the error can&apos;t be parsed. If not specified, the returned
+ * error will maintain the original message.
  * @return {FormattedError}
  */
 
@@ -146,9 +155,9 @@ class Parserror {
   }
   /**
    * Add a new error case.
-   * @param {ErrorCaseDefinition} definition The case definition settings.
-   * @param {?String}             scope      The name of the scope where the case should be added.
-   *                                         If not defined, it will be added to the global scope.
+   * @param {ErrorCaseDefinition} definition   The case definition settings.
+   * @param {?String}             [scope=null] The name of the scope where the case should be added.
+   *                                           If not defined, it will be added to the global scope.
    * @return {Parserror} For chaining purposes.
    */
   addCase(definition, scope = null) {
@@ -169,15 +178,64 @@ class Parserror {
   }
   /**
    * Adds a list of error cases.
-   * @param {Array&lt;ErrorCaseDefinition&gt;} definitions The cases&apos; definitions.
-   * @param {?String}                    scope       The name of the scope where the cases should
-   *                                                 be added. If not defined, they will be added
-   *                                                 to the global scope.
+   * @param {Array&lt;ErrorCaseDefinition&gt;} definitions  The cases&apos; definitions.
+   * @param {?String}                    [scope=null] The name of the scope where the cases should
+   *                                                  be added. If not defined, they will be added
+   *                                                  to the global scope.
    * @return {Parserror} For chaining purposes.
    */
   addCases(definitions, scope = null) {
     Utils.ensureArray(definitions).forEach((definition) =&gt; {
       this.addCase(definition, scope);
+    });
+
+    return this;
+  }
+  /**
+   * Allows a specific error message to be matched. The idea is for this feature to be used with
+   * fallback messages: If you want a message to be used as it is but at the same time you want
+   * to use a fallback message, you would use this method; the original message won&apos;t be
+   * discarded and you still have the fallback for messages that don&apos;t have a match.
+   * @param {String|RegExp|ErrorCaseDefinition} condition
+   * Internally, this method will generate a new {@link ErrorCase}, so this parameter can be a
+   * string or a regular expression to match the error message, or an actual case definition.
+   * By default, the created case will have a random string as a name, but you can use a case
+   * definition to specify the name you want.
+   * @param {?String} [scope=null]
+   * The name of the scope where the case should be added. If not defined, it will be added to
+   * the global scope.
+   * @return {Parserror} For chaining purposes.
+   */
+  allowOriginal(condition, scope = null) {
+    let definition;
+    if (typeof condition === &apos;string&apos; || condition instanceof RegExp) {
+      definition = {};
+      definition.condition = condition;
+    } else {
+      definition = condition;
+    }
+
+    if (!definition.name) {
+      const nameLength = 20;
+      definition.name = Utils.getRandomString(nameLength);
+    }
+
+    definition.useOriginal = true;
+    return this.addCase(definition, scope);
+  }
+  /**
+   * Allows for multiple error messages to be matched. This is the &quot;bulk alias&quot; of
+   * {@link Parserror#allowOriginal}, so please read the documentation of that method to better
+   * understand in which case you would want to allow original messages.
+   * @param {Array&lt;String|RegExp|ErrorCaseDefinition&gt;} conditions
+   * The list of conditions/definitions for the cases that will match the messages.
+   * @param {?String} [scope=null] The name of the scope where the cases should be added. If not
+   * defined, they will be added to the global scope.
+   * @return {Parserror} For chaining purposes.
+   */
+  allowOriginals(conditions, scope = null) {
+    Utils.ensureArray(conditions).forEach((condition) =&gt; {
+      this.allowOriginal(condition, scope);
     });
 
     return this;
@@ -219,15 +277,20 @@ class Parserror {
   }
   /**
    * Creates a new scope.
-   * @param {String}                      name              The name of the scope.
-   * @param {Array&lt;ErrorCaseDefinition&gt;}  cases             A list of cases&apos; defintions to add.
-   * @param {Boolean}                     [overwrite=false] If there&apos;s a scope with the same name
-   *                                                        already, using this flag allows you to
-   *                                                        overwrite it.
+   * @param {String} name
+   * The name of the scope.
+   * @param {Array&lt;ErrorCaseDefinition&gt;} [cases=[]]
+   * A list of cases&apos; defintions to add.
+   * @param {Array&lt;String|RegExp|ErrorCaseDefinition&gt;} [allowedOriginals=[]]
+   * a list of conditions/definitions for cases that allow original messages to be matched. To
+   * better understand how this work, please read the description of
+   * {@link Parserror#allowOriginal}.
+   * @param {Boolean} [overwrite=false]
+   * If there&apos;s a scope with the same name already, using this flag allows you to overwrite it.
    * @return {Parserror} For chaining purposes.
    * @throws {Error} If `overwrite` is `false` and there&apos;s already a scope with the same name.
    */
-  addScope(name, cases = [], overwrite = false) {
+  addScope(name, cases = [], allowedOriginals = [], overwrite = false) {
     if (this._scopes[name]) {
       if (overwrite) {
         this.removeScope(name);
@@ -246,6 +309,10 @@ class Parserror {
       this.addCases(cases, name);
     }
 
+    if (allowedOriginals.length) {
+      this.allowOriginals(allowedOriginals, name);
+    }
+
     return this;
   }
   /**
@@ -262,9 +329,10 @@ class Parserror {
   }
   /**
    * Parses and formats an error.
-   * @param {Error|String|ParserrorErrorObject} error        The error to parse.
-   * @param {ParserrorParseOptions}             [options={}] Options to customize how the parsing
-   *                                                         is done.
+   * @param {Error|String|ParserrorErrorObject} error
+   * The error to parse.
+   * @param {ParserrorParseOptions} [options={}]
+   * Options to customize how the parsing is done.
    * @return {FormattedError}
    * @throws {TypeError} If `error` is not an {@link Error}, a string or a
    *                     {@link ParserrorErrorObject}.
@@ -274,6 +342,7 @@ class Parserror {
       {
         cases: [],
         scopes: [],
+        fallback: null,
       },
       options
     );
@@ -346,7 +415,9 @@ class Parserror {
       result = newError;
     } else {
       const { FormattedErrorClass } = this._options;
-      result = new FormattedErrorClass(message, {}, { original: true });
+      result = useOptions.fallback ?
+        new FormattedErrorClass(useOptions.fallback, {}, { fallback: true }) :
+        new FormattedErrorClass(message, {}, { original: true });
     }
 
     return result;
@@ -354,25 +425,33 @@ class Parserror {
   /**
    * Creates a wrapper: a pre configured parser to format errors with specific cases and/or
    * scopes.
-   * @param {Array&lt;String&gt;} cases  A list of cases&apos; names.
-   * @param {Array&lt;String&gt;} scopes A list of scopes&apos; names.
+   * @param {Array&lt;String&gt;} cases           A list of cases&apos; names.
+   * @param {Array&lt;String&gt;} scopes          A list of scopes&apos; names.
+   * @param {?String}       [fallback=null] A fallback message in case the error can&apos;t be parsed.
+   *                                        If not specified, the returned error will maintain the
+   *                                        original message.
    * @return {ParserrorWrapper}
    */
-  wrap(cases = [], scopes = []) {
-    return (error) =&gt; this.parse(error, ({
+  wrap(cases = [], scopes = [], fallback = null) {
+    return (error, fallbackMessage = null) =&gt; this.parse(error, ({
       cases,
       scopes,
+      fallback: fallbackMessage || fallback,
     }));
   }
   /**
    * Creates a wrapper for specific scopes. A wrapper is a pre configured parser to format errors
    * with specific cases and/or scopes.
-   * @param {Array&lt;String&gt;} scopes A list of scopes&apos; names.
+   * @param {Array&lt;String&gt;} scopes          A list of scopes&apos; names.
+   * @param {?String}       [fallback=null] A fallback message in case the error can&apos;t be parsed.
+   *                                        If not specified, the returned error will maintain the
+   *                                        original message.
    * @return {ParserrorWrapper}
    */
-  wrapForScopes(scopes) {
-    return (error) =&gt; this.parse(error, {
+  wrapForScopes(scopes, fallback = null) {
+    return (error, fallbackMessage = null) =&gt; this.parse(error, {
       scopes,
+      fallback: fallbackMessage || fallback,
     });
   }
   /**
