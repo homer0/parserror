@@ -869,4 +869,29 @@ describe('ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
   });
+
+  describe('original', () => {
+    it('should keep an error original message', () => {
+      // Given
+      Utils.execRegExp.mockImplementationOnce((exp, txt) => exp.exec(txt));
+      const definition = {
+        name: 'name',
+        condition: /weird/,
+        useOriginal: true,
+      };
+      const error = 'something weird happened!';
+      let sut = null;
+      let result = null;
+      // When
+      sut = new ErrorCase(definition);
+      result = sut.parse(error);
+      // Then
+      expect(result).toBeInstanceOf(FormattedError);
+      expect(FormattedError).toHaveBeenCalledTimes(1);
+      expect(FormattedError).toHaveBeenCalledWith(error, [], {
+        original: true,
+      });
+      expect(Utils.execRegExp).toHaveBeenCalledTimes(0);
+    });
+  });
 });

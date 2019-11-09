@@ -15,6 +15,7 @@ describe('Parserror', () => {
     Scope.mockReset();
     Utils.ensureArray.mockReset();
     Utils.isObject.mockReset();
+    Utils.getRandomString.mockReset();
     FormattedError.mockReset();
   });
 
@@ -238,6 +239,283 @@ describe('Parserror', () => {
     });
   });
 
+  describe('allowOriginal', () => {
+    it('should allow an original message', () => {
+      // Given
+      const condition = 'Rosario';
+      const caseInstance = {
+        name: 'Pilar',
+      };
+      ErrorCase.mockImplementationOnce(() => caseInstance);
+      const name = 'homer0';
+      Utils.getRandomString.mockImplementationOnce(() => name);
+      let sut = null;
+      let globalScope = null;
+      let result = null;
+      // When
+      sut = new Parserror({
+        ErrorCaseClass: ErrorCase,
+      });
+      globalScope = sut.getScope(sut.globalScopeName);
+      result = sut.allowOriginal(condition);
+      // Then
+      expect(result).toBe(sut);
+      expect(ErrorCase).toHaveBeenCalledTimes(1);
+      expect(ErrorCase).toHaveBeenCalledWith(
+        {
+          name,
+          condition,
+          useOriginal: true,
+        },
+        {
+          CaseParserClass: CaseParser,
+          FormattedErrorClass: FormattedError,
+        }
+      );
+      expect(globalScope.addCase).toHaveBeenCalledTimes(1);
+      expect(globalScope.addCase).toHaveBeenCalledWith(caseInstance);
+      expect(Utils.getRandomString).toHaveBeenCalledTimes(1);
+      expect(Utils.getRandomString).toHaveBeenCalledWith(20);
+    });
+
+    it('should allow an original message by matching a expression', () => {
+      // Given
+      const condition = /Rosario/i;
+      const caseInstance = {
+        name: 'Pilar',
+      };
+      ErrorCase.mockImplementationOnce(() => caseInstance);
+      const name = 'homer0';
+      Utils.getRandomString.mockImplementationOnce(() => name);
+      let sut = null;
+      let globalScope = null;
+      let result = null;
+      // When
+      sut = new Parserror({
+        ErrorCaseClass: ErrorCase,
+      });
+      globalScope = sut.getScope(sut.globalScopeName);
+      result = sut.allowOriginal(condition);
+      // Then
+      expect(result).toBe(sut);
+      expect(ErrorCase).toHaveBeenCalledTimes(1);
+      expect(ErrorCase).toHaveBeenCalledWith(
+        {
+          name,
+          condition,
+          useOriginal: true,
+        },
+        {
+          CaseParserClass: CaseParser,
+          FormattedErrorClass: FormattedError,
+        }
+      );
+      expect(globalScope.addCase).toHaveBeenCalledTimes(1);
+      expect(globalScope.addCase).toHaveBeenCalledWith(caseInstance);
+      expect(Utils.getRandomString).toHaveBeenCalledTimes(1);
+      expect(Utils.getRandomString).toHaveBeenCalledWith(20);
+    });
+
+    it('should allow an original message and use a custom name for the case', () => {
+      // Given
+      const name = 'homer0';
+      const condition = /Rosario/i;
+      const conditionDefinition = {
+        name,
+        condition,
+      };
+      const caseInstance = {
+        name: 'Pilar',
+      };
+      ErrorCase.mockImplementationOnce(() => caseInstance);
+      let sut = null;
+      let globalScope = null;
+      let result = null;
+      // When
+      sut = new Parserror({
+        ErrorCaseClass: ErrorCase,
+      });
+      globalScope = sut.getScope(sut.globalScopeName);
+      result = sut.allowOriginal(conditionDefinition);
+      // Then
+      expect(result).toBe(sut);
+      expect(ErrorCase).toHaveBeenCalledTimes(1);
+      expect(ErrorCase).toHaveBeenCalledWith(
+        {
+          name,
+          condition,
+          useOriginal: true,
+        },
+        {
+          CaseParserClass: CaseParser,
+          FormattedErrorClass: FormattedError,
+        }
+      );
+      expect(globalScope.addCase).toHaveBeenCalledTimes(1);
+      expect(globalScope.addCase).toHaveBeenCalledWith(caseInstance);
+      expect(Utils.getRandomString).toHaveBeenCalledTimes(0);
+    });
+
+    it('should allow an original message for a specific scope', () => {
+      // Given
+      const scopeName = 'myScope';
+      const condition = 'Rosario';
+      const caseInstance = {
+        name: 'Pilar',
+      };
+      ErrorCase.mockImplementationOnce(() => caseInstance);
+      const name = 'homer0';
+      Utils.getRandomString.mockImplementationOnce(() => name);
+      let sut = null;
+      let customScope = null;
+      let result = null;
+      // When
+      sut = new Parserror({
+        ErrorCaseClass: ErrorCase,
+      });
+      customScope = sut.getScope(scopeName);
+      result = sut.allowOriginal(condition, scopeName);
+      // Then
+      expect(result).toBe(sut);
+      expect(ErrorCase).toHaveBeenCalledTimes(1);
+      expect(ErrorCase).toHaveBeenCalledWith(
+        {
+          name,
+          condition,
+          useOriginal: true,
+        },
+        {
+          CaseParserClass: CaseParser,
+          FormattedErrorClass: FormattedError,
+        }
+      );
+      expect(customScope.addCase).toHaveBeenCalledTimes(1);
+      expect(customScope.addCase).toHaveBeenCalledWith(caseInstance);
+      expect(Utils.getRandomString).toHaveBeenCalledTimes(1);
+      expect(Utils.getRandomString).toHaveBeenCalledWith(20);
+    });
+  });
+
+  describe('allowOriginals', () => {
+    it('should allow multiple original messages at once', () => {
+      // Given
+      const conditionOne = 'Rosario';
+      const caseOneInstance = {
+        name: 'Charo',
+      };
+      const conditionTwo = 'Pilar';
+      const caseTwoInstance = {
+        name: 'Pili',
+      };
+      Utils.getRandomString.mockImplementationOnce(() => caseOneInstance.name);
+      Utils.getRandomString.mockImplementationOnce(() => caseTwoInstance.name);
+      ErrorCase.mockImplementationOnce(() => caseOneInstance);
+      ErrorCase.mockImplementationOnce(() => caseTwoInstance);
+      Utils.ensureArray.mockImplementationOnce((list) => list);
+      let sut = null;
+      let globalScope = null;
+      let result = null;
+      // When
+      sut = new Parserror({
+        ErrorCaseClass: ErrorCase,
+      });
+      globalScope = sut.getScope(sut.globalScopeName);
+      result = sut.allowOriginals([
+        conditionOne,
+        conditionTwo,
+      ]);
+      // Then
+      expect(result).toBe(sut);
+      expect(ErrorCase).toHaveBeenCalledTimes(2);
+      expect(ErrorCase).toHaveBeenCalledWith(
+        {
+          name: caseOneInstance.name,
+          condition: conditionOne,
+          useOriginal: true,
+        },
+        {
+          CaseParserClass: CaseParser,
+          FormattedErrorClass: FormattedError,
+        }
+      );
+      expect(ErrorCase).toHaveBeenCalledWith(
+        {
+          name: caseTwoInstance.name,
+          condition: conditionTwo,
+          useOriginal: true,
+        },
+        {
+          CaseParserClass: CaseParser,
+          FormattedErrorClass: FormattedError,
+        }
+      );
+      expect(globalScope.addCase).toHaveBeenCalledTimes(2);
+      expect(globalScope.addCase).toHaveBeenCalledWith(caseOneInstance);
+      expect(globalScope.addCase).toHaveBeenCalledWith(caseTwoInstance);
+    });
+
+    it('should allow multiple original messages at once for a specific scope', () => {
+      // Given
+      const scopeName = 'myScope';
+      const conditionOne = 'Rosario';
+      const caseOneInstance = {
+        name: 'Charo',
+      };
+      const conditionTwo = 'Pilar';
+      const caseTwoInstance = {
+        name: 'Pili',
+      };
+      Utils.getRandomString.mockImplementationOnce(() => caseOneInstance.name);
+      Utils.getRandomString.mockImplementationOnce(() => caseTwoInstance.name);
+      ErrorCase.mockImplementationOnce(() => caseOneInstance);
+      ErrorCase.mockImplementationOnce(() => caseTwoInstance);
+      Utils.ensureArray.mockImplementationOnce((list) => list);
+      let sut = null;
+      let customScope = null;
+      let result = null;
+      // When
+      sut = new Parserror({
+        ErrorCaseClass: ErrorCase,
+      });
+      customScope = sut.getScope(scopeName);
+      result = sut.allowOriginals(
+        [
+          conditionOne,
+          conditionTwo,
+        ],
+        scopeName
+      );
+      // Then
+      expect(result).toBe(sut);
+      expect(ErrorCase).toHaveBeenCalledTimes(2);
+      expect(ErrorCase).toHaveBeenCalledWith(
+        {
+          name: caseOneInstance.name,
+          condition: conditionOne,
+          useOriginal: true,
+        },
+        {
+          CaseParserClass: CaseParser,
+          FormattedErrorClass: FormattedError,
+        }
+      );
+      expect(ErrorCase).toHaveBeenCalledWith(
+        {
+          name: caseTwoInstance.name,
+          condition: conditionTwo,
+          useOriginal: true,
+        },
+        {
+          CaseParserClass: CaseParser,
+          FormattedErrorClass: FormattedError,
+        }
+      );
+      expect(customScope.addCase).toHaveBeenCalledTimes(2);
+      expect(customScope.addCase).toHaveBeenCalledWith(caseOneInstance);
+      expect(customScope.addCase).toHaveBeenCalledWith(caseTwoInstance);
+    });
+  });
+
   describe('addParser', () => {
     it('should add a parser to the global scope', () => {
       // Given
@@ -407,6 +685,60 @@ describe('Parserror', () => {
       expect(savedScope.addCase).toHaveBeenCalledWith(caseInstance);
     });
 
+    it('should create a scope with cases', () => {
+      // Given
+      Utils.ensureArray.mockImplementationOnce((list) => list);
+      Utils.ensureArray.mockImplementationOnce((list) => list);
+      const scopeName = 'myScope';
+      const caseDefinition = {
+        name: 'Rosario',
+        scope: scopeName,
+      };
+      const caseInstance = {
+        name: 'Pilar',
+      };
+      const allowedCondition = 'you shall pass!';
+      const allowedCaseInstance = {
+        name: 'Gandalf',
+      };
+      ErrorCase.mockImplementationOnce(() => caseInstance);
+      ErrorCase.mockImplementationOnce(() => allowedCaseInstance);
+      Utils.getRandomString.mockImplementationOnce(() => allowedCaseInstance.name);
+      let sut = null;
+      let result = null;
+      let savedScope = null;
+      // When
+      sut = new Parserror({
+        ErrorCaseClass: ErrorCase,
+      });
+      result = sut.addScope(scopeName, [caseDefinition], [allowedCondition]);
+      savedScope = sut.getScope(scopeName);
+      // Then
+      expect(result).toBe(sut);
+      expect(Scope).toHaveBeenCalledTimes(2);
+      expect(Scope).toHaveBeenCalledWith(sut.globalScopeName);
+      expect(Scope).toHaveBeenCalledWith(scopeName);
+      expect(ErrorCase).toHaveBeenCalledTimes(2);
+      expect(ErrorCase).toHaveBeenCalledWith(caseDefinition, {
+        CaseParserClass: CaseParser,
+        FormattedErrorClass: FormattedError,
+      });
+      expect(ErrorCase).toHaveBeenCalledWith(
+        {
+          name: allowedCaseInstance.name,
+          condition: allowedCondition,
+          useOriginal: true,
+        },
+        {
+          CaseParserClass: CaseParser,
+          FormattedErrorClass: FormattedError,
+        }
+      );
+      expect(savedScope.addCase).toHaveBeenCalledTimes(2);
+      expect(savedScope.addCase).toHaveBeenCalledWith(caseInstance);
+      expect(savedScope.addCase).toHaveBeenCalledWith(allowedCaseInstance);
+    });
+
     it('should create a scope by overwriting an existing one', () => {
       // Given
       const scopeName = 'myScope';
@@ -415,7 +747,7 @@ describe('Parserror', () => {
       // When
       sut = new Parserror();
       sut.addScope(scopeName);
-      result = sut.addScope(scopeName, [], true);
+      result = sut.addScope(scopeName, [], [], true);
       // Then
       expect(result).toBe(sut);
       expect(Scope).toHaveBeenCalledTimes(3);
