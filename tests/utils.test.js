@@ -93,4 +93,29 @@ describe('Utils', () => {
       expect(Utils.ensureArray(target)).toEqual([target]);
     });
   });
+
+  describe('getRandomString', () => {
+    it('should generate unique strings', () => {
+      // Given
+      const lengths = [4, 8, 15, 16, 23, 42];
+      const samples = 5;
+      let results = null;
+      // When
+      results = lengths.map((length) => (
+        (new Array(samples))
+        .fill('')
+        .map(() => Utils.getRandomString(length))
+      ));
+      // Then
+      results.forEach((result, index) => {
+        const length = lengths[index];
+        result.forEach((string, stringIndex) => {
+          expect(string.length).toBe(length);
+          if (stringIndex) {
+            expect(string).not.toEqual(result[stringIndex - 1]);
+          }
+        });
+      });
+    });
+  });
 });

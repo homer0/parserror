@@ -107,9 +107,9 @@ class Parserror {
   }
   /**
    * Add a new error case.
-   * @param {ErrorCaseDefinition} definition The case definition settings.
-   * @param {?String}             scope      The name of the scope where the case should be added.
-   *                                         If not defined, it will be added to the global scope.
+   * @param {ErrorCaseDefinition} definition   The case definition settings.
+   * @param {?String}             [scope=null] The name of the scope where the case should be added.
+   *                                           If not defined, it will be added to the global scope.
    * @return {Parserror} For chaining purposes.
    */
   addCase(definition, scope = null) {
@@ -130,15 +130,64 @@ class Parserror {
   }
   /**
    * Adds a list of error cases.
-   * @param {Array<ErrorCaseDefinition>} definitions The cases' definitions.
-   * @param {?String}                    scope       The name of the scope where the cases should
-   *                                                 be added. If not defined, they will be added
-   *                                                 to the global scope.
+   * @param {Array<ErrorCaseDefinition>} definitions  The cases' definitions.
+   * @param {?String}                    [scope=null] The name of the scope where the cases should
+   *                                                  be added. If not defined, they will be added
+   *                                                  to the global scope.
    * @return {Parserror} For chaining purposes.
    */
   addCases(definitions, scope = null) {
     Utils.ensureArray(definitions).forEach((definition) => {
       this.addCase(definition, scope);
+    });
+
+    return this;
+  }
+  /**
+   * Allows a specific error message to be matched. The idea is for this feature to be used with
+   * fallback messages: If you want a message to be used as it is but at the same time you want
+   * to use a fallback message, you would use this method; the original message won't be
+   * discarded and you still have the fallback for messages that don't have a match.
+   * @param {String|RegExp|ErrorCaseDefinition} condition
+   * Internally, this method will generate a new {@link ErrorCase}, so this parameter can be a
+   * string or a regular expression to match the error message, or an actual case definition.
+   * By default, the created case will have a random string as a name, but you can use a case
+   * definition to specify the name you want.
+   * @param {?String} [scope=null]
+   * The name of the scope where the case should be added. If not defined, it will be added to
+   * the global scope.
+   * @return {Parserror} For chaining purposes.
+   */
+  allowOriginal(condition, scope = null) {
+    let definition;
+    if (typeof condition === 'string' || condition instanceof RegExp) {
+      definition = {};
+      definition.condition = condition;
+    } else {
+      definition = condition;
+    }
+
+    if (!definition.name) {
+      const nameLength = 20;
+      definition.name = Utils.getRandomString(nameLength);
+    }
+
+    definition.useOriginal = true;
+    return this.addCase(definition, scope);
+  }
+  /**
+   * Allows for multiple error messages to be matched. This is the "bulk alias" of
+   * {@link Parserror#allowOriginal}, so please read the documentation of that method to better
+   * understand in which case you would want to allow original messages.
+   * @param {Array<String|RegExp|ErrorCaseDefinition>} conditions
+   * The list of conditions/definitions for the cases that will match the messages.
+   * @param {?String} [scope=null] The name of the scope where the cases should be added. If not
+   * defined, they will be added to the global scope.
+   * @return {Parserror} For chaining purposes.
+   */
+  allowOriginals(conditions, scope = null) {
+    Utils.ensureArray(conditions).forEach((condition) => {
+      this.allowOriginal(condition, scope);
     });
 
     return this;
@@ -180,15 +229,20 @@ class Parserror {
   }
   /**
    * Creates a new scope.
-   * @param {String}                      name              The name of the scope.
-   * @param {Array<ErrorCaseDefinition>}  cases             A list of cases' defintions to add.
-   * @param {Boolean}                     [overwrite=false] If there's a scope with the same name
-   *                                                        already, using this flag allows you to
-   *                                                        overwrite it.
+   * @param {String} name
+   * The name of the scope.
+   * @param {Array<ErrorCaseDefinition>} [cases=[]]
+   * A list of cases' defintions to add.
+   * @param {Array<String|RegExp|ErrorCaseDefinition>} [allowedOriginals=[]]
+   * a list of conditions/definitions for cases that allow original messages to be matched. To
+   * better understand how this work, please read the description of
+   * {@link Parserror#allowOriginal}.
+   * @param {Boolean} [overwrite=false]
+   * If there's a scope with the same name already, using this flag allows you to overwrite it.
    * @return {Parserror} For chaining purposes.
    * @throws {Error} If `overwrite` is `false` and there's already a scope with the same name.
    */
-  addScope(name, cases = [], overwrite = false) {
+  addScope(name, cases = [], allowedOriginals = [], overwrite = false) {
     if (this._scopes[name]) {
       if (overwrite) {
         this.removeScope(name);
@@ -205,6 +259,10 @@ class Parserror {
 
     if (cases.length) {
       this.addCases(cases, name);
+    }
+
+    if (allowedOriginals.length) {
+      this.allowOriginals(allowedOriginals, name);
     }
 
     return this;

@@ -50,7 +50,6 @@ As demonstrated in the introduction's example, the way you match and parse your 
 
 You add new cases using the `addCases` method, and they can be as simple as the one we already saw, with a basic condition and a `string` message, or they can be a little more complex.
 
-
 #### Using specific cases
 
 The reason cases have a name is that when you call `parse`, you can specify a limited list of cases that you want to use for an error.
@@ -432,6 +431,55 @@ try {
   showNotification(formatted.message);
 }
 ```
+
+### Keep original messages
+
+Let's say some of the errors you receive are actually useful, you don't want to create a case to just return the same message... and to make it worst, you want a fallback for some messages that still don't have a case for. The easiest way to solve this is to "allow the original" message to be matched but not parsed/formatted, and that's done with the `allowOriginal` method:
+
+```js
+const parserror = Parserror
+.new()
+.addCases([
+  {
+    name: 'duplicatedEmail',
+    condition: /email_address already exists/i,
+    message: 'This email address is already in use, please choose another',
+  },
+  ...
+)
+.allowOriginal(/a message that is actually useful/);
+
+const formatUserErrors = parserror.wrap(['duplicatedEmail', ...]);
+
+...
+
+try {
+  await saveProduct();
+} catch (error) {
+  // Send the received error to the parser.
+  const formatted = parserror.parse(error, {
+    // Define the fallback message
+    fallback: 'There was an error saving the product, please try again',
+  });
+  // Get a new error with the formatted message.
+  showNotification(formatted.message);
+}
+```
+
+If the error matches the condition sent on `allowOriginal`, it will keep it as it is and avoid the fallback.
+
+Internally, `allowOriginal` creates a new error case but with a flag to keep the original message, so instead of sending a regular expression (or a string), you can send a case definition and even give it a name, so it can be used on `parse` and `wrap`.
+
+```js
+const parserror = Parserror
+.allowOriginal({
+  condition: /a message that is actually useful/,
+  name: 'thatUsefulMessage',
+  scope: 'someCustomScope',
+});
+```
+
+And just like `addCase` and `addCases`, you also have `allowOriginals` to define multiple conditions at once.
 
 ## Development
 

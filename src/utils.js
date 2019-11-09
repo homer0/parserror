@@ -76,6 +76,18 @@ class Utils {
   static ensureArray(target) {
     return Array.isArray(target) ? target : [target];
   }
+  /**
+   * Generates a unique random string.
+   * @param {Number} length The required length of the string.
+   * @return {String}
+   * @static
+   */
+  static getRandomString(length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    return (new Array(length))
+    .fill('')
+    .reduce((acc) => acc + chars.charAt(Math.floor(Math.random() * chars.length)), '');
+  }
 }
 
 module.exports = Utils;
