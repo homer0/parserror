@@ -15,8 +15,8 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "@babel/preset-env": "7.6.3",
-    "@babel/core": "7.6.4",
+    "@babel/preset-env": "7.7.1",
+    "@babel/core": "7.7.2",
     "@babel/plugin-transform-runtime": "7.6.2",
     "coveralls": "^3.0.7",
     "esdoc": "^1.1.0",
@@ -28,7 +28,7 @@
     "jasmine-expect": "^4.0.3",
     "jest-ex": "^6.1.1",
     "jest-cli": "^24.9.0",
-    "leasot": "^8.3.0",
+    "leasot": "^9.0.0",
     "wootils": "^2.6.5"
   },
   "engine-strict": true,
