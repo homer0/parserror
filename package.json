@@ -2,7 +2,7 @@
   "name": "parserror",
   "description": "Parse errors and generate more human messages",
   "homepage": "https://homer0.github.io/parserror/",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "repository": "homer0/parserror",
   "author": "Leonardo Apiwan (@homer0) <me@homer0.com>",
   "license": "MIT",
