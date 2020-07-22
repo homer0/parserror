@@ -1,6 +1,6 @@
 # Parserror
 
-[![Travis](https://img.shields.io/travis/homer0/parserror.svg?style=flat-square)](https://travis-ci.org/homer0/parserror)
+[![GitHub Workflow Status (master)](https://img.shields.io/github/workflow/status/homer0/parserror/Test/master?style=flat-square)](https://github.com/homer0/parserror/actions?query=workflow%3ATest)
 [![Coveralls github](https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square)](https://coveralls.io/github/homer0/parserror?branch=master)
 [![David](https://img.shields.io/david/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)
 [![David](https://img.shields.io/david/dev/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)
@@ -15,6 +15,8 @@ Parserror allows you parse errors from external resources by defining simple (or
 
 ```js
 const Parserror = require('parserror');
+// Or, if you are using modules...
+// import ParserError from 'parserror/esm';
 
 // Define the cases
 const parserror = Parserror
@@ -207,7 +209,7 @@ try {
   const formatted = parserror.parse(error);
   // Get a new error with the formatted message.
   showNotification(formatted.message);
-  
+
   // Extract the formatted parameter metadata.
   const [property] = formatted.parameters;
   highlightUIController(property.field);
@@ -353,13 +355,13 @@ You can also create a wrapper for a scope or a list of them:
 
 ```js
 const formatUserErrors = parserror.wrap([], ['userValidationScope']);
-``` 
+```
 
 The only thing weird there is that if you are not using cases, having to define an empty array as first parameter doesn't look very nice... so you could just use `wrapForScopes`:
 
 ```js
 const formatUserErrors = parserror.wrapForScopes(['userValidationScope']);
-``` 
+```
 
 ### Fallback
 
@@ -481,6 +483,22 @@ const parserror = Parserror
 
 And just like `addCase` and `addCases`, you also have `allowOriginals` to define multiple conditions at once.
 
+## ES Modules
+
+All files are written using commonjs, as I targeted the oldest Node LTS and it doesn't support modules (without a flag) yet, but you can use it with ESM.
+
+When the package gets published, an ESM version is generated on the path `/esm`. If you are using the latest version of Node, or a module bundler (like [projext](https://projextjs.com) :D), instead of requiring from the package's root path, you should do it from the `/esm` sub path:
+
+```js
+// commonjs
+const Parserror = require('parserror');
+
+// ESM
+import Parserror from 'parserror/esm';
+```
+
+Since the next LTS to become "the oldest" is 12, which still uses the flag, I still have no plans on going with ESM by default.
+
 ## Development
 
 ### NPM/Yarn tasks
@@ -493,13 +511,30 @@ And just like `addCase` and `addCases`, you also have `allowOriginals` to define
 | `docs`     | Generate the project documentation. |
 | `todo`     | List all the pending to-do's.       |
 
+
 ### Repository hooks
 
-I use [husky](https://yarnpkg.com/en/package/husky) to automatically install the repository hooks so the code will be tested and linted before any commit and the dependencies updated after every merge. The configuration is on the `husky` property of the `package.json` and the hooks' files are on `./utils/hooks`.
+I use [`husky`](https://yarnpkg.com/package/husky) to automatically install the repository hooks so the code will be tested and linted before any commit and the dependencies updated after every merge.
+
+The configuration is on the `husky` property of the `package.json` and the hooks' files are on `./utils/hooks`.
+
+#### Commits convention
+
+I use [conventional commits](https://www.conventionalcommits.org) with [`commitizen`](https://yarnpkg.com/package/commitizen) in order to support semantic releases. The one that sets it up is actually husky, that installs a script that runs commitizen on the `git commit` command.
+
+The hook for this is on `./utils/hooks/prepare-commit-msg` and the configuration for comitizen is on the `config.commitizen` property of the `package.json`.
+
+### Releases
+
+I use [`semantic-release`](https://yarnpkg.com/package/semantic-release) and a GitHub action to automatically release on NPM everything that gets merged to master.
+
+The configuration for `semantic-release` is on `./releaserc` and the workflow for the release is on `./.github/workflow/release.yml`.
 
 ### Testing
 
-I use [Jest](https://facebook.github.io/jest/) with [Jest-Ex](https://yarnpkg.com/en/package/jest-ex) to test the project. The configuration file is on `./.jestrc.json`, the tests are on `./tests` and the script that runs it is on `./utils/scripts/test`.
+I use [Jest](https://facebook.github.io/jest/) to test the project.
+
+The configuration file is on `./.jestrc.json`, the tests are on `./tests` and the script that runs it is on `./utils/scripts/test`.
 
 ### Linting
 
@@ -507,7 +542,9 @@ I use [ESlint](http://eslint.org) with [my own custom configuration](http://yarn
 
 ### Documentation
 
-I use [ESDoc](http://esdoc.org) to generate HTML documentation for the project. The configuration file is on `./.esdoc.json` and the script that runs it is on `./utils/scripts/docs`.
+I use [JSDoc](https://jsdoc.app) to generate an HTML documentation site for the project.
+
+The configuration file is on `./.jsdoc.js` and the script that runs it is on `./utils/scripts/docs`.
 
 ### To-Dos
 

@@ -1,15 +1,13 @@
-const CaseParser = require('./caseParser');
-const ErrorCase = require('./errorCase');
-const FormattedError = require('./formattedError');
-const Parserror = require('./parserror');
-const Scope = require('./scope');
-const Utils = require('./utils');
+const CaseParser = require('./caseParser.js');
+const ErrorCase = require('./errorCase.js');
+const FormattedError = require('./formattedError.js');
+const Parserror = require('./parserror.js');
+const Scope = require('./scope.js');
+const Utils = require('./utils.js');
 
-module.exports = {
-  CaseParser,
-  ErrorCase,
-  FormattedError,
-  Parserror,
-  Scope,
-  Utils,
-};
+module.exports.CaseParser = CaseParser;
+module.exports.ErrorCase = ErrorCase;
+module.exports.FormattedError = FormattedError;
+module.exports.Parserror = Parserror;
+module.exports.Scope = Scope;
+module.exports.Utils = Utils;

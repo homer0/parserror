@@ -1,10 +1,10 @@
-jest.unmock('/src/errorCase');
+/* eslint-disable max-classes-per-file */
+jest.unmock('../src/errorCase');
 
-require('jasmine-expect');
-const CaseParser = require('/src/caseParser');
-const ErrorCase = require('/src/errorCase');
-const FormattedError = require('/src/formattedError');
-const Utils = require('/src/utils');
+const CaseParser = require('../src/caseParser');
+const ErrorCase = require('../src/errorCase');
+const FormattedError = require('../src/formattedError');
+const Utils = require('../src/utils');
 
 describe('ErrorCase', () => {
   beforeEach(() => {
@@ -219,7 +219,7 @@ describe('ErrorCase', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         formattedMessage,
         [],
-        null
+        null,
       );
       expect(Utils.execRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
@@ -248,7 +248,7 @@ describe('ErrorCase', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         parameter,
         [parameter],
-        null
+        null,
       );
       expect(Utils.execRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
@@ -278,7 +278,7 @@ describe('ErrorCase', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         parameter,
         [parameter],
-        context
+        context,
       );
       expect(Utils.execRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
@@ -318,7 +318,7 @@ describe('ErrorCase', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         `hello ${formattedParameter}`,
         [formattedParameter],
-        null
+        null,
       );
       expect(Utils.ensureArray).toHaveBeenCalledTimes(1);
       expect(Utils.ensureArray).toHaveBeenCalledWith({
@@ -366,7 +366,7 @@ describe('ErrorCase', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         `hello ${formattedParameter}`,
         [formattedParameter],
-        null
+        null,
       );
       expect(Utils.ensureArray).toHaveBeenCalledTimes(1);
       expect(Utils.ensureArray).toHaveBeenCalledWith({
@@ -458,7 +458,7 @@ describe('ErrorCase', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         `Did you know that ${formattedParameterOne} actually had ${expectedParameterTwo} robins?`,
         [formattedParameterOne, expectedParameterTwo],
-        null
+        null,
       );
       expect(Utils.ensureArray).toHaveBeenCalledTimes(2);
       expect(Utils.ensureArray).toHaveBeenCalledWith({
@@ -521,7 +521,7 @@ describe('ErrorCase', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         `hello ${formattedParameter}`,
         [formattedParameter],
-        null
+        null,
       );
       expect(Utils.ensureArray).toHaveBeenCalledTimes(1);
       expect(Utils.ensureArray).toHaveBeenCalledWith(parserName);
@@ -574,7 +574,7 @@ describe('ErrorCase', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         `hello ${formattedParameter}`,
         [formattedParameter],
-        null
+        null,
       );
       expect(Utils.ensureArray).toHaveBeenCalledTimes(1);
       expect(Utils.ensureArray).toHaveBeenCalledWith(parser);
@@ -614,7 +614,7 @@ describe('ErrorCase', () => {
       // When/Then
       sut = new ErrorCase(definition);
       expect(() => sut.parse(error)).toThrow(
-        /The condition for the case '\w+' didn't return groups, but the 'parse' instructions were set on an 'object' format/i
+        /The condition for the case '\w+' didn't return groups, but the 'parse' instructions were set on an 'object' format/i,
       );
       // Then
       expect(parser).toHaveBeenCalledTimes(0);
@@ -649,7 +649,7 @@ describe('ErrorCase', () => {
       // When/Then
       sut = new ErrorCase(definition);
       expect(() => sut.parse(error, scopes)).toThrow(
-        /No parser with the name of '\w+' could be found for the case '\w+'/i
+        /No parser with the name of '\w+' could be found for the case '\w+'/i,
       );
       // Then
       expect(Utils.ensureArray).toHaveBeenCalledTimes(1);
@@ -691,7 +691,7 @@ describe('ErrorCase', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         formattedMessage,
         [],
-        null
+        null,
       );
       expect(Utils.execRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
@@ -721,7 +721,7 @@ describe('ErrorCase', () => {
       // When/Then
       sut = new ErrorCase(definition);
       expect(() => sut.parse(error)).toThrow(
-        /The condition for the case '\w+' is trying to extract parameters as named and unnamed groups, only one method is allowed/i
+        /The condition for the case '\w+' is trying to extract parameters as named and unnamed groups, only one method is allowed/i,
       );
       // Then
       expect(definition.message).toHaveBeenCalledTimes(0);
@@ -754,7 +754,7 @@ describe('ErrorCase', () => {
       // When/Then
       sut = new ErrorCase(definition);
       expect(() => sut.parse(error)).toThrow(
-        /The condition for the case '\w+' returned groups, but the 'parse' instructions were set on an 'array' format/i
+        /The condition for the case '\w+' returned groups, but the 'parse' instructions were set on an 'array' format/i,
       );
       // Then
       expect(definition.message).toHaveBeenCalledTimes(0);
@@ -801,7 +801,7 @@ describe('ErrorCase', () => {
         {
           [parameterName]: parameter,
         },
-        null
+        null,
       );
       expect(Utils.execRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
@@ -859,7 +859,7 @@ describe('ErrorCase', () => {
         {
           [parameterName]: formattedParameter,
         },
-        null
+        null,
       );
       expect(Utils.ensureArray).toHaveBeenCalledTimes(1);
       expect(Utils.ensureArray).toHaveBeenCalledWith({

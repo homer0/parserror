@@ -1,1 +1,3 @@
-module.exports = require('./parserror');
+const Parserror = require('./parserror.js');
+
+module.exports = Parserror;
