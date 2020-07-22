@@ -220,7 +220,7 @@ describe('Parserror', () => {
           caseOneDefinition,
           caseTwoDefinition,
         ],
-        scopeName
+        scopeName,
       );
       // Then
       expect(result).toBe(sut);
@@ -270,7 +270,7 @@ describe('Parserror', () => {
         {
           CaseParserClass: CaseParser,
           FormattedErrorClass: FormattedError,
-        }
+        },
       );
       expect(globalScope.addCase).toHaveBeenCalledTimes(1);
       expect(globalScope.addCase).toHaveBeenCalledWith(caseInstance);
@@ -308,7 +308,7 @@ describe('Parserror', () => {
         {
           CaseParserClass: CaseParser,
           FormattedErrorClass: FormattedError,
-        }
+        },
       );
       expect(globalScope.addCase).toHaveBeenCalledTimes(1);
       expect(globalScope.addCase).toHaveBeenCalledWith(caseInstance);
@@ -349,7 +349,7 @@ describe('Parserror', () => {
         {
           CaseParserClass: CaseParser,
           FormattedErrorClass: FormattedError,
-        }
+        },
       );
       expect(globalScope.addCase).toHaveBeenCalledTimes(1);
       expect(globalScope.addCase).toHaveBeenCalledWith(caseInstance);
@@ -387,7 +387,7 @@ describe('Parserror', () => {
         {
           CaseParserClass: CaseParser,
           FormattedErrorClass: FormattedError,
-        }
+        },
       );
       expect(customScope.addCase).toHaveBeenCalledTimes(1);
       expect(customScope.addCase).toHaveBeenCalledWith(caseInstance);
@@ -436,7 +436,7 @@ describe('Parserror', () => {
         {
           CaseParserClass: CaseParser,
           FormattedErrorClass: FormattedError,
-        }
+        },
       );
       expect(ErrorCase).toHaveBeenCalledWith(
         {
@@ -447,7 +447,7 @@ describe('Parserror', () => {
         {
           CaseParserClass: CaseParser,
           FormattedErrorClass: FormattedError,
-        }
+        },
       );
       expect(globalScope.addCase).toHaveBeenCalledTimes(2);
       expect(globalScope.addCase).toHaveBeenCalledWith(caseOneInstance);
@@ -483,7 +483,7 @@ describe('Parserror', () => {
           conditionOne,
           conditionTwo,
         ],
-        scopeName
+        scopeName,
       );
       // Then
       expect(result).toBe(sut);
@@ -497,7 +497,7 @@ describe('Parserror', () => {
         {
           CaseParserClass: CaseParser,
           FormattedErrorClass: FormattedError,
-        }
+        },
       );
       expect(ErrorCase).toHaveBeenCalledWith(
         {
@@ -508,7 +508,7 @@ describe('Parserror', () => {
         {
           CaseParserClass: CaseParser,
           FormattedErrorClass: FormattedError,
-        }
+        },
       );
       expect(customScope.addCase).toHaveBeenCalledTimes(2);
       expect(customScope.addCase).toHaveBeenCalledWith(caseOneInstance);
@@ -583,7 +583,7 @@ describe('Parserror', () => {
       sut = new Parserror();
       expect(() => sut.addScope(sut.globalScopeName))
       .toThrow(
-        /The scope '\w+' already exists\. You can use 'removeScope' to remove it first, or set the 'overwrite' parameter to 'true'/i
+        /The scope '\w+' already exists\. You can use 'removeScope' to remove it first, or set the 'overwrite' parameter to 'true'/i,
       );
     });
 
@@ -732,7 +732,7 @@ describe('Parserror', () => {
         {
           CaseParserClass: CaseParser,
           FormattedErrorClass: FormattedError,
-        }
+        },
       );
       expect(savedScope.addCase).toHaveBeenCalledTimes(2);
       expect(savedScope.addCase).toHaveBeenCalledWith(caseInstance);
@@ -762,7 +762,7 @@ describe('Parserror', () => {
       // Given/When/Then
       expect(() => (new Parserror()).parse([]))
       .toThrow(
-        /'parse' can only handle error messages \('string'\), native errors \('Error'\) or literal objects \('object'\) with a 'message' property/i
+        /'parse' can only handle error messages \('string'\), native errors \('Error'\) or literal objects \('object'\) with a 'message' property/i,
       );
     });
 
@@ -801,7 +801,7 @@ describe('Parserror', () => {
       expect(theCase.parse).toHaveBeenCalledWith(
         error,
         [scopeInstance],
-        null
+        null,
       );
     });
 
@@ -829,7 +829,7 @@ describe('Parserror', () => {
       expect(theCase.parse).toHaveBeenCalledWith(
         errorMessage,
         [scopeInstance],
-        null
+        null,
       );
     });
 
@@ -860,7 +860,7 @@ describe('Parserror', () => {
       expect(theCase.parse).toHaveBeenCalledWith(
         errorMessage,
         [scopeInstance],
-        null
+        null,
       );
     });
 
@@ -898,14 +898,14 @@ describe('Parserror', () => {
       expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [globalScopeInstance, customScopeInstance],
-        null
+        null,
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [globalScopeInstance, customScopeInstance],
-        null
+        null,
       );
     });
 
@@ -946,14 +946,14 @@ describe('Parserror', () => {
       expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
-        null
+        null,
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
-        null
+        null,
       );
     });
 
@@ -995,14 +995,14 @@ describe('Parserror', () => {
       expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [globalScopeInstance, customScopeInstance],
-        null
+        null,
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [globalScopeInstance, customScopeInstance],
-        null
+        null,
       );
     });
 
@@ -1035,7 +1035,7 @@ describe('Parserror', () => {
       expect(theCase.parse).toHaveBeenCalledWith(
         errorMessage,
         [scopeInstance],
-        errorContext
+        errorContext,
       );
     });
 
@@ -1063,7 +1063,7 @@ describe('Parserror', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         error,
         {},
-        { original: true }
+        { original: true },
       );
     });
 
@@ -1092,7 +1092,7 @@ describe('Parserror', () => {
       expect(FormattedError).toHaveBeenCalledWith(
         fallback,
         {},
-        { fallback: true }
+        { fallback: true },
       );
     });
   });
@@ -1124,7 +1124,7 @@ describe('Parserror', () => {
       expect(theCase.parse).toHaveBeenCalledWith(
         error,
         [scopeInstance],
-        null
+        null,
       );
     });
 
@@ -1156,7 +1156,7 @@ describe('Parserror', () => {
       expect(theCase.parse).toHaveBeenCalledWith(
         error,
         [scopeInstance],
-        null
+        null,
       );
     });
 
@@ -1197,14 +1197,14 @@ describe('Parserror', () => {
       expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
-        null
+        null,
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
-        null
+        null,
       );
     });
 
@@ -1240,13 +1240,13 @@ describe('Parserror', () => {
       expect(theCase.parse).toHaveBeenCalledWith(
         error,
         [scopeInstance],
-        null
+        null,
       );
       expect(FormattedError).toHaveBeenCalledTimes(1);
       expect(FormattedError).toHaveBeenCalledWith(
         fallback,
         {},
-        { fallback: true }
+        { fallback: true },
       );
     });
 
@@ -1282,13 +1282,13 @@ describe('Parserror', () => {
       expect(theCase.parse).toHaveBeenCalledWith(
         error,
         [scopeInstance],
-        null
+        null,
       );
       expect(FormattedError).toHaveBeenCalledTimes(1);
       expect(FormattedError).toHaveBeenCalledWith(
         fallback,
         {},
-        { fallback: true }
+        { fallback: true },
       );
     });
   });
@@ -1331,7 +1331,7 @@ describe('Parserror', () => {
       expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
-        null
+        null,
       );
     });
 
@@ -1374,20 +1374,20 @@ describe('Parserror', () => {
       expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
-        null
+        null,
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
-        null
+        null,
       );
       expect(FormattedError).toHaveBeenCalledTimes(1);
       expect(FormattedError).toHaveBeenCalledWith(
         fallback,
         {},
-        { fallback: true }
+        { fallback: true },
       );
     });
 
@@ -1430,20 +1430,20 @@ describe('Parserror', () => {
       expect(globalScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
-        null
+        null,
       );
       expect(customScopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledTimes(1);
       expect(customScopeCase.parse).toHaveBeenCalledWith(
         error,
         [customScopeInstance, globalScopeInstance],
-        null
+        null,
       );
       expect(FormattedError).toHaveBeenCalledTimes(1);
       expect(FormattedError).toHaveBeenCalledWith(
         fallback,
         {},
-        { fallback: true }
+        { fallback: true },
       );
     });
   });
