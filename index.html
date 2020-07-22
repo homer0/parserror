@@ -1,60 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <base data-ice="baseUrl">
-  <title data-ice="title">Home | parserror</title>
-  <link type="text/css" rel="stylesheet" href="css/style.css">
-  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
-  <script src="script/prettify/prettify.js"></script>
-  <script src="script/manual.js"></script>
-<meta name="description" content="Parse errors and generate more human messages"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="parserror"><meta property="twitter:description" content="Parse errors and generate more human messages"></head>
-<body class="layout-container" data-ice="rootContainer">
-
-<header>
-  <a href="./">Home</a>
-  
-  <a href="identifiers.html">Reference</a>
-  <a href="source.html">Source</a>
-  
-  <div class="search-box">
-  <span>
-    <img src="./image/search.png">
-    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
-  </span>
-    <ul class="search-result"></ul>
-  </div>
-<a style="position:relative; top:3px;" href="https://github.com/homer0/parserror"><img width="20px" src="./image/github.png"></a></header>
-
-<nav class="navigation" data-ice="nav"><div>
-  <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/caseParser.js~CaseParser.html">CaseParser</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errorCase.js~ErrorCase.html">ErrorCase</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/formattedError.js~FormattedError.html">FormattedError</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/parserror.js~Parserror.html">Parserror</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/scope.js~Scope.html">Scope</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CaseParserType">CaseParserType</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ErrorCaseDefinition">ErrorCaseDefinition</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ErrorCaseOptions">ErrorCaseOptions</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ParserrorOptions">ParserrorOptions</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ParserrorParseOptions">ParserrorParseOptions</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ParserrorWrapper">ParserrorWrapper</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">Class</a></span></span></li>
-</ul>
-</div>
+    <meta charset="utf-8" />
+    <title>Home - parserror docs</title>
+    
+    
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css" />
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <link rel="shortcut icon" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="48x48" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/favicon-72.png" />
+    <link rel="apple-touch-icon" sizes="96x96" href="icons/favicon-96.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/favicon-144.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/favicon-256.png" />
+    <link rel="apple-touch-icon" sizes="384x384" href="icons/favicon-384.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/favicon-512.png" />
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html" class="home-link">parserror</a></h2><h2><a href="https://github.com/homer0/parserror" target="_blank" >GitHub</a></h2><h3>Classes</h3><ul><li><a href="CaseParser.html">CaseParser</a><ul class='methods'><li data-type='method' style='display: none;'><a href="CaseParser.html#parse">parse</a></li></ul></li><li><a href="ErrorCase.html">ErrorCase</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ErrorCase.html#parse">parse</a></li></ul></li><li><a href="FormattedError.html">FormattedError</a></li><li><a href="Parserror.html">Parserror</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Parserror.html#.new">new</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addCase">addCase</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addCases">addCases</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addParser">addParser</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addScope">addScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#allowOriginal">allowOriginal</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#allowOriginals">allowOriginals</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#getScope">getScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#parse">parse</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#removeScope">removeScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#wrap">wrap</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#wrapForScopes">wrapForScopes</a></li></ul></li><li><a href="Scope.html">Scope</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Scope.html#addCase">addCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#addParser">addParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getCase">getCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getCases">getCases</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getParser">getParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#hasCase">hasCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#hasParser">hasParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#removeCase">removeCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#removeParser">removeParser</a></li></ul></li><li><a href="Utils.html">Utils</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Utils.html#.copyRegExp">copyRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.ensureArray">ensureArray</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.escapeForRegExp">escapeForRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.execRegExp">execRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.getRandomString">getRandomString</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.isObject">isObject</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
-<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><h1 id="parserror">Parserror</h1><p><a href="https://travis-ci.org/homer0/parserror"><img src="https://img.shields.io/travis/homer0/parserror.svg?style=flat-square" alt="Travis"></a>
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+    <section class="package">
+        <h3> </h3>		
+    </section>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    <section class="readme usertext">
+        <article><h1>Parserror</h1>
+<p><a href="https://github.com/homer0/parserror/actions?query=workflow%3ATest"><img src="https://img.shields.io/github/workflow/status/homer0/parserror/Test/master?style=flat-square" alt="GitHub Workflow Status (master)"></a>
 <a href="https://coveralls.io/github/homer0/parserror?branch=master"><img src="https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square" alt="Coveralls github"></a>
 <a href="https://david-dm.org/homer0/parserror"><img src="https://img.shields.io/david/homer0/parserror.svg?style=flat-square" alt="David"></a>
 <a href="https://david-dm.org/homer0/parserror"><img src="https://img.shields.io/david/dev/homer0/parserror.svg?style=flat-square" alt="David"></a></p>
 <p>Parse errors and generate more human messages</p>
-<h2 id="introduction">Introduction</h2><blockquote>
+<h2>Introduction</h2>
+<blockquote>
 <p>If you are wondering why I built this, go to the <a href="#motivation">Motivation</a> section.</p>
 </blockquote>
 <p>Parserror allows you parse errors from external resources by defining simple (or complex) cases in order to be able to use them in the context of your project:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const Parserror = require(&apos;parserror&apos;);
+<pre class="prettyprint source lang-js"><code>const Parserror = require('parserror');
+// Or, if you are using modules...
+// import ParserError from 'parserror/esm';
 
 // Define the cases
 const parserror = Parserror
@@ -62,11 +87,11 @@ const parserror = Parserror
 .addCases([
   {
     // A simple name to use as reference.
-    name: &apos;duplicatedEmail&apos;,
+    name: 'duplicatedEmail',
     // An expression the error message must match.
     condition: /email_address already exists/i,
     // A new, more human friendly, error message for your project to use.
-    message: &apos;This email address is already in use, please choose another&apos;,
+    message: 'This email address is already in use, please choose another',
   }
 ]);
 
@@ -79,105 +104,116 @@ try {
   const formatted = parserror.parse(error);
   // Get a new error with the formatted message.
   showNotification(formatted.message);
-}</code>
+}
 </code></pre>
-<h2 id="usage">Usage</h2><h3 id="cases">Cases</h3><p>As demonstrated in the introduction&apos;s example, the way you match and parse your errors is by defining &quot;cases&quot;.</p>
+<h2>Usage</h2>
+<h3>Cases</h3>
+<p>As demonstrated in the introduction's example, the way you match and parse your errors is by defining &quot;cases&quot;.</p>
 <p>You add new cases using the <code>addCases</code> method, and they can be as simple as the one we already saw, with a basic condition and a <code>string</code> message, or they can be a little more complex.</p>
-<h4 id="using-specific-cases">Using specific cases</h4><p>The reason cases have a name is that when you call <code>parse</code>, you can specify a limited list of cases that you want to use for an error.</p>
+<h4>Using specific cases</h4>
+<p>The reason cases have a name is that when you call <code>parse</code>, you can specify a limited list of cases that you want to use for an error.</p>
 <p>Keeping with the example from above:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">try {
+<pre class="prettyprint source lang-js"><code>try {
   await registerUser();
 } catch (error) {
   // Send the received error to the parser.
   const formatted = parserror.parse(error, {
     // You can the cases list on the options parameter.
-    cases: [&apos;duplicatedEmail&apos;],
+    cases: ['duplicatedEmail'],
   });
   // Get a new error with the formatted message.
   showNotification(formatted.message);
-}</code>
+}
 </code></pre>
 <p>Then, no matter how many cases you have, the error will validate only against the <code>duplicatedEmail</code> case.</p>
-<h4 id="case-parameters">Case parameters</h4><p>Let&apos;s say you have an error that is triggered when you send a <code>string</code> with more than <code>300</code> characters, and this is what the message says:</p>
-<pre><code><code class="source-code prettyprint">Invalid message: the text exceeds the limit of 300</code>
-</code></pre><blockquote>
-<p>Yes, I&apos;m using pretty horrible errors to show my point.</p>
+<h4>Case parameters</h4>
+<p>Let's say you have an error that is triggered when you send a <code>string</code> with more than <code>300</code> characters, and this is what the message says:</p>
+<pre class="prettyprint source"><code>Invalid message: the text exceeds the limit of 300
+</code></pre>
+<blockquote>
+<p>Yes, I'm using pretty horrible errors to show my point.</p>
 </blockquote>
 <p>You could extract the <code>300</code> from there so it can be used on the formatted message:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">{
-  name: &apos;messageLimitValidation&apos;,
+<pre class="prettyprint source lang-js"><code>{
+  name: 'messageLimitValidation',
   condition: /Invalid message: the text exceeds the limit of (\d+)/i,
-  message: (limit) =&gt; `Your message can&apos;t exceeds the ${limit} characters`,
-}</code>
+  message: (limit) => `Your message can't exceeds the ${limit} characters`,
+}
 </code></pre>
 <p>You just need to use a group on your expression. If the library detects that you have groups, it will use <code>message</code> as a <code>function</code> and send the group as parameters in the order they were found.</p>
-<h4 id="case-parsers">Case parsers</h4><p>But what if you want to transformed and extracted parameter before using it your message? Well, that&apos;s what the parsers are for.</p>
-<p>Let&apos;s say you have a library that performs image optimization, it has a size limit of 1mb for the files it can handle and you send a ~3.5MB photo, you could get something like this:</p>
-<pre><code><code class="source-code prettyprint">Size Violation - The file is to large (3584KB)</code>
-</code></pre><p>You could use a parser to make that value into MB:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">{
-  name: &apos;fileLimitValidation&apos;,
+<h4>Case parsers</h4>
+<p>But what if you want to transformed and extracted parameter before using it your message? Well, that's what the parsers are for.</p>
+<p>Let's say you have a library that performs image optimization, it has a size limit of 1mb for the files it can handle and you send a ~3.5MB photo, you could get something like this:</p>
+<pre class="prettyprint source"><code>Size Violation - The file is to large (3584KB)
+</code></pre>
+<p>You could use a parser to make that value into MB:</p>
+<pre class="prettyprint source lang-js"><code>{
+  name: 'fileLimitValidation',
   condition: /Size Violation - The file is to large \((\d+)\w+\)/i,
-  parse: [(size) =&gt; prettysize(size)],
-  message: (size) =&gt; `Your image is too big (${size})`,
-}</code>
+  parse: [(size) => prettysize(size)],
+  message: (size) => `Your image is too big (${size})`,
+}
 </code></pre>
 <p>You can use the <code>parse</code> property to send functions that will allow you to transform the parameters before using them on the <code>message</code>. The order of the list is the same as the parameters.</p>
 <p>And you can also use multiple parsers for the same parameters, just use and <code>array</code>:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">{
-  name: &apos;fileLimitValidation&apos;,
+<pre class="prettyprint source lang-js"><code>{
+  name: 'fileLimitValidation',
   condition: /Size Violation - The file is to large \((\d+)\w+\)/i,
-  parse: [Number, (size) =&gt; prettysize(size)],
-  message: (size) =&gt; `Your image is too big (${size})`,
-}</code>
+  parse: [Number, (size) => prettysize(size)],
+  message: (size) => `Your image is too big (${size})`,
+}
 </code></pre>
 <p>In this case, before getting to the <code>prettysize</code> parameter, <code>Number</code> will act as a parser and transform the value into a proper number (as values extracted from expressions are always <code>string</code>).</p>
-<h5 id="reusable-parsers">Reusable parsers</h5><p>But that&apos;s not all parsers can do; Let&apos;s say the error also shows the limit:</p>
-<pre><code><code class="source-code prettyprint">Size Violation - The file is to large (3584KB) - limit is 1024KB</code>
-</code></pre><p>And you want to extract and format both sizes for your message, you can define reusable parsers:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">{
-  name: &apos;fileLimitValidation&apos;,
+<h5>Reusable parsers</h5>
+<p>But that's not all parsers can do; Let's say the error also shows the limit:</p>
+<pre class="prettyprint source"><code>Size Violation - The file is to large (3584KB) - limit is 1024KB
+</code></pre>
+<p>And you want to extract and format both sizes for your message, you can define reusable parsers:</p>
+<pre class="prettyprint source lang-js"><code>{
+  name: 'fileLimitValidation',
   condition: /Size Violation - The file is to large \((\d+)\w+\) - limit is (\d+)\w+/i,
   parsers: {
-    sizeParser: (size) =&gt; prettysize(Number(size)),
+    sizeParser: (size) => prettysize(Number(size)),
   },
-  parse: [&apos;sizeParser&apos;, &apos;sizeParser&apos;],
-  message: (size, limit) =&gt; `Your image is too big: ${size} - The limit size is ${limit}`,
-}</code>
+  parse: ['sizeParser', 'sizeParser'],
+  message: (size, limit) => `Your image is too big: ${size} - The limit size is ${limit}`,
+}
 </code></pre>
 <p>You can define an object on the <code>parsers</code> property with named parsers, that you can later reference on the <code>parse</code> list.</p>
-<h5 id="map-parsers">Map parsers</h5><p>Finally, the last &quot;feature&quot; here is that, instead of defining a function, you can also define an &quot;object map&quot; to match with the value of a parameter.</p>
+<h5>Map parsers</h5>
+<p>Finally, the last &quot;feature&quot; here is that, instead of defining a function, you can also define an &quot;object map&quot; to match with the value of a parameter.</p>
 <p>Everything is easier with an example!</p>
-<p>Let&apos;s imagine a form to create products, with fields for name, description, price; and on the service you are using save the data, each field has specific rules to validate invalid characters: The name and the description can&apos;t have special symbols, just regular text, and the price can only have numbers.</p>
-<p>Then, the fields on the service are called <code>product_name</code>, <code>product_description</code> and <code>product_price</code>, so it&apos;s not uncommon that you&apos;ll get errors like this:</p>
-<pre><code><code class="source-code prettyprint">Validation Error: product_description has invalid characters</code>
-</code></pre><p>Yes, if you paid attention, you could use a parameter for the name and parser function to map it to a name the end user will understand (like <code>product_description</code> to <code>description</code>).</p>
+<p>Let's imagine a form to create products, with fields for name, description, price; and on the service you are using save the data, each field has specific rules to validate invalid characters: The name and the description can't have special symbols, just regular text, and the price can only have numbers.</p>
+<p>Then, the fields on the service are called <code>product_name</code>, <code>product_description</code> and <code>product_price</code>, so it's not uncommon that you'll get errors like this:</p>
+<pre class="prettyprint source"><code>Validation Error: product_description has invalid characters
+</code></pre>
+<p>Yes, if you paid attention, you could use a parameter for the name and parser function to map it to a name the end user will understand (like <code>product_description</code> to <code>description</code>).</p>
 <p>Well, you could do that, or you can create a simple map parser:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">{
-  name: &apos;charactersValidation&apos;,
+<pre class="prettyprint source lang-js"><code>{
+  name: 'charactersValidation',
   condition: /Validation Error: (\w+) has invalid characters/i,
   parsers: {
     fieldParser: {
-      &apos;product_name&apos;: {
-        label: &apos;product\&apos;s name&apos;,
-        field: &apos;input_name&apos;,
+      'product_name': {
+        label: 'product\'s name',
+        field: 'input_name',
       },
-      &apos;product_description&apos;: {
-        label: &apos;product\&apos;s description&apos;,
-        field: &apos;input_description&apos;,
+      'product_description': {
+        label: 'product\'s description',
+        field: 'input_description',
       },
-      &apos;product_price&apos;: {
-        label: &apos;product\&apos;s price&apos;,
-        field: &apos;input_price&apos;,
+      'product_price': {
+        label: 'product\'s price',
+        field: 'input_price',
       }
     }
   },
-  parse: [&apos;fieldParser&apos;],
-  message: (property) =&gt; `The ${property.label} has invalid characters`,
-};</code>
+  parse: ['fieldParser'],
+  message: (property) => `The ${property.label} has invalid characters`,
+};
 </code></pre>
-<p>And if you are wondering what are the <code>field</code> properties for, there&apos;s a &quot;sub feature&quot; here: all parameters are saved on a <code>parameters</code> property, so you could use the map to store metadata that you can later use. For this case, imagine that <code>field</code> could be the name of the UI controller you want to highlight for the user to identify where the error is:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">try {
+<p>And if you are wondering what are the <code>field</code> properties for, there's a &quot;sub feature&quot; here: all parameters are saved on a <code>parameters</code> property, so you could use the map to store metadata that you can later use. For this case, imagine that <code>field</code> could be the name of the UI controller you want to highlight for the user to identify where the error is:</p>
+<pre class="prettyprint source lang-js"><code>try {
   await saveProduct();
 } catch (error) {
   // Send the received error to the parser.
@@ -188,98 +224,102 @@ try {
   // Extract the formatted parameter metadata.
   const [property] = formatted.parameters;
   highlightUIController(property.field);
-}</code>
+}
 </code></pre>
-<h3 id="scopes">Scopes</h3><p>By default, when you add cases, they are added to a &quot;global scope&quot;, so they are all available every time you call <code>parse</code>. This &quot;global scope&quot; is automatically created when Parserror is instantiated.</p>
+<h3>Scopes</h3>
+<p>By default, when you add cases, they are added to a &quot;global scope&quot;, so they are all available every time you call <code>parse</code>. This &quot;global scope&quot; is automatically created when Parserror is instantiated.</p>
 <p>Scopes are groups of cases and parsers that you can use to limit the number of cases that parse an error, and to share reusable parsers between different cases.</p>
 <p>There are three ways you can create a scope:</p>
 <p>1 - With <code>addScope</code>:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+<pre class="prettyprint source lang-js"><code>const parserror = Parserror
 .new()
-.addScope(&apos;userValidationScope&apos;, [
+.addScope('userValidationScope', [
   {
-    name: &apos;duplicatedEmail&apos;,
+    name: 'duplicatedEmail',
     condition: /email_address already exists/i,
-    message: &apos;This email address is already in use, please choose another&apos;,
+    message: 'This email address is already in use, please choose another',
   }
-]);</code>
+]);
 </code></pre>
 <p>2 - With <code>addCase</code>/<code>addCases</code>:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+<pre class="prettyprint source lang-js"><code>const parserror = Parserror
 .new()
 .addCase(
   {
-    name: &apos;duplicatedEmail&apos;,
+    name: 'duplicatedEmail',
     condition: /email_address already exists/i,
-    message: &apos;This email address is already in use, please choose another&apos;,
+    message: 'This email address is already in use, please choose another',
   },
-  &apos;userValidationScope&apos;
-);</code>
+  'userValidationScope'
+);
 </code></pre>
-<p>You just send it as a second parameter, and if the scope doesn&apos;t exist, it will be created.</p>
+<p>You just send it as a second parameter, and if the scope doesn't exist, it will be created.</p>
 <p>3 - As a property of a case definition:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+<pre class="prettyprint source lang-js"><code>const parserror = Parserror
 .new()
 .addCase({
-  name: &apos;duplicatedEmail&apos;,
+  name: 'duplicatedEmail',
   condition: /email_address already exists/i,
-  message: &apos;This email address is already in use, please choose another&apos;,
-  scope: &apos;userValidationScope&apos;,
-});</code>
+  message: 'This email address is already in use, please choose another',
+  scope: 'userValidationScope',
+});
 </code></pre>
 <p>And yes, this works for both <code>addCase</code> and <code>addCases</code>.</p>
-<h4 id="using-scopes">Using scopes</h4><p>Once you have your scopes defined, you can specify them when you call <code>parse</code>:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">try {
+<h4>Using scopes</h4>
+<p>Once you have your scopes defined, you can specify them when you call <code>parse</code>:</p>
+<pre class="prettyprint source lang-js"><code>try {
   await saveProduct();
 } catch (error) {
   // Send the received error to the parser.
   const formatted = parserror.parse(error, {
     // You can the scopes list on the options parameter.
-    scopes: [&apos;userValidationScope&apos;],
+    scopes: ['userValidationScope'],
   });
   // Get a new error with the formatted message.
   showNotification(formatted.message);
-}</code>
+}
 </code></pre>
 <p>In this case, Parserror will try to match against the cases of <code>userValidationScope</code> before trying with the global scope.</p>
-<h4 id="scope-parsers">Scope parsers</h4><p>On the parsers section we saw that we can define a reusable parser inside a case definition, but Parserror also allows you to define a parser on a scope and reuse it across multiple cases:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+<h4>Scope parsers</h4>
+<p>On the parsers section we saw that we can define a reusable parser inside a case definition, but Parserror also allows you to define a parser on a scope and reuse it across multiple cases:</p>
+<pre class="prettyprint source lang-js"><code>const parserror = Parserror
 .new()
-.addParser(&apos;sizeParser&apos;, (size) =&gt; prettysize(Number(size))
+.addParser('sizeParser', (size) => prettysize(Number(size))
 .addCases([
   {
-    name: &apos;fileLimitValidation&apos;,
+    name: 'fileLimitValidation',
     condition: /Size Violation - The file is to large \((\d+)\w+\) - limit is (\d+)\w+/i,
-    parse: [&apos;sizeParser&apos;, &apos;sizeParser&apos;],
-    message: (size, limit) =&gt; `Your image is too big: ${size} - The limit size is ${limit}`,
+    parse: ['sizeParser', 'sizeParser'],
+    message: (size, limit) => `Your image is too big: ${size} - The limit size is ${limit}`,
   },
   {
-    name: &apos;compressionValidation&apos;,
+    name: 'compressionValidation',
     condition: /The file size is to big to be compressed, the limit is \(\d+)\w+/i,
-    parse: [&apos;sizeParser&apos;],
-    message: (limit) =&gt; `You can&apos;t compress a file over ${limit}`,
+    parse: ['sizeParser'],
+    message: (limit) => `You can't compress a file over ${limit}`,
   },
-]);</code>
+]);
 </code></pre>
-<p>We first added the parser to the global scope and then we just referenced it from the cases, that&apos;s all.</p>
+<p>We first added the parser to the global scope and then we just referenced it from the cases, that's all.</p>
 <p>A few things you should know:</p>
 <ul>
 <li>The example uses the global scope, but you can achieve the same for a custom scope by using the <code>scope</code> parameter on <code>addParser</code> and <code>addCase</code>/<code>addCases</code>.</li>
 <li>If you add the case to a custom scope, you can still reference parsers from the global scope, as Parserror automatically adds the global scope as the last item of the list of scopes to use.</li>
 </ul>
-<h3 id="wrappers">Wrappers</h3><p>Wrappers are little helpers that allow you to create functions with scopes and/or cases already pre configured:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+<h3>Wrappers</h3>
+<p>Wrappers are little helpers that allow you to create functions with scopes and/or cases already pre configured:</p>
+<pre class="prettyprint source lang-js"><code>const parserror = Parserror
 .new()
 .addCases([
   {
-    name: &apos;duplicatedEmail&apos;,
+    name: 'duplicatedEmail',
     condition: /email_address already exists/i,
-    message: &apos;This email address is already in use, please choose another&apos;,
+    message: 'This email address is already in use, please choose another',
   },
   ...
 );
 
-const formatUserErrors = parserror.wrap([&apos;duplicatedEmail&apos;, ...]);
+const formatUserErrors = parserror.wrap(['duplicatedEmail', ...]);
 
 ...
 
@@ -290,50 +330,54 @@ try {
   const formatted = formatUserErrors(error);
   // Get a new error with the formatted message.
   showNotification(formatted.message);
-}</code>
+}
 </code></pre>
 <p>You can also create a wrapper for a scope or a list of them:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const formatUserErrors = parserror.wrap([], [&apos;userValidationScope&apos;]);</code>
+<pre class="prettyprint source lang-js"><code>const formatUserErrors = parserror.wrap([], ['userValidationScope']);
 </code></pre>
-<p>The only thing weird there is that if you are not using cases, having to define an empty array as first parameter doesn&apos;t look very nice... so you could just use <code>wrapForScopes</code>:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const formatUserErrors = parserror.wrapForScopes([&apos;userValidationScope&apos;]);</code>
+<p>The only thing weird there is that if you are not using cases, having to define an empty array as first parameter doesn't look very nice... so you could just use <code>wrapForScopes</code>:</p>
+<pre class="prettyprint source lang-js"><code>const formatUserErrors = parserror.wrapForScopes(['userValidationScope']);
 </code></pre>
-<h3 id="fallback">Fallback</h3><p>In the case you don&apos;t want the original message reaching the user even if no case matched it, maybe it&apos;s a 50x error or something like that, you can use a fallback message.</p>
+<h3>Fallback</h3>
+<p>In the case you don't want the original message reaching the user even if no case matched it, maybe it's a 50x error or something like that, you can use a fallback message.</p>
 <p>There are a few different ways to define fallback messages:</p>
-<h4 id="add-a-fallback-when-parsing-an-error">Add a fallback when parsing an error</h4><p>You can send it as the <code>fallback</code> option on the <code>parse</code> method:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">try {
+<h4>Add a fallback when parsing an error</h4>
+<p>You can send it as the <code>fallback</code> option on the <code>parse</code> method:</p>
+<pre class="prettyprint source lang-js"><code>try {
   await saveProduct();
 } catch (error) {
   // Send the received error to the parser.
   const formatted = parserror.parse(error, {
     // Define the fallback message
-    fallback: &apos;There was an error saving the product, please try again&apos;,
+    fallback: 'There was an error saving the product, please try again',
   });
   // Get a new error with the formatted message.
   showNotification(formatted.message);
-}</code>
+}
 </code></pre>
-<h4 id="add-a-fallback-when-creating-a-wrapper">Add a fallback when creating a wrapper</h4><p>You can create wrappers with a defined fallback message so all the errors parsed can make use of.</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const formatUserErrors = parserror.wrap(
-  [&apos;duplicatedEmail&apos;, ...],
+<h4>Add a fallback when creating a wrapper</h4>
+<p>You can create wrappers with a defined fallback message so all the errors parsed can make use of.</p>
+<pre class="prettyprint source lang-js"><code>const formatUserErrors = parserror.wrap(
+  ['duplicatedEmail', ...],
   [...],
-  &apos;There was an error saving the product, please try again&apos;
-);</code>
+  'There was an error saving the product, please try again'
+);
 </code></pre>
 <p>Both <code>wrap</code> and <code>wrapForScopes</code> support the fallback message as their last parameter.</p>
-<h4 id="add-a-fallback-message-for-an-specific-error-parsed-by-a-wrapper">Add a fallback message for an specific error parsed by a wrapper</h4><p>If you are using the same wrapper for multiple tasks and the fallback message should be different depending on the task that failed, instead of sending it as the last parameter of <code>wrap</code> or <code>wrapForScopes</code>, you can send it as the second parameter of the created wrapper:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+<h4>Add a fallback message for an specific error parsed by a wrapper</h4>
+<p>If you are using the same wrapper for multiple tasks and the fallback message should be different depending on the task that failed, instead of sending it as the last parameter of <code>wrap</code> or <code>wrapForScopes</code>, you can send it as the second parameter of the created wrapper:</p>
+<pre class="prettyprint source lang-js"><code>const parserror = Parserror
 .new()
 .addCases([
   {
-    name: &apos;duplicatedEmail&apos;,
+    name: 'duplicatedEmail',
     condition: /email_address already exists/i,
-    message: &apos;This email address is already in use, please choose another&apos;,
+    message: 'This email address is already in use, please choose another',
   },
   ...
 );
 
-const formatUserErrors = parserror.wrap([&apos;duplicatedEmail&apos;, ...]);
+const formatUserErrors = parserror.wrap(['duplicatedEmail', ...]);
 
 ...
 
@@ -343,26 +387,27 @@ try {
   // Send the received error to the wrapper, and define a fallback message.
   const formatted = formatUserErrors(
     error,
-    &apos;There was an error saving the product, please try again&apos;
+    'There was an error saving the product, please try again'
   );
   // Get a new error with the formatted message.
   showNotification(formatted.message);
-}</code>
+}
 </code></pre>
-<h3 id="keep-original-messages">Keep original messages</h3><p>Let&apos;s say some of the errors you receive are actually useful, you don&apos;t want to create a case to just return the same message... and to make it worst, you want a fallback for some messages that still don&apos;t have a case for. The easiest way to solve this is to &quot;allow the original&quot; message to be matched but not parsed/formatted, and that&apos;s done with the <code>allowOriginal</code> method:</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+<h3>Keep original messages</h3>
+<p>Let's say some of the errors you receive are actually useful, you don't want to create a case to just return the same message... and to make it worst, you want a fallback for some messages that still don't have a case for. The easiest way to solve this is to &quot;allow the original&quot; message to be matched but not parsed/formatted, and that's done with the <code>allowOriginal</code> method:</p>
+<pre class="prettyprint source lang-js"><code>const parserror = Parserror
 .new()
 .addCases([
   {
-    name: &apos;duplicatedEmail&apos;,
+    name: 'duplicatedEmail',
     condition: /email_address already exists/i,
-    message: &apos;This email address is already in use, please choose another&apos;,
+    message: 'This email address is already in use, please choose another',
   },
   ...
 )
 .allowOriginal(/a message that is actually useful/);
 
-const formatUserErrors = parserror.wrap([&apos;duplicatedEmail&apos;, ...]);
+const formatUserErrors = parserror.wrap(['duplicatedEmail', ...]);
 
 ...
 
@@ -372,23 +417,35 @@ try {
   // Send the received error to the parser.
   const formatted = parserror.parse(error, {
     // Define the fallback message
-    fallback: &apos;There was an error saving the product, please try again&apos;,
+    fallback: 'There was an error saving the product, please try again',
   });
   // Get a new error with the formatted message.
   showNotification(formatted.message);
-}</code>
+}
 </code></pre>
 <p>If the error matches the condition sent on <code>allowOriginal</code>, it will keep it as it is and avoid the fallback.</p>
 <p>Internally, <code>allowOriginal</code> creates a new error case but with a flag to keep the original message, so instead of sending a regular expression (or a string), you can send a case definition and even give it a name, so it can be used on <code>parse</code> and <code>wrap</code>.</p>
-<pre><code class="lang-js"><code class="source-code prettyprint">const parserror = Parserror
+<pre class="prettyprint source lang-js"><code>const parserror = Parserror
 .allowOriginal({
   condition: /a message that is actually useful/,
-  name: &apos;thatUsefulMessage&apos;,
-  scope: &apos;someCustomScope&apos;,
-});</code>
+  name: 'thatUsefulMessage',
+  scope: 'someCustomScope',
+});
 </code></pre>
 <p>And just like <code>addCase</code> and <code>addCases</code>, you also have <code>allowOriginals</code> to define multiple conditions at once.</p>
-<h2 id="development">Development</h2><h3 id="npm-yarn-tasks">NPM/Yarn tasks</h3><table>
+<h2>ES Modules</h2>
+<p>All files are written using commonjs, as I targeted the oldest Node LTS and it doesn't support modules (without a flag) yet, but you can use it with ESM.</p>
+<p>When the package gets published, an ESM version is generated on the path <code>/esm</code>. If you are using the latest version of Node, or a module bundler (like <a href="https://projextjs.com">projext</a> :D), instead of requiring from the package's root path, you should do it from the <code>/esm</code> sub path:</p>
+<pre class="prettyprint source lang-js"><code>// commonjs
+const Parserror = require('parserror');
+
+// ESM
+import Parserror from 'parserror/esm';
+</code></pre>
+<p>Since the next LTS to become &quot;the oldest&quot; is 12, which still uses the flag, I still have no plans on going with ESM by default.</p>
+<h2>Development</h2>
+<h3>NPM/Yarn tasks</h3>
+<table>
 <thead>
 <tr>
 <th>Task</th>
@@ -414,25 +471,41 @@ try {
 </tr>
 <tr>
 <td><code>todo</code></td>
-<td>List all the pending to-do&apos;s.</td>
+<td>List all the pending to-do's.</td>
 </tr>
 </tbody>
 </table>
-<h3 id="repository-hooks">Repository hooks</h3><p>I use <a href="https://yarnpkg.com/en/package/husky">husky</a> to automatically install the repository hooks so the code will be tested and linted before any commit and the dependencies updated after every merge. The configuration is on the <code>husky</code> property of the <code>package.json</code> and the hooks&apos; files are on <code>./utils/hooks</code>.</p>
-<h3 id="testing">Testing</h3><p>I use <a href="https://facebook.github.io/jest/">Jest</a> with <a href="https://yarnpkg.com/en/package/jest-ex">Jest-Ex</a> to test the project. The configuration file is on <code>./.jestrc.json</code>, the tests are on <code>./tests</code> and the script that runs it is on <code>./utils/scripts/test</code>.</p>
-<h3 id="linting">Linting</h3><p>I use <a href="http://eslint.org">ESlint</a> with <a href="http://yarnpkg.com/en/package/eslint-plugin-homer0">my own custom configuration</a> to validate all the JS code. The configuration file for the project code is on <code>./.eslintrc</code> and the one for the tests is on <code>./tests/.eslintrc</code>. There&apos;s also an <code>./.eslintignore</code> to exclude some files on the process. The script that runs it is on <code>./utils/scripts/lint</code>.</p>
-<h3 id="documentation">Documentation</h3><p>I use <a href="http://esdoc.org">ESDoc</a> to generate HTML documentation for the project. The configuration file is on <code>./.esdoc.json</code> and the script that runs it is on <code>./utils/scripts/docs</code>.</p>
-<h3 id="to-dos">To-Dos</h3><p>I use <code>@todo</code> comments to write all the pending improvements and fixes, and <a href="https://yarnpkg.com/en/package/leasot">Leasot</a> to generate a report. The script that runs it is on <code>./utils/scripts/todo</code>.</p>
-<h2 id="motivation">Motivation</h2><blockquote>
+<h3>Repository hooks</h3>
+<p>I use <a href="https://yarnpkg.com/package/husky"><code>husky</code></a> to automatically install the repository hooks so the code will be tested and linted before any commit and the dependencies updated after every merge.</p>
+<p>The configuration is on the <code>husky</code> property of the <code>package.json</code> and the hooks' files are on <code>./utils/hooks</code>.</p>
+<h4>Commits convention</h4>
+<p>I use <a href="https://www.conventionalcommits.org">conventional commits</a> with <a href="https://yarnpkg.com/package/commitizen"><code>commitizen</code></a> in order to support semantic releases. The one that sets it up is actually husky, that installs a script that runs commitizen on the <code>git commit</code> command.</p>
+<p>The hook for this is on <code>./utils/hooks/prepare-commit-msg</code> and the configuration for comitizen is on the <code>config.commitizen</code> property of the <code>package.json</code>.</p>
+<h3>Releases</h3>
+<p>I use <a href="https://yarnpkg.com/package/semantic-release"><code>semantic-release</code></a> and a GitHub action to automatically release on NPM everything that gets merged to master.</p>
+<p>The configuration for <code>semantic-release</code> is on <code>./releaserc</code> and the workflow for the release is on <code>./.github/workflow/release.yml</code>.</p>
+<h3>Testing</h3>
+<p>I use <a href="https://facebook.github.io/jest/">Jest</a> to test the project.</p>
+<p>The configuration file is on <code>./.jestrc.json</code>, the tests are on <code>./tests</code> and the script that runs it is on <code>./utils/scripts/test</code>.</p>
+<h3>Linting</h3>
+<p>I use <a href="http://eslint.org">ESlint</a> with <a href="http://yarnpkg.com/en/package/eslint-plugin-homer0">my own custom configuration</a> to validate all the JS code. The configuration file for the project code is on <code>./.eslintrc</code> and the one for the tests is on <code>./tests/.eslintrc</code>. There's also an <code>./.eslintignore</code> to exclude some files on the process. The script that runs it is on <code>./utils/scripts/lint</code>.</p>
+<h3>Documentation</h3>
+<p>I use <a href="https://jsdoc.app">JSDoc</a> to generate an HTML documentation site for the project.</p>
+<p>The configuration file is on <code>./.jsdoc.js</code> and the script that runs it is on <code>./utils/scripts/docs</code>.</p>
+<h3>To-Dos</h3>
+<p>I use <code>@todo</code> comments to write all the pending improvements and fixes, and <a href="https://yarnpkg.com/en/package/leasot">Leasot</a> to generate a report. The script that runs it is on <code>./utils/scripts/todo</code>.</p>
+<h2>Motivation</h2>
+<blockquote>
 <p>I put this at the end because no one usually reads it :P.</p>
 </blockquote>
-<p>Nowadays it&apos;s pretty common to be working with APIs/services/libraries (we&apos;ll call them &quot;resources&quot;) external to your projects, and those resources are <strong>almost never</strong> aware of what kind of project you are building, so whenever they throw/emit errors, they lack context.</p>
-<p>Errors without context are hard to handle, most of the times you just can&apos;t just show them to the end user, whether the resource is a library or an API, errors tend to be specific to the its own context.</p>
+<p>Nowadays it's pretty common to be working with APIs/services/libraries (we'll call them &quot;resources&quot;) external to your projects, and those resources are <strong>almost never</strong> aware of what kind of project you are building, so whenever they throw/emit errors, they lack context.</p>
+<p>Errors without context are hard to handle, most of the times you just can't just show them to the end user, whether the resource is a library or an API, errors tend to be specific to the its own context.</p>
 <p>For example:</p>
-<p>Let&apos;s say you have a web app that connects to an API that manages users. You create a UI with a form to enter a new user and email address; on the other side, the API implements some sort of ORM with out-of-the-box validations and the email address is a unique field.</p>
+<p>Let's say you have a web app that connects to an API that manages users. You create a UI with a form to enter a new user and email address; on the other side, the API implements some sort of ORM with out-of-the-box validations and the email address is a unique field.</p>
 <p>When the user submits the form with an email that is already being used, the API may respond with something like this:</p>
-<pre><code><code class="source-code prettyprint">The field &apos;email&apos; must be unique</code>
-</code></pre><p>What do you do?</p>
+<pre class="prettyprint source"><code>The field 'email' must be unique
+</code></pre>
+<p>What do you do?</p>
 <ol>
 <li>Do you show that error to the user?</li>
 <li>Check if the error matches against a <code>RegExp</code> or a <code>string</code> in order to rewrite it for the user?</li>
@@ -441,26 +514,37 @@ try {
 <p>My answers are:</p>
 <ol>
 <li>No</li>
-<li>That won&apos;t scale if I have a lot of errors to parse.</li>
+<li>That won't scale if I have a lot of errors to parse.</li>
 <li>Even if that were the case, &quot;no, thanks&quot;.</li>
 </ol>
 <blockquote>
 <p>If you have other answers, this library may not be of interest to you.</p>
 </blockquote>
-<p>Ok, so there weren&apos;t other alternatives, so I took the &quot;possible solution&quot; I could have more control over and created a library that would help me handle it on a more simple and organized way.</p>
-</div>
+<p>Ok, so there weren't other alternatives, so I took the &quot;possible solution&quot; I could have more control over and created a library that would help me handle it on a more simple and organized way.</p></article>
+    </section>
+
+
+
+
+
+
+
+    
 </div>
 
-<footer class="footer">
-  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> using a forked <a href="https://github.com/homer0/docdash">docdash</a> theme.
 </footer>
 
-<script src="script/search_index.js"></script>
-<script src="script/search.js"></script>
-<script src="script/pretty-print.js"></script>
-<script src="script/inherited-summary.js"></script>
-<script src="script/test-summary.js"></script>
-<script src="script/inner-link.js"></script>
-<script src="script/patch-for-local.js"></script>
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
 </body>
 </html>

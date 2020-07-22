@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8" />
+    <title>ErrorCase - parserror docs</title>
+    
+    
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css" />
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <link rel="shortcut icon" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="48x48" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/favicon-72.png" />
+    <link rel="apple-touch-icon" sizes="96x96" href="icons/favicon-96.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/favicon-144.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/favicon-256.png" />
+    <link rel="apple-touch-icon" sizes="384x384" href="icons/favicon-384.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/favicon-512.png" />
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html" class="home-link">parserror</a></h2><h2><a href="https://github.com/homer0/parserror" target="_blank" >GitHub</a></h2><h3>Classes</h3><ul><li><a href="CaseParser.html">CaseParser</a><ul class='methods'><li data-type='method' style='display: none;'><a href="CaseParser.html#parse">parse</a></li></ul></li><li><a href="ErrorCase.html">ErrorCase</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ErrorCase.html#parse">parse</a></li></ul></li><li><a href="FormattedError.html">FormattedError</a></li><li><a href="Parserror.html">Parserror</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Parserror.html#.new">new</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addCase">addCase</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addCases">addCases</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addParser">addParser</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addScope">addScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#allowOriginal">allowOriginal</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#allowOriginals">allowOriginals</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#getScope">getScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#parse">parse</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#removeScope">removeScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#wrap">wrap</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#wrapForScopes">wrapForScopes</a></li></ul></li><li><a href="Scope.html">Scope</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Scope.html#addCase">addCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#addParser">addParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getCase">getCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getCases">getCases</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getParser">getParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#hasCase">hasCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#hasParser">hasParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#removeCase">removeCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#removeParser">removeParser</a></li></ul></li><li><a href="Utils.html">Utils</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Utils.html#.copyRegExp">copyRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.ensureArray">ensureArray</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.escapeForRegExp">escapeForRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.execRegExp">execRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.getRandomString">getRandomString</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.isObject">isObject</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">ErrorCase</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        ErrorCase
+        </h2>
+        
+            <div class="class-description usertext"><p>The core object of Parserror. A case is like a &quot;service&quot; that validates if an error message
+matches its <code>condition</code> and, if defined, runs multiple parsers in order to generate a new
+error.</p></div>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="ErrorCase"><span class="type-signature"></span>new ErrorCase<span class="signature">(definition, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="errorCase.js.html">errorCase.js</a>, <a href="errorCase.js.html#line24">line 24</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>definition</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ErrorCaseDefinition">ErrorCaseDefinition</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The case definition settings.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ErrorCaseOptions">ErrorCaseOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>{}</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>The options to customize how the class behaves.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the definition is missing the <code>name</code>, the <code>condition</code> or the <code>message</code>.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the definition <code>message</code> is not a string nor a function.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the definition <code>condition</code> is not a RegExp nor a string.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the definition includes <code>parsers</code> and it's not an object.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If a parser is not an object, a function or an instance of
+<a href="CaseParser.html"><code>CaseParser</code></a>.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the definition includes <code>parse</code> and it's not an <code>array</code> nor an object.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the definition includes <code>parse</code> and an item is not an <code>array</code>, a
+function or an object.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="name"><span class="type-signature"></span>name<span class="type-signature"> :<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="errorCase.js.html">errorCase.js</a>, <a href="errorCase.js.html#line137">line 137</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>The case name.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="parse"><span class="type-signature"></span>parse<span class="signature">(errorMessage, scopes<span class="signature-attributes">opt</span>, context<span class="signature-attributes">opt, nullable</span>)</span><span class="type-signature"> &rarr; (nullable) {<a href="FormattedError.html">FormattedError</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="errorCase.js.html">errorCase.js</a>, <a href="errorCase.js.html#line117">line 117</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Validates an error message against the case condition and if it matches, it parses it in
+order to return a formatted error.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>errorMessage</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The error message to validate and, possibly, parse.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scopes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>.&lt;<a href="Scope.html">Scope</a>></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>[]</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>A list of scopes from where the case can try to find
+reusable parsers.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>context</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Custom context information about the error that can be
+sent to the formatted error.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the condition matches, parameters are extracted as named groups but the
+case's <code>parse</code> instructions were defined as an array.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the condition matches, parameters are extracted as a list but the case's
+<code>parse</code> instructions were defined as an object.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the condition matches, one of the parsers the case wants to use is
+suppoused to be on one of the scopes but it can't be found.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>If the condition has a mix of named and unnamed groups.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>If the condition doesn't match, it will return <code>null</code>.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="FormattedError.html">FormattedError</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> using a forked <a href="https://github.com/homer0/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

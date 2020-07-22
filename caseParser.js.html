@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8" />
+    <title>caseParser.js - parserror docs</title>
+    
+    
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css" />
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <link rel="shortcut icon" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="48x48" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/favicon-72.png" />
+    <link rel="apple-touch-icon" sizes="96x96" href="icons/favicon-96.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/favicon-144.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/favicon-256.png" />
+    <link rel="apple-touch-icon" sizes="384x384" href="icons/favicon-384.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/favicon-512.png" />
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html" class="home-link">parserror</a></h2><h2><a href="https://github.com/homer0/parserror" target="_blank" >GitHub</a></h2><h3>Classes</h3><ul><li><a href="CaseParser.html">CaseParser</a><ul class='methods'><li data-type='method' style='display: none;'><a href="CaseParser.html#parse">parse</a></li></ul></li><li><a href="ErrorCase.html">ErrorCase</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ErrorCase.html#parse">parse</a></li></ul></li><li><a href="FormattedError.html">FormattedError</a></li><li><a href="Parserror.html">Parserror</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Parserror.html#.new">new</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addCase">addCase</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addCases">addCases</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addParser">addParser</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addScope">addScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#allowOriginal">allowOriginal</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#allowOriginals">allowOriginals</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#getScope">getScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#parse">parse</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#removeScope">removeScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#wrap">wrap</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#wrapForScopes">wrapForScopes</a></li></ul></li><li><a href="Scope.html">Scope</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Scope.html#addCase">addCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#addParser">addParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getCase">getCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getCases">getCases</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getParser">getParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#hasCase">hasCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#hasParser">hasParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#removeCase">removeCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#removeParser">removeParser</a></li></ul></li><li><a href="Utils.html">Utils</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Utils.html#.copyRegExp">copyRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.ensureArray">ensureArray</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.escapeForRegExp">escapeForRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.execRegExp">execRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.getRandomString">getRandomString</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.isObject">isObject</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">caseParser.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const Utils = require('./utils.js');
+
+/**
+ * A parser an error cases can use to format a value extracted from an error.
+ */
+class CaseParser {
+  /**
+   * @param {string}                     name   The name of the parser.
+   * @param {Object.&lt;string,*>|Function} parser A function to parse a value or an `object` to
+   *                                            map the value to something else.
+   * @throws {TypeError} If the `name` is not a `string`.
+   * @throws {TypeError} If the `parser` is not a `function` nor an `object`.
+   * @throws {Error}     If the `parser` is an empty `object`.
+   */
+  constructor(name, parser) {
+    /**
+     * The name of the parser.
+     *
+     * @type {string}
+     * @access protected
+     * @ignore
+     */
+    this._name = this._validateName(name);
+    /**
+     * If the parser is a map, this is where the object will be stored.
+     *
+     * @type {?Object.&lt;string,*>}
+     * @access protected
+     * @ignore
+     */
+    this._map = null;
+    /**
+     * If the parser is a function, this is where the function will be saved.
+     *
+     * @type {?Function}
+     * @access protected
+     * @ignore
+     */
+    this._function = null;
+    /**
+     * An object with properties to validate the parser type.
+     *
+     * @type {CaseParserType}
+     * @access protected
+     * @ignore
+     */
+    this._parserType = this._validateParserType(parser);
+
+    if (this._parserType.map) {
+      /**
+       * @ignore
+       */
+      this._map = parser;
+    } else {
+      /**
+       * @ignore
+       */
+      this._function = parser;
+    }
+  }
+  /**
+   * Parse a value with the class parser.
+   * If the parser is a map and the value is an object with a `raw` property, which means it comes
+   * from another map parser, instead of generating a new value, the parser will merge the new
+   * value in top of the previous one.
+   *
+   * @param {*} value The value to parse.
+   * @returns {*} The result of the parsing.
+   */
+  parse(value) {
+    let result;
+    if (this.is.map) {
+      const extend = Utils.isObject(value) &amp;&amp; typeof value.raw !== 'undefined';
+      const useValue = extend ? value.raw : value;
+      if (this._map[useValue]) {
+        if (extend) {
+          result = { ...value, ...this._map[useValue] };
+        } else {
+          result = {
+            raw: useValue,
+            ...this._map[useValue],
+          };
+        }
+      }
+    } else {
+      result = this._function(value);
+    }
+
+    return result || value;
+  }
+  /**
+   * An object with properties to validate the parser type.
+   *
+   * @type {CaseParserType}
+   */
+  get is() {
+    return this._parserType;
+  }
+  /**
+   * The name of the parser.
+   *
+   * @type {string}
+   */
+  get name() {
+    return this._name;
+  }
+  /**
+   * Validate the name of the parser.
+   *
+   * @param {string} name The name the class intends to use.
+   * @returns {string}
+   * @throws {TypeError} If the `name` is not a `string`.
+   * @access protected
+   * @ignore
+   */
+  _validateName(name) {
+    if (typeof name !== 'string') {
+      throw new TypeError('The \'name\' can only be a \'string\'');
+    }
+
+    return name;
+  }
+  /**
+   * Validate the parser and generated an object with flags for the type.
+   *
+   * @param {Object.&lt;string,*>|Function} parser The parser the class intends to save.
+   * @returns {CaseParserType}
+   * @throws {TypeError} If the parser is not a `function` nor an `object`.
+   * @throws {Error}     If the `parser` is an empty `object`.
+   * @access protected
+   * @ignore
+   */
+  _validateParserType(parser) {
+    const result = {
+      map: false,
+      function: false,
+    };
+    const isObject = Utils.isObject(parser);
+    if (isObject) {
+      const mapKeys = Object.keys(parser);
+      if (mapKeys.length) {
+        result.map = true;
+      } else {
+        throw new Error(
+          `'${this._name}': the parser is empty. It should include at least one item to map`,
+        );
+      }
+    } else if (typeof parser === 'function') {
+      result.function = true;
+    } else {
+      throw new TypeError(
+        `'${this._name}': the 'parser' parameter can only be a 'string' ` +
+        'or a \'function\'',
+      );
+    }
+
+    return result;
+  }
+}
+
+module.exports = CaseParser;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> using a forked <a href="https://github.com/homer0/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

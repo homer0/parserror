@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8" />
+    <title>FormattedError - parserror docs</title>
+    
+    
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css" />
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <link rel="shortcut icon" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="48x48" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/favicon-72.png" />
+    <link rel="apple-touch-icon" sizes="96x96" href="icons/favicon-96.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/favicon-144.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/favicon-256.png" />
+    <link rel="apple-touch-icon" sizes="384x384" href="icons/favicon-384.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/favicon-512.png" />
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html" class="home-link">parserror</a></h2><h2><a href="https://github.com/homer0/parserror" target="_blank" >GitHub</a></h2><h3>Classes</h3><ul><li><a href="CaseParser.html">CaseParser</a><ul class='methods'><li data-type='method' style='display: none;'><a href="CaseParser.html#parse">parse</a></li></ul></li><li><a href="ErrorCase.html">ErrorCase</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ErrorCase.html#parse">parse</a></li></ul></li><li><a href="FormattedError.html">FormattedError</a></li><li><a href="Parserror.html">Parserror</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Parserror.html#.new">new</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addCase">addCase</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addCases">addCases</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addParser">addParser</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#addScope">addScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#allowOriginal">allowOriginal</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#allowOriginals">allowOriginals</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#getScope">getScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#parse">parse</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#removeScope">removeScope</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#wrap">wrap</a></li><li data-type='method' style='display: none;'><a href="Parserror.html#wrapForScopes">wrapForScopes</a></li></ul></li><li><a href="Scope.html">Scope</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Scope.html#addCase">addCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#addParser">addParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getCase">getCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getCases">getCases</a></li><li data-type='method' style='display: none;'><a href="Scope.html#getParser">getParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#hasCase">hasCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#hasParser">hasParser</a></li><li data-type='method' style='display: none;'><a href="Scope.html#removeCase">removeCase</a></li><li data-type='method' style='display: none;'><a href="Scope.html#removeParser">removeParser</a></li></ul></li><li><a href="Utils.html">Utils</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Utils.html#.copyRegExp">copyRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.ensureArray">ensureArray</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.escapeForRegExp">escapeForRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.execRegExp">execRegExp</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.getRandomString">getRandomString</a></li><li data-type='method' style='display: none;'><a href="Utils.html#.isObject">isObject</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">FormattedError</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        FormattedError
+        </h2>
+        
+            <div class="class-description usertext"><p>A custom version of <code>Error</code> so the Parserror can store the parsing parameters and some
+context information.</p></div>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="FormattedError"><span class="type-signature"></span>new FormattedError<span class="signature">(message, params<span class="signature-attributes">opt</span>, context<span class="signature-attributes">opt, nullable</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formattedError.js.html">formattedError.js</a>, <a href="formattedError.js.html#line17">line 17</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The error message.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>.&lt;<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, <a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></span>
+|
+
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>.&lt;<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>{}</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>The parsed parameters Parserror. When parsing a case that uses named groups, the parameters
+are stored on an <code>object</code>; otherwise, they'll be an <code>array</code>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>context</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Any extra context information for the error.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="context"><span class="type-signature"></span>context<span class="type-signature"> :<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formattedError.js.html">formattedError.js</a>, <a href="formattedError.js.html#line33">line 33</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>Remove `Object.freeze`.</li>
+        </ul>
+    </dd>
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Any extra context information for the error.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="params"><span class="type-signature"></span>params<span class="type-signature"> :<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>.&lt;<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, <a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>|<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>.&lt;<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></span></h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formattedError.js.html">formattedError.js</a>, <a href="formattedError.js.html#line26">line 26</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>Remove `Object.freeze`.</li>
+        </ul>
+    </dd>
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>The parsed parameters Parserror found. When parsing a case that uses named groups, the
+parameters are stored on an <code>object</code>; otherwise, they'll be an <code>array</code>.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>.&lt;<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, <a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></span>
+|
+
+<span class="param-type"><a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>.&lt;<a  target="_blank" href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> using a forked <a href="https://github.com/homer0/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>
