@@ -1,0 +1,6 @@
+/.*
+coverage
+docs
+tests
+utils
+yarn-error.log
