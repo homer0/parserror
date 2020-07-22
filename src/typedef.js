@@ -2,3 +2,97 @@
  * @external Class
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
  */
+
+/**
+ * @typedef {Object} CaseParserType
+ * @description A simple object to check what kind of parser it's.
+ * @property {boolean} map      Whether or not the parser is an `object` map.
+ * @property {boolean} function Whether or not the parser is a `function`.
+ */
+
+/**
+ * A function that generates a formatted message for an error.
+ *
+ * @typedef {Function} ErrorCaseMessage
+ * @returns {string}
+ */
+
+/**
+ * @typedef {Object} ErrorCaseDefinition
+ * @description The required properties to create a new {@link ErrorCase}.
+ * @property {string} name
+ * The name of the case.
+ * @property {ErrorCaseDefinition|string} message
+ * The formatted message or the `function` that generates one.
+ * @property {RegExp|string} condition
+ * A `string` or a expression to match against an error that could be parsed.
+ * @property {?Object} parsers
+ * A map of reusable parsers. Each parser can be an `object` map, a `function` or an instance of
+ * {@link CaseParser}.
+ * @property {?Array} parse
+ * A list of parsers the case should use on extracted parameters. Each item of the list can be
+ * either the name of a parser defined on `parsers`, the name of a parser on the scope, a
+ * `function` to parse a value, or an `array` of all the thing previously mentioned.
+ * @property {?boolean} useOriginal
+ * Whether or not the case should use the original message when matched.
+ */
+
+/**
+ * @typedef {Object} ErrorCaseOptions
+ * @description The options to customize how the class behaves.
+ * @property {Class<CaseParser>}     CaseParserClass     The class to be used to create a parser.
+ * @property {Class<FormattedError>} FormattedErrorClass The class to be used to create a custom
+ *                                                       error after a message is parsed.
+ */
+
+/**
+ * @typedef {Object} ParserrorOptions
+ * @description The options to customize how the class behaves.
+ * @property {Class<CaseParser>}     CaseParserClass        The class that will be used to create
+ *                                                          parsers. It will also be sent down to
+ *                                                          every case that gets created, on its
+ *                                                          `option` parameter.
+ * @property {Class<ErrorCase>}      ErrorCaseClass         The class that will be used to create
+ *                                                          cases.
+ * @property {Class<FormattedError>} FormattedErrorClass    The class that will be used to create
+ *                                                          formatted errors. It will also be sent
+ *                                                          down to every case that gets created,
+ *                                                          on its `options` parameter.
+ * @property {Class<Scope>}          ScopeClass             The class that will be used to create
+ *                                                          scopes.
+ * @property {Array<string>}         errorContextProperties A list of properties the class will try
+ *                                                          to find on given errors in order to use
+ *                                                          as context information for
+ *                                                          {@link ErrorCase} and
+ *                                                          {@link FormattedError}.
+ */
+
+/**
+ * @typedef {Object} ParserrorErrorObject
+ * @description An object with a signature similar to an {@link Error} that {@link Parserror}
+ *              can parse.
+ * @property {string} message The error message.
+ */
+
+/**
+ * @typedef {Object} ParserrorParseOptions
+ * @description The options that can be used to customize how {@link Parserror#parse} works.
+ * @property {Array<string>} cases    A list of specific cases it should validated
+ *                                    against.
+ * @property {Array<string>} scopes   A list of specific scopes it should use to
+ *                                    valdiate the error.
+ * @property {?string}       fallback A fallback message in case the error can't be parsed.
+ *                                    If not specified, the returned error will
+ *                                    maintain the original message.
+ */
+
+/**
+ * @typedef {Function} ParserrorWrapper
+ * @description A pre configured parser to format errors with specific cases and/or scopes.
+ * @param {Error|string|ParserrorErrorObject} error
+ * The error to parse.
+ * @param {?string} [fallback=null]
+ * A fallback message in case the error can't be parsed. If not specified, the returned
+ * error will maintain the original message.
+ * @returns {FormattedError}
+ */

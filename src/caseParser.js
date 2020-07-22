@@ -1,10 +1,4 @@
 const Utils = require('./utils');
-/**
- * @typedef {Object} CaseParserType
- * @description A simple object to check what kind of parser it's.
- * @property {boolean} map      Whether or not the parser is an `object` map.
- * @property {boolean} function Whether or not the parser is a `function`.
- */
 
 /**
  * A parser an error cases can use to format a value extracted from an error.

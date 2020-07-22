@@ -3,41 +3,6 @@ const CaseParser = require('./caseParser');
 const FormattedError = require('./formattedError');
 
 /**
- * A function that generates a formatted message for an error.
- *
- * @typedef {Function} ErrorCaseMessage
- * @returns {string}
- */
-
-/**
- * @typedef {Object} ErrorCaseDefinition
- * @description The required properties to create a new {@link ErrorCase}.
- * @property {string} name
- * The name of the case.
- * @property {ErrorCaseDefinition|string} message
- * The formatted message or the `function` that generates one.
- * @property {RegExp|string} condition
- * A `string` or a expression to match against an error that could be parsed.
- * @property {?Object} parsers
- * A map of reusable parsers. Each parser can be an `object` map, a `function` or an instance of
- * {@link CaseParser}.
- * @property {?Array} parse
- * A list of parsers the case should use on extracted parameters. Each item of the list can be
- * either the name of a parser defined on `parsers`, the name of a parser on the scope, a
- * `function` to parse a value, or an `array` of all the thing previously mentioned.
- * @property {?boolean} useOriginal
- * Whether or not the case should use the original message when matched.
- */
-
-/**
- * @typedef {Object} ErrorCaseOptions
- * @description The options to customize how the class behaves.
- * @property {Class<CaseParser>}     CaseParserClass     The class to be used to create a parser.
- * @property {Class<FormattedError>} FormattedErrorClass The class to be used to create a custom
- *                                                       error after a message is parsed.
- */
-
-/**
  * The core object of Parserror. A case is like a "service" that validates if an error message
  * matches its `condition` and, if defined, runs multiple parsers in order to generate a new
  * error.

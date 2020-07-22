@@ -5,58 +5,6 @@ const Scope = require('./scope');
 const Utils = require('./utils');
 
 /**
- * @typedef {Object} ParserrorOptions
- * @description The options to customize how the class behaves.
- * @property {Class<CaseParser>}     CaseParserClass        The class that will be used to create
- *                                                          parsers. It will also be sent down to
- *                                                          every case that gets created, on its
- *                                                          `option` parameter.
- * @property {Class<ErrorCase>}      ErrorCaseClass         The class that will be used to create
- *                                                          cases.
- * @property {Class<FormattedError>} FormattedErrorClass    The class that will be used to create
- *                                                          formatted errors. It will also be sent
- *                                                          down to every case that gets created,
- *                                                          on its `options` parameter.
- * @property {Class<Scope>}          ScopeClass             The class that will be used to create
- *                                                          scopes.
- * @property {Array<string>}         errorContextProperties A list of properties the class will try
- *                                                          to find on given errors in order to use
- *                                                          as context information for
- *                                                          {@link ErrorCase} and
- *                                                          {@link FormattedError}.
- */
-
-/**
- * @typedef {Object} ParserrorErrorObject
- * @description An object with a signature similar to an {@link Error} that {@link Parserror}
- *              can parse.
- * @property {string} message The error message.
- */
-
-/**
- * @typedef {Object} ParserrorParseOptions
- * @description The options that can be used to customize how {@link Parserror#parse} works.
- * @property {Array<string>} cases    A list of specific cases it should validated
- *                                    against.
- * @property {Array<string>} scopes   A list of specific scopes it should use to
- *                                    valdiate the error.
- * @property {?string}       fallback A fallback message in case the error can't be parsed.
- *                                    If not specified, the returned error will
- *                                    maintain the original message.
- */
-
-/**
- * @typedef {Function} ParserrorWrapper
- * @description A pre configured parser to format errors with specific cases and/or scopes.
- * @param {Error|string|ParserrorErrorObject} error
- * The error to parse.
- * @param {?string} [fallback=null]
- * A fallback message in case the error can't be parsed. If not specified, the returned
- * error will maintain the original message.
- * @returns {FormattedError}
- */
-
-/**
  * The main class of the library. It allows you to create cases, parsers and scopes.
  */
 class Parserror {
