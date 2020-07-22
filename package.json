@@ -18,6 +18,8 @@
     "@babel/core": "^7.10.5",
     "@babel/preset-env": "^7.10.4",
     "5to6-codemod": "1.8.0",
+    "commitizen": "^4.1.2",
+    "cz-conventional-changelog": "^3.2.0",
     "docdash": "homer0/docdash#semver:^2.0.0",
     "eslint": "^7.5.0",
     "eslint-plugin-homer0": "^5.0.1",
@@ -46,10 +48,16 @@
   "husky": {
     "hooks": {
       "pre-commit": "./utils/hooks/pre-commit",
-      "post-merge": "./utils/hooks/post-merge"
+      "post-merge": "./utils/hooks/post-merge",
+      "prepare-commit-msg": "./utils/hooks/prepare-commit-msg"
     }
   },
   "lint-staged": {
     "*.js": "eslint"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }
