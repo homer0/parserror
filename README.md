@@ -15,6 +15,8 @@ Parserror allows you parse errors from external resources by defining simple (or
 
 ```js
 const Parserror = require('parserror');
+// Or, if you are using modules...
+// import ParserError from 'parserror/esm';
 
 // Define the cases
 const parserror = Parserror
@@ -480,6 +482,22 @@ const parserror = Parserror
 ```
 
 And just like `addCase` and `addCases`, you also have `allowOriginals` to define multiple conditions at once.
+
+## ES Modules
+
+All files are written using commonjs, as I targeted the oldest Node LTS and it doesn't support modules (without a flag) yet, but you can use it with ESM.
+
+When the package gets published, an ESM version is generated on the path `/esm`. If you are using the latest version of Node, or a module bundler (like [projext](https://projextjs.com) :D), instead of requiring from the package's root path, you should do it from the `/esm` sub path:
+
+```js
+// commonjs
+const Parserror = require('parserror');
+
+// ESM
+import Parserror from 'parserror/esm';
+```
+
+Since the next LTS to become "the oldest" is 12, which still uses the flag, I still have no plans on going with ESM by default.
 
 ## Development
 
