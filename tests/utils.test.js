@@ -1,7 +1,6 @@
-jest.unmock('/src/utils');
+jest.unmock('../src/utils');
 
-require('jasmine-expect');
-const Utils = require('/src/utils');
+const Utils = require('../src/utils');
 
 describe('Utils', () => {
   describe('escapeForRegExp', () => {
@@ -27,10 +26,10 @@ describe('Utils', () => {
       result = Utils.copyRegExp(expression);
       // Then
       expect(expression).not.toBe(result);
-      expect(result).toBeRegExp();
-      expect(result.ignoreCase).toBeTrue();
-      expect(result.global).toBeTrue();
-      expect(result.multiline).toBeFalse();
+      expect(result).toBeInstanceOf(RegExp);
+      expect(result.ignoreCase).toBe(true);
+      expect(result.global).toBe(true);
+      expect(result.multiline).toBe(false);
     });
 
     it('should copy a regular expression and add extra flags', () => {
@@ -44,10 +43,10 @@ describe('Utils', () => {
       result = Utils.copyRegExp(expression, extraFlags);
       // Then
       expect(expression).not.toBe(result);
-      expect(result).toBeRegExp();
-      expect(result.ignoreCase).toBeTrue();
-      expect(result.global).toBeTrue();
-      expect(result.multiline).toBeTrue();
+      expect(result).toBeInstanceOf(RegExp);
+      expect(result.ignoreCase).toBe(true);
+      expect(result.global).toBe(true);
+      expect(result.multiline).toBe(true);
     });
   });
 
@@ -72,9 +71,9 @@ describe('Utils', () => {
   describe('isObject', () => {
     it('should validate that something is a literal object', () => {
       // Given/When/Then
-      expect(Utils.isObject({})).toBeTrue();
-      expect(Utils.isObject(new Error())).toBeFalse();
-      expect(Utils.isObject([])).toBeFalse();
+      expect(Utils.isObject({})).toBe(true);
+      expect(Utils.isObject(new Error())).toBe(false);
+      expect(Utils.isObject([])).toBe(false);
     });
   });
 

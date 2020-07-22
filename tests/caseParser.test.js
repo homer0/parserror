@@ -1,8 +1,7 @@
-jest.unmock('/src/caseParser');
+jest.unmock('../src/caseParser');
 
-require('jasmine-expect');
-const CaseParser = require('/src/caseParser');
-const Utils = require('/src/utils');
+const CaseParser = require('../src/caseParser');
+const Utils = require('../src/utils');
 
 describe('CaseParser', () => {
   beforeEach(() => {

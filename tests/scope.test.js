@@ -1,12 +1,11 @@
 /* eslint-disable max-classes-per-file */
-jest.unmock('/src/scope');
-jest.unmock('/src/errorCase');
-jest.unmock('/src/caseParser');
+jest.unmock('../src/scope');
+jest.unmock('../src/errorCase');
+jest.unmock('../src/caseParser');
 
-require('jasmine-expect');
-const Scope = require('/src/scope');
-const ErrorCase = require('/src/errorCase');
-const CaseParser = require('/src/caseParser');
+const Scope = require('../src/scope');
+const ErrorCase = require('../src/errorCase');
+const CaseParser = require('../src/caseParser');
 
 describe('Scope', () => {
   describe('constructor', () => {
