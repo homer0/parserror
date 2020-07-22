@@ -121,7 +121,7 @@ class Parserror {
    * The name of the scope.
    * @param {ErrorCaseDefinition[]} [cases=[]]
    * A list of cases' defintions to add.
-   * @param {(string|RegExp|ErrorCaseDefinition)[]} [allowedOriginals=[]]
+   * @param {Condition[]} [allowedOriginals=[]]
    * a list of conditions/definitions for cases that allow original messages to be matched. To
    * better understand how this work, please read the description of
    * {@link Parserror#allowOriginal}.
@@ -161,7 +161,7 @@ class Parserror {
    * to use a fallback message, you would use this method; the original message won't be
    * discarded and you still have the fallback for messages that don't have a match.
    *
-   * @param {string|RegExp|ErrorCaseDefinition} condition
+   * @param {Condition} condition
    * Internally, this method will generate a new {@link ErrorCase}, so this parameter can be a
    * string or a regular expression to match the error message, or an actual case definition.
    * By default, the created case will have a random string as a name, but you can use a case
@@ -193,7 +193,7 @@ class Parserror {
    * {@link Parserror#allowOriginal}, so please read the documentation of that method to better
    * understand in which case you would want to allow original messages.
    *
-   * @param {(string|RegExp|ErrorCaseDefinition)[]} conditions
+   * @param {Condition[]} conditions
    * The list of conditions/definitions for the cases that will match the messages.
    * @param {?string} [scope=null] The name of the scope where the cases should be added. If not
    * defined, they will be added to the global scope.

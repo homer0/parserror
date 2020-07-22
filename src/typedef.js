@@ -32,6 +32,10 @@
  */
 
 /**
+ * @typedef {string|RegExp|ErrorCaseDefinition} Condition
+ */
+
+/**
  * @callback InstructionFn
  * @param {*} value The value captured from the error that needs to formatted.
  * @returns {*}
@@ -42,7 +46,7 @@
  */
 
 /**
- * @typedef {(Instruction|Instruction[])[]} InstructionList
+ * @typedef {Array<Instruction|Instruction[]>} InstructionList
  * @typedef {InstructionList|Object.<string,InstructionList>} InstructionListLike
  */
 
