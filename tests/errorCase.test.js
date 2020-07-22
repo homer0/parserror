@@ -1,11 +1,10 @@
 /* eslint-disable max-classes-per-file */
-jest.unmock('/src/errorCase');
+jest.unmock('../src/errorCase');
 
-require('jasmine-expect');
-const CaseParser = require('/src/caseParser');
-const ErrorCase = require('/src/errorCase');
-const FormattedError = require('/src/formattedError');
-const Utils = require('/src/utils');
+const CaseParser = require('../src/caseParser');
+const ErrorCase = require('../src/errorCase');
+const FormattedError = require('../src/formattedError');
+const Utils = require('../src/utils');
 
 describe('ErrorCase', () => {
   beforeEach(() => {

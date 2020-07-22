@@ -1,12 +1,11 @@
-jest.unmock('/src/parserror');
+jest.unmock('../src/parserror');
 
-require('jasmine-expect');
-const CaseParser = require('/src/caseParser');
-const ErrorCase = require('/src/errorCase');
-const Parserror = require('/src/parserror');
-const FormattedError = require('/src/formattedError');
-const Scope = require('/src/scope');
-const Utils = require('/src/utils');
+const CaseParser = require('../src/caseParser');
+const ErrorCase = require('../src/errorCase');
+const Parserror = require('../src/parserror');
+const FormattedError = require('../src/formattedError');
+const Scope = require('../src/scope');
+const Utils = require('../src/utils');
 
 describe('Parserror', () => {
   beforeEach(() => {
@@ -1117,7 +1116,6 @@ describe('Parserror', () => {
       parser = sut.wrap();
       result = parser(error);
       // Then
-      expect(parser).toBeFunction();
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(theCase.parse).toHaveBeenCalledTimes(1);
@@ -1148,7 +1146,6 @@ describe('Parserror', () => {
       parser = sut.wrap([theCaseName]);
       result = parser(error);
       // Then
-      expect(parser).toBeFunction();
       expect(result).toBe(formatted);
       expect(scopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(scopeInstance.getCase).toHaveBeenCalledWith(theCaseName);
@@ -1189,7 +1186,6 @@ describe('Parserror', () => {
       parser = sut.wrap([globalScopeCaseName], [customScopeName]);
       result = parser(error);
       // Then
-      expect(parser).toBeFunction();
       expect(result).toBe(formatted);
       expect(globalScopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(globalScopeInstance.getCase).toHaveBeenCalledWith(globalScopeCaseName);
@@ -1232,7 +1228,6 @@ describe('Parserror', () => {
       parser = sut.wrap([theCaseName], [], fallback);
       result = parser(error);
       // Then
-      expect(parser).toBeFunction();
       expect(result).toBe(errorInstance);
       expect(scopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(scopeInstance.getCase).toHaveBeenCalledWith(theCaseName);
@@ -1274,7 +1269,6 @@ describe('Parserror', () => {
       parser = sut.wrap([theCaseName]);
       result = parser(error, fallback);
       // Then
-      expect(parser).toBeFunction();
       expect(result).toBe(errorInstance);
       expect(scopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(scopeInstance.getCase).toHaveBeenCalledWith(theCaseName);
@@ -1322,7 +1316,6 @@ describe('Parserror', () => {
       parser = sut.wrapForScopes([customScopeName]);
       result = parser(error);
       // Then
-      expect(parser).toBeFunction();
       expect(result).toBe(formatted);
       expect(globalScopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(globalScopeCase.parse).toHaveBeenCalledTimes(0);
@@ -1367,7 +1360,6 @@ describe('Parserror', () => {
       parser = sut.wrapForScopes([customScopeName], fallback);
       result = parser(error);
       // Then
-      expect(parser).toBeFunction();
       expect(result).toBe(errorInstance);
       expect(globalScopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(globalScopeCase.parse).toHaveBeenCalledTimes(1);
@@ -1423,7 +1415,6 @@ describe('Parserror', () => {
       parser = sut.wrapForScopes([customScopeName]);
       result = parser(error, fallback);
       // Then
-      expect(parser).toBeFunction();
       expect(result).toBe(errorInstance);
       expect(globalScopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(globalScopeCase.parse).toHaveBeenCalledTimes(1);
