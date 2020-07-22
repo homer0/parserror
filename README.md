@@ -207,7 +207,7 @@ try {
   const formatted = parserror.parse(error);
   // Get a new error with the formatted message.
   showNotification(formatted.message);
-  
+
   // Extract the formatted parameter metadata.
   const [property] = formatted.parameters;
   highlightUIController(property.field);
@@ -353,13 +353,13 @@ You can also create a wrapper for a scope or a list of them:
 
 ```js
 const formatUserErrors = parserror.wrap([], ['userValidationScope']);
-``` 
+```
 
 The only thing weird there is that if you are not using cases, having to define an empty array as first parameter doesn't look very nice... so you could just use `wrapForScopes`:
 
 ```js
 const formatUserErrors = parserror.wrapForScopes(['userValidationScope']);
-``` 
+```
 
 ### Fallback
 
@@ -499,7 +499,9 @@ I use [husky](https://yarnpkg.com/en/package/husky) to automatically install the
 
 ### Testing
 
-I use [Jest](https://facebook.github.io/jest/) with [Jest-Ex](https://yarnpkg.com/en/package/jest-ex) to test the project. The configuration file is on `./.jestrc.json`, the tests are on `./tests` and the script that runs it is on `./utils/scripts/test`.
+I use [Jest](https://facebook.github.io/jest/) to test the project.
+
+The configuration file is on `./.jestrc.json`, the tests are on `./tests` and the script that runs it is on `./utils/scripts/test`.
 
 ### Linting
 
@@ -507,7 +509,9 @@ I use [ESlint](http://eslint.org) with [my own custom configuration](http://yarn
 
 ### Documentation
 
-I use [ESDoc](http://esdoc.org) to generate HTML documentation for the project. The configuration file is on `./.esdoc.json` and the script that runs it is on `./utils/scripts/docs`.
+I use [JSDoc](https://jsdoc.app) to generate an HTML documentation site for the project.
+
+The configuration file is on `./.jsdoc.js` and the script that runs it is on `./utils/scripts/docs`.
 
 ### To-Dos
 
