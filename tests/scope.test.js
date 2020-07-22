@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 jest.unmock('/src/scope');
 jest.unmock('/src/errorCase');
 jest.unmock('/src/caseParser');

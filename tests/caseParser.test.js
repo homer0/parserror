@@ -75,7 +75,7 @@ describe('CaseParser', () => {
       sut = new CaseParser('myParser', parser);
       result = sut.parse(value);
       // Then
-      expect(result).toEqual(Object.assign({ raw: value }, parser[value]));
+      expect(result).toEqual({ raw: value, ...parser[value] });
     });
 
     it('should extend an already mapped value', () => {
@@ -97,7 +97,7 @@ describe('CaseParser', () => {
       sut = new CaseParser('myParser', parser);
       result = sut.parse(value);
       // Then
-      expect(result).toEqual(Object.assign({}, value, parser[value.raw]));
+      expect(result).toEqual({ ...value, ...parser[value.raw] });
     });
   });
 

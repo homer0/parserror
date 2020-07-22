@@ -1,11 +1,12 @@
 /**
  * A custom version of `Error` so the Parserror can store the parsing parameters and some
  * context information.
- * @extends {Error}
+ *
+ * @augments Error
  */
 class FormattedError extends Error {
   /**
-   * @param {String}       message        The error message.
+   * @param {string}       message        The error message.
    * @param {Object|Array} [params={}]    The parsed parameters Parserror found. When parsing a
    *                                      case that uses named groups, the parameters are stored
    *                                      on an `object`; otherwise, they'll be an `array`.
@@ -15,12 +16,14 @@ class FormattedError extends Error {
     super(message);
     /**
      * The parsed parameters Parserror found. When parsing a case that uses named groups, the
-     * parameters are stored on an `object`; otherwise, they'll be an `array`
+     * parameters are stored on an `object`; otherwise, they'll be an `array`.
+     *
      * @type {Object|Array}
      */
     this.params = Object.freeze(params);
     /**
      * Any extra context information for the error.
+     *
      * @type {Object}
      */
     this.context = Object.freeze(context || {});

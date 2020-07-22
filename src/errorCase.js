@@ -3,19 +3,20 @@ const CaseParser = require('./caseParser');
 const FormattedError = require('./formattedError');
 
 /**
- * @type {function} ErrorCaseMessage
- * @description A function that generates a formatted message for an error.
- * @return {String}
+ * A function that generates a formatted message for an error.
+ *
+ * @typedef {Function} ErrorCaseMessage
+ * @returns {string}
  */
 
 /**
  * @typedef {Object} ErrorCaseDefinition
  * @description The required properties to create a new {@link ErrorCase}.
- * @property {String} name
+ * @property {string} name
  * The name of the case.
- * @property {ErrorCaseDefinition|String} message
+ * @property {ErrorCaseDefinition|string} message
  * The formatted message or the `function` that generates one.
- * @property {RegExp|String} condition
+ * @property {RegExp|string} condition
  * A `string` or a expression to match against an error that could be parsed.
  * @property {?Object} parsers
  * A map of reusable parsers. Each parser can be an `object` map, a `function` or an instance of
@@ -24,7 +25,7 @@ const FormattedError = require('./formattedError');
  * A list of parsers the case should use on extracted parameters. Each item of the list can be
  * either the name of a parser defined on `parsers`, the name of a parser on the scope, a
  * `function` to parse a value, or an `array` of all the thing previously mentioned.
- * @property {?Boolean} useOriginal
+ * @property {?boolean} useOriginal
  * Whether or not the case should use the original message when matched.
  */
 
@@ -58,29 +59,30 @@ class ErrorCase {
   constructor(definition, options = {}) {
     /**
      * The options to customize how the class behaves.
+     *
      * @type {ErrorCaseOptions}
      * @access protected
      * @ignore
      */
-    this._options = Object.assign(
-      {
-        CaseParserClass: CaseParser,
-        FormattedErrorClass: FormattedError,
-      },
-      options
-    );
+    this._options = {
+      CaseParserClass: CaseParser,
+      FormattedErrorClass: FormattedError,
+      ...options,
+    };
 
     this._validateMissingProperties(definition);
     /**
      * The case name.
-     * @type {String}
+     *
+     * @type {string}
      * @access protected
      * @ignore
      */
     this._name = this._validateName(definition.name);
     /**
      * Whether or not the case should use the original message when matched.
-     * @type {Boolean}
+     *
+     * @type {boolean}
      * @access protected
      * @ignore
      */
@@ -88,6 +90,7 @@ class ErrorCase {
     /**
      * The function that generates the formatted message. If the case should use the original
      * message, then the property will be `null`.
+     *
      * @type {?ErrorCaseMessage}
      * @access protected
      * @ignore
@@ -95,6 +98,7 @@ class ErrorCase {
     this._message = this._useOriginal ? null : this._validateMessage(definition.message);
     /**
      * The expression to validate if an error matches the case.
+     *
      * @type {RegExp}
      * @access protected
      * @ignore
@@ -102,6 +106,7 @@ class ErrorCase {
     this._condition = this._validateCondition(definition.condition);
     /**
      * An object with all the parsers the case can make use of.
+     *
      * @type {Object}
      * @access protected
      * @ignore
@@ -109,6 +114,7 @@ class ErrorCase {
     this._parsers = this._validateParsers(definition.parsers);
     /**
      * A list of the parse instructions the case can use on extracted parameters.
+     *
      * @type {Array}
      * @access protected
      * @ignore
@@ -118,7 +124,8 @@ class ErrorCase {
      * A flag to know whether the parse instructions where defined as an object (`true`) or
      * an array (`false`). This is for when the condition uses named groups to extract
      * parameters.
-     * @type {Boolean}
+     *
+     * @type {boolean}
      * @access protected
      * @ignore
      */
@@ -127,12 +134,13 @@ class ErrorCase {
   /**
    * Validates an error message against the case condition and if it matches, it parses it in
    * order to return a formatted error.
-   * @param {String}       errorMessage   The error message to validate and, possibly, parse.
+   *
+   * @param {string}       errorMessage   The error message to validate and, possibly, parse.
    * @param {Array<Scope>} [scopes=[]]    A list of scopes from where the case can try to find
    *                                      reusable parsers.
    * @param {?Object}      [context=null] Custom context information about the error that can be
    *                                      sent to the formatted error.
-   * @return {?FormattedError} If the condition doesn't match, it will return `null`.
+   * @returns {?FormattedError} If the condition doesn't match, it will return `null`.
    * @throws {Error} If the condition matches, parameters are extracted as named groups but the
    *                 case's `parse` instructions were defined as an array.
    * @throws {Error} If the condition matches, parameters are extracted as a list but the case's
@@ -145,7 +153,10 @@ class ErrorCase {
     let result;
     if (errorMessage.match(this._condition)) {
       result = this._useOriginal ?
-        this._createError(errorMessage, [], Object.assign({}, context, { original: true })) :
+        this._createError(errorMessage, [], {
+          ...context,
+          original: true,
+        }) :
         this._parseError(errorMessage, scopes, context);
     } else {
       result = null;
@@ -155,19 +166,77 @@ class ErrorCase {
   }
   /**
    * The case name.
-   * @type {String}
+   *
+   * @type {string}
    */
   get name() {
     return this._name;
   }
   /**
+   * Creates a new instance of the {@link FormattedError} using the class sent on the case's
+   * `constructor` options.
+   *
+   * @param {string}       message  The error message.
+   * @param {Object|Array} params   The parsed parameters Parserror found. When parsing a
+   *                                case that uses named groups, the parameters are stored
+   *                                on an `object`; otherwise, they'll be an `array`.
+   * @param {?Object}      context  Any extra context information for the error.
+   * @returns {FormattedError}
+   * @access protected
+   * @ignore
+   */
+  _createError(message, params, context) {
+    const { FormattedErrorClass } = this._options;
+    return new FormattedErrorClass(message, params, context);
+  }
+  /**
+   * Extracts the parameters from an error message using the case condition.
+   *
+   * @param {string} errorMessage The message from where the parameters will be extracted.
+   * @returns {Object}           Only one of the properties will be returned.
+   * @property {?Array} matches If the expression extracted unnamed groups, this will be a list of
+   *                            them.
+   * @property {?Object} groups If the expression extracted named groups, this will be the
+   *                            dictionary with them.
+   * @throws {Error} If there's a mix of named and unnamed groups on the condition.
+   * @access protected
+   * @ignore
+   */
+  _extractParameters(errorMessage) {
+    const match = Utils.execRegExp(this._condition, errorMessage);
+    let result;
+    const matches = match.slice().filter((item) => typeof item !== 'undefined');
+    matches.shift();
+    if (match.groups) {
+      const groups = { ...match.groups };
+      const groupsLength = Object.keys(groups).length;
+      if (groupsLength) {
+        if (groupsLength !== matches.length) {
+          throw new Error(
+            `The condition for the case '${this._name}' is trying to extract parameters as ` +
+            'named and unnamed groups, only one method is allowed',
+          );
+        } else {
+          result = { groups };
+        }
+      } else {
+        result = { matches };
+      }
+    } else {
+      result = { matches };
+    }
+
+    return result;
+  }
+  /**
    * The actual method that parses an error message once it matches the case condition.
-   * @param {String}       errorMessage The error message to validate and, possibly, parse.
+   *
+   * @param {string}       errorMessage The error message to validate and, possibly, parse.
    * @param {Array<Scope>} scopes       A list of scopes from where the case can try to find
    *                                    reusable parsers.
    * @param {?Object}      context      Custom context information about the error that can be sent
    *                                    to the formatted error.
-   * @return {FormattedError}
+   * @returns {FormattedError}
    * @throws {Error} If the parameters are extracted as named groups but the case's `parse`
    *                 instructions were defined as an array.
    * @throws {Error} If the parameters are extracted as a list but the case's `parse` instructions
@@ -185,14 +254,14 @@ class ErrorCase {
       } else {
         throw new Error(
           `The condition for the case '${this._name}' returned groups, but the 'parse' ` +
-          'instructions were set on an \'array\' format'
+          'instructions were set on an \'array\' format',
         );
       }
     } else if (extracted.matches.length) {
       if (this._parseAsGroups) {
         throw new Error(
           `The condition for the case '${this._name}' didn't return groups, but the 'parse' ` +
-          'instructions were set on an \'object\' format'
+          'instructions were set on an \'object\' format',
         );
       } else {
         result = this._parseList(extracted.matches, scopes, context);
@@ -205,13 +274,14 @@ class ErrorCase {
   }
   /**
    * Parses named groups extracted from the case condition expression.
+   *
    * @param {Object}       groups  The named groups.
    * @param {Array<Scope>} scopes  A list of scopes from where the case can try to find
    *                               reusable parsers.
    * @param {?Object}      context Custom context information about the error that can be sent
    *                               to the formatted error.
    *
-   * @return {Object} The new parameters, also named.
+   * @returns {Object} The new parameters, also named.
    * @access protected
    * @ignore
    */
@@ -224,17 +294,18 @@ class ErrorCase {
         if (parsers) {
           newValue = parsers.reduce(
             (currentValue, parser) => this._parseValue(parser, currentValue, scopes),
-            value
+            value,
           );
         } else {
           newValue = value;
         }
 
-        return Object.assign({}, newParams, {
+        return {
+          ...newParams,
           [name]: newValue,
-        });
+        };
       },
-      {}
+      {},
     );
 
     const message = this._message(params);
@@ -242,13 +313,14 @@ class ErrorCase {
   }
   /**
    * Parses a list of parameters extracted from the case condition expression.
-   * @param {Array<String>}  list   The list of parameters to parse.
-   * @param {Array<Scope>}   scopes A list of scopes from where the case can try to find
-   *                                reusable parsers.
-   * @param {?Object}      context  Custom context information about the error that can be sent
-   *                                to the formatted error.
    *
-   * @return {Array}
+   * @param {Array<string>}  list    The list of parameters to parse.
+   * @param {Array<Scope>}   scopes  A list of scopes from where the case can try to find
+   *                                 reusable parsers.
+   * @param {?Object}        context Custom context information about the error that can be sent
+   *                                 to the formatted error.
+   *
+   * @returns {Array}
    * @access protected
    * @ignore
    */
@@ -259,7 +331,7 @@ class ErrorCase {
       if (parsers) {
         newValue = parsers.reduce(
           (currentValue, parser) => this._parseValue(parser, currentValue, scopes),
-          value
+          value,
         );
       } else {
         newValue = value;
@@ -275,11 +347,12 @@ class ErrorCase {
    * Parses a single value using a given parser. The reason this is wrapped in a method is
    * because this functionality is independant of the type of parameters extracted (named or
    * unnamed groups).
-   * @param {String|CaseParser} parser The name of a parser the needs to be found on the scopes or
+   *
+   * @param {string|CaseParser} parser The name of a parser the needs to be found on the scopes or
    *                                   an actual parser to format the value.
    * @param {*}                 value  The value to parse.
    * @param {Array<Scope>}      scopes A list of scopes where parsers can be found.
-   * @return {*} The parsed value.
+   * @returns {*} The parsed value.
    * @throws {Error} If the parser is a `string` and a parser with that name can't be found in any
    *                 of the scopes.
    * @access protected
@@ -299,7 +372,7 @@ class ErrorCase {
       } else {
         throw new Error(
           `No parser with the name of '${parser}' could be found for the ` +
-          `case '${this._name}'`
+          `case '${this._name}'`,
         );
       }
     } else {
@@ -309,23 +382,61 @@ class ErrorCase {
     return result;
   }
   /**
-   * Creates a new instance of the {@link FormattedError} using the class sent on the case's
-   * `constructor` options.
-   * @param {String}       message  The error message.
-   * @param {Object|Array} params   The parsed parameters Parserror found. When parsing a
-   *                                case that uses named groups, the parameters are stored
-   *                                on an `object`; otherwise, they'll be an `array`.
-   * @param {?Object}      context  Any extra context information for the error.
-   * @return {FormattedError}
+   * Validates whether something can be used as the case's condition.
+   *
+   * @param {string|RegExp} condition The value intended to be the case's condition.
+   * @returns {RegExp}
+   * @throws {Error} If the condition is not a `string` nor a `RegExp`.
    * @access protected
    * @ignore
    */
-  _createError(message, params, context) {
-    const { FormattedErrorClass } = this._options;
-    return new FormattedErrorClass(message, params, context);
+  _validateCondition(condition) {
+    let result;
+    if (typeof condition === 'string') {
+      result = new RegExp(Utils.escapeForRegExp(condition));
+    } else if (condition instanceof RegExp) {
+      result = condition;
+    } else {
+      throw new TypeError(
+        `'${this._name}': 'condition' can only be a 'string' or a 'RegExp'`,
+      );
+    }
+
+    return result;
+  }
+  /**
+   * Validates whether something can be used as the case's message.
+   *
+   * @param {string|ErrorCaseMessage} message The value intended to be the case's message.
+   * @returns {ErrorCaseMessage}
+   * @throws {Error} If the message is not a `function` nor a `string`.
+   * @access protected
+   * @ignore
+   */
+  _validateMessage(message) {
+    let result;
+    const type = typeof message;
+    if (type === 'string') {
+      /**
+       * Dummy wrapper to maintain the signature.
+       *
+       * @returns {string}
+       * @ignore
+       */
+      result = () => message;
+    } else if (type === 'function') {
+      result = message;
+    } else {
+      throw new TypeError(
+        `'${this._name}': 'message' can only be a 'string' or a 'function'`,
+      );
+    }
+
+    return result;
   }
   /**
    * Validates if one on the case's definition required properties is missing.
+   *
    * @param {ErrorCaseDefinition} definition The case definition settings.
    * @throws {Error} If one of the properties is missing.
    * @access protected
@@ -344,8 +455,9 @@ class ErrorCase {
   }
   /**
    * Validates that the name the class intends to use is a `string`.
-   * @param {String} name The name to validate.
-   * @return {String}
+   *
+   * @param {string} name The name to validate.
+   * @returns {string}
    * @throws {TypeError} If the `name` is not a string.
    * @access protected
    * @ignore
@@ -358,164 +470,16 @@ class ErrorCase {
     return name;
   }
   /**
-   * Validates whether something can be used as the case's message.
-   * @param {String|ErrorCaseMessage} message The value intended to be the case's message.
-   * @return {ErrorCaseMessage}
-   * @throws {Error} If the message is not a `function` nor a `string`.
-   * @access protected
-   * @ignore
-   */
-  _validateMessage(message) {
-    let result;
-    const type = typeof message;
-    if (type === 'string') {
-      result = () => message;
-    } else if (type === 'function') {
-      result = message;
-    } else {
-      throw new TypeError(
-        `'${this._name}': 'message' can only be a 'string' or a 'function'`
-      );
-    }
-
-    return result;
-  }
-  /**
-   * Validates whether something can be used as the case's condition.
-   * @param {String|RegExp} condition The value intended to be the case's condition.
-   * @return {RegExp}
-   * @throws {Error} If the condition is not a `string` nor a `RegExp`.
-   * @access protected
-   * @ignore
-   */
-  _validateCondition(condition) {
-    let result;
-    if (typeof condition === 'string') {
-      result = new RegExp(Utils.escapeForRegExp(condition));
-    } else if (condition instanceof RegExp) {
-      result = condition;
-    } else {
-      throw new TypeError(
-        `'${this._name}': 'condition' can only be a 'string' or a 'RegExp'`
-      );
-    }
-
-    return result;
-  }
-  /**
-   * Validates a dictionary of parsers so it can be used by the case.
-   * @param {?Object} parsers A dictionary of reusable parsers.
-   * @return {Object}
-   * @throws {Error} If `parsers` is not an object.
-   * @throws {Error} If a a value insde a parser is not an instance of {@link CaseParserClass},
-   *                 an `object` nor a `function`.
-   * @access protected
-   * @ignore
-   */
-  _validateParsers(parsers) {
-    let result;
-    if (parsers) {
-      if (!Utils.isObject(parsers)) {
-        throw new TypeError(`'${this._name}': 'parsers' can only be an 'object'`);
-      }
-
-      const { CaseParserClass } = this._options;
-      result = Object.keys(parsers).reduce(
-        (newParsers, name) => Object.assign({}, newParsers, {
-          [name]: this._validateParser(name, parsers[name], CaseParserClass),
-        }),
-        {}
-      );
-    } else {
-      result = {};
-    }
-
-    return result;
-  }
-  /**
-   * Validates and normalizes a parser intended to be used in the case.
-   * @param {String}                          name             The name of the parser.
-   * @param {CaseParserClass|Object|Function} parser           The parser definition.
-   * @param {Class<CaseParser>}               CaseParserClass  To compare if the parser definition
-   *                                                           is `instaceof`.
-   * @return {CaseParserClass}
-   * @throws {Error} If the `parser` is not an instance of {@link CaseParserClass}, an `object`
-   *                 nor a `function`.
-   * @access protected
-   * @ignore
-   */
-  _validateParser(name, parser, CaseParserClass) {
-    let result;
-    if (parser instanceof CaseParserClass) {
-      result = parser;
-    } else {
-      const isObject = Utils.isObject(parser);
-      if (isObject || typeof parser === 'function') {
-        result = new CaseParserClass(name, parser);
-      } else {
-        throw new TypeError(
-          `'${this._name}' - '${name}': a parser can only be a 'function' or an 'object'`
-        );
-      }
-    }
-
-    return result;
-  }
-  /**
-   * Validates and normalizes the parse instructions for the case.
-   * @param {?Array|?Object} parse The list/map of instructions to validate.
-   * @return {Array|Object}
-   * @throws {Error} If the instructions are not an `array` nor an `object`.
-   * @throws {Error} If an instruction is not a `function`, a `string` or an `array`.
-   * @access protected
-   * @ignore
-   */
-  _validateParseInstructions(parse) {
-    let result;
-    if (parse) {
-      const { CaseParserClass } = this._options;
-      if (Array.isArray(parse)) {
-        result = parse.map((instruction, index) => Utils.ensureArray(
-          this._validateParseInstruction(
-            `${this._name}-parser-${index}`,
-            instruction,
-            CaseParserClass
-          )
-        ));
-      } else if (Utils.isObject(parse)) {
-        result = Object.keys(parse).reduce(
-          (newParse, parameterName) => Object.assign({}, newParse, {
-            [parameterName]: Utils.ensureArray(
-              this._validateParseInstruction(
-                `${this._name}-parser-${parameterName}`,
-                parse[parameterName],
-                CaseParserClass
-              )
-            ),
-          }),
-          {}
-        );
-      } else {
-        throw new TypeError(
-          `'${this._name}': 'parse' can only be an 'array' or an 'object'`
-        );
-      }
-    } else {
-      result = [];
-    }
-
-    return result;
-  }
-  /**
    * Validates and normalizes a single parse instruction.
-   * @param {String}                id              The ID of the instruction. Internally generated
+   *
+   * @param {string}                id              The ID of the instruction. Internally generated
    *                                                by the case in order to have some reference
    *                                                for error messages.
-   * @param {function|String|Array} instruction     The instruction to validate.
+   * @param {Function|string|Array} instruction     The instruction to validate.
    * @param {Class<CaseParser>}     CaseParserClass The class used to create new parsers. If the
    *                                                instruction is a function, it will be converted
    *                                                into a parser.
-   * @return {function|String|Array}
+   * @returns {Function|string|Array}
    * @throws {Error} If the instruction is not a `function`, a `string` or an `array`.
    * @access protected
    * @ignore
@@ -535,51 +499,122 @@ class ErrorCase {
       result = instruction.map((item, index) => this._validateParseInstruction(
         `${id}-sub-${index}`,
         item,
-        CaseParserClass
+        CaseParserClass,
       ));
     } else {
       throw new TypeError(
         `'${this._name}': a 'parse' instruction can only be ` +
-        'an \'array\', a \'function\' or a \'string\''
+        'an \'array\', a \'function\' or a \'string\'',
       );
     }
 
     return result;
   }
   /**
-   * Extracts the parameters from an error message using the case condition.
-   * @param {String} errorMessage The message from where the parameters will be extracted.
-   * @return {Object}           Only one of the properties will be returned
-   * @property {?Array} matches If the expression extracted unnamed groups, this will be a list of
-   *                            them.
-   * @property {?Object} groups If the expression extracted named groups, this will be the
-   *                            dictionary with them.
-   * @throws {Error} If there's a mix of named and unnamed groups on the condition.
+   * Validates and normalizes the parse instructions for the case.
+   *
+   * @param {?Array|?Object} parse The list/map of instructions to validate.
+   * @returns {Array|Object}
+   * @throws {Error} If the instructions are not an `array` nor an `object`.
+   * @throws {Error} If an instruction is not a `function`, a `string` or an `array`.
    * @access protected
    * @ignore
    */
-  _extractParameters(errorMessage) {
-    const match = Utils.execRegExp(this._condition, errorMessage);
+  _validateParseInstructions(parse) {
     let result;
-    const matches = match.slice().filter((item) => typeof item !== 'undefined');
-    matches.shift();
-    if (match.groups) {
-      const groups = Object.assign({}, match.groups);
-      const groupsLength = Object.keys(groups).length;
-      if (groupsLength) {
-        if (groupsLength !== matches.length) {
-          throw new Error(
-            `The condition for the case '${this._name}' is trying to extract parameters as ` +
-            'named and unnamed groups, only one method is allowed'
-          );
-        } else {
-          result = { groups };
-        }
+    if (parse) {
+      const { CaseParserClass } = this._options;
+      if (Array.isArray(parse)) {
+        result = parse.map((instruction, index) => Utils.ensureArray(
+          this._validateParseInstruction(
+            `${this._name}-parser-${index}`,
+            instruction,
+            CaseParserClass,
+          ),
+        ));
+      } else if (Utils.isObject(parse)) {
+        result = Object.keys(parse).reduce(
+          (newParse, parameterName) => ({
+            ...newParse,
+            [parameterName]: Utils.ensureArray(
+              this._validateParseInstruction(
+                `${this._name}-parser-${parameterName}`,
+                parse[parameterName],
+                CaseParserClass,
+              ),
+            ),
+          }),
+          {},
+        );
       } else {
-        result = { matches };
+        throw new TypeError(
+          `'${this._name}': 'parse' can only be an 'array' or an 'object'`,
+        );
       }
     } else {
-      result = { matches };
+      result = [];
+    }
+
+    return result;
+  }
+  /**
+   * Validates and normalizes a parser intended to be used in the case.
+   *
+   * @param {string}                          name             The name of the parser.
+   * @param {CaseParserClass|Object|Function} parser           The parser definition.
+   * @param {Class<CaseParser>}               CaseParserClass  To compare if the parser definition
+   *                                                           is `instaceof`.
+   * @returns {CaseParserClass}
+   * @throws {Error} If the `parser` is not an instance of {@link CaseParserClass}, an `object`
+   *                 nor a `function`.
+   * @access protected
+   * @ignore
+   */
+  _validateParser(name, parser, CaseParserClass) {
+    let result;
+    if (parser instanceof CaseParserClass) {
+      result = parser;
+    } else {
+      const isObject = Utils.isObject(parser);
+      if (isObject || typeof parser === 'function') {
+        result = new CaseParserClass(name, parser);
+      } else {
+        throw new TypeError(
+          `'${this._name}' - '${name}': a parser can only be a 'function' or an 'object'`,
+        );
+      }
+    }
+
+    return result;
+  }
+  /**
+   * Validates a dictionary of parsers so it can be used by the case.
+   *
+   * @param {?Object} parsers A dictionary of reusable parsers.
+   * @returns {Object}
+   * @throws {Error} If `parsers` is not an object.
+   * @throws {Error} If a a value insde a parser is not an instance of {@link CaseParserClass},
+   *                 an `object` nor a `function`.
+   * @access protected
+   * @ignore
+   */
+  _validateParsers(parsers) {
+    let result;
+    if (parsers) {
+      if (!Utils.isObject(parsers)) {
+        throw new TypeError(`'${this._name}': 'parsers' can only be an 'object'`);
+      }
+
+      const { CaseParserClass } = this._options;
+      result = Object.keys(parsers).reduce(
+        (newParsers, name) => ({
+          ...newParsers,
+          [name]: this._validateParser(name, parsers[name], CaseParserClass),
+        }),
+        {},
+      );
+    } else {
+      result = {};
     }
 
     return result;
