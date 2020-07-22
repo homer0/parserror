@@ -1,6 +1,6 @@
 # Parserror
 
-[![Travis](https://img.shields.io/travis/homer0/parserror.svg?style=flat-square)](https://travis-ci.org/homer0/parserror)
+[![GitHub Workflow Status (master)](https://img.shields.io/github/workflow/status/homer0/parserror/Test/master?style=flat-square)](https://github.com/homer0/parserror/actions?query=workflow%3ATest)
 [![Coveralls github](https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square)](https://coveralls.io/github/homer0/parserror?branch=master)
 [![David](https://img.shields.io/david/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)
 [![David](https://img.shields.io/david/dev/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)
