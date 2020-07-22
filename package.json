@@ -15,10 +15,6 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "@babel/preset-env": "7.10.4",
-    "@babel/core": "7.10.5",
-    "@babel/plugin-transform-runtime": "7.10.5",
-    "coveralls": "^3.1.0",
     "docdash": "homer0/docdash#semver:^2.0.0",
     "eslint": "^7.5.0",
     "eslint-plugin-homer0": "^5.0.1",
