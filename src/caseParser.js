@@ -5,9 +5,9 @@ const Utils = require('./utils');
  */
 class CaseParser {
   /**
-   * @param {string}          name    The name of the parser.
-   * @param {Function|Object} parser  A function to parse a value or an `object` to map the value to
-   *                                  something else.
+   * @param {string}                     name   The name of the parser.
+   * @param {Object.<string,*>|Function} parser A function to parse a value or an `object` to
+   *                                            map the value to something else.
    * @throws {TypeError} If the `name` is not a `string`.
    * @throws {TypeError} If the `parser` is not a `function` nor an `object`.
    * @throws {Error}     If the `parser` is an empty `object`.
@@ -24,7 +24,7 @@ class CaseParser {
     /**
      * If the parser is a map, this is where the object will be stored.
      *
-     * @type {?Object}
+     * @type {?Object.<string,*>}
      * @access protected
      * @ignore
      */
@@ -123,7 +123,7 @@ class CaseParser {
   /**
    * Validate the parser and generated an object with flags for the type.
    *
-   * @param {Function|Object} parser The parser the class intends to save.
+   * @param {Object.<string,*>|Function} parser The parser the class intends to save.
    * @returns {CaseParserType}
    * @throws {TypeError} If the parser is not a `function` nor an `object`.
    * @throws {Error}     If the `parser` is an empty `object`.

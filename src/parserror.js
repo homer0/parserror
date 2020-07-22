@@ -13,12 +13,13 @@ class Parserror {
    *
    * @param {ParserrorOptions} [options] The options to customize how the class behaves.
    * @returns {Parserror}
+   * @static
    */
   static new(options) {
     return new Parserror(options);
   }
   /**
-   * @param {ParserrorOptions} [options={}] The options to customize how the class behaves.
+   * @param {Partial<ParserrorOptions>} [options={}] The options to customize how the class behaves.
    */
   constructor(options = {}) {
     /**
@@ -47,7 +48,7 @@ class Parserror {
     /**
      * A dictionary with the available scopes.
      *
-     * @type {Object}
+     * @type {Object.<string,Scope>}
      * @access protected
      * @ignore
      */
@@ -98,10 +99,12 @@ class Parserror {
   /**
    * Adds a reusable parser.
    *
-   * @param {string}           name   The name of the parser.
-   * @param {Object|Function}  parser The parser function or map (see {@link CaseParser}).
-   * @param {?string}          scope  The name of the scope where the parser should be added. If
-   *                                  not defined, it will be added to the global scope.
+   * @param {string}                      name   The name of the parser.
+   * @param {Object.<string,*>|Function}  parser The parser function or map. This is the second
+   *                                             parameter for {@link CaseParser#constructor}.
+   * @param {?string}                     scope  The name of the scope where the parser should be
+   *                                             added. If not defined, it will be added to the
+   *                                             global scope.
    * @returns {Parserror} For chaining purposes.
    */
   addParser(name, parser, scope = null) {
@@ -116,9 +119,9 @@ class Parserror {
    *
    * @param {string} name
    * The name of the scope.
-   * @param {Array<ErrorCaseDefinition>} [cases=[]]
+   * @param {ErrorCaseDefinition[]} [cases=[]]
    * A list of cases' defintions to add.
-   * @param {Array<string|RegExp|ErrorCaseDefinition>} [allowedOriginals=[]]
+   * @param {(string|RegExp|ErrorCaseDefinition)[]} [allowedOriginals=[]]
    * a list of conditions/definitions for cases that allow original messages to be matched. To
    * better understand how this work, please read the description of
    * {@link Parserror#allowOriginal}.
@@ -190,7 +193,7 @@ class Parserror {
    * {@link Parserror#allowOriginal}, so please read the documentation of that method to better
    * understand in which case you would want to allow original messages.
    *
-   * @param {Array<string|RegExp|ErrorCaseDefinition>} conditions
+   * @param {(string|RegExp|ErrorCaseDefinition)[]} conditions
    * The list of conditions/definitions for the cases that will match the messages.
    * @param {?string} [scope=null] The name of the scope where the cases should be added. If not
    * defined, they will be added to the global scope.
@@ -229,7 +232,7 @@ class Parserror {
    *
    * @param {Error|string|ParserrorErrorObject} error
    * The error to parse.
-   * @param {ParserrorParseOptions} [options={}]
+   * @param {Partial<ParserrorParseOptions>} [options={}]
    * Options to customize how the parsing is done.
    * @returns {FormattedError}
    * @throws {TypeError} If `error` is not an {@link Error}, a string or a
@@ -335,11 +338,11 @@ class Parserror {
    * Creates a wrapper: a pre configured parser to format errors with specific cases and/or
    * scopes.
    *
-   * @param {Array<string>} cases           A list of cases' names.
-   * @param {Array<string>} scopes          A list of scopes' names.
-   * @param {?string}       [fallback=null] A fallback message in case the error can't be parsed.
-   *                                        If not specified, the returned error will maintain the
-   *                                        original message.
+   * @param {string[]} cases           A list of cases' names.
+   * @param {string[]} scopes          A list of scopes' names.
+   * @param {?string}  [fallback=null] A fallback message in case the error can't be parsed.
+   *                                   If not specified, the returned error will maintain the
+   *                                   original message.
    * @returns {ParserrorWrapper}
    */
   wrap(cases = [], scopes = [], fallback = null) {
@@ -353,10 +356,10 @@ class Parserror {
    * Creates a wrapper for specific scopes. A wrapper is a pre configured parser to format errors
    * with specific cases and/or scopes.
    *
-   * @param {Array<string>} scopes          A list of scopes' names.
-   * @param {?string}       [fallback=null] A fallback message in case the error can't be parsed.
-   *                                        If not specified, the returned error will maintain the
-   *                                        original message.
+   * @param {string[]} scopes          A list of scopes' names.
+   * @param {?string}  [fallback=null] A fallback message in case the error can't be parsed.
+   *                                   If not specified, the returned error will maintain the
+   *                                   original message.
    * @returns {ParserrorWrapper}
    */
   wrapForScopes(scopes, fallback = null) {
@@ -391,7 +394,7 @@ class Parserror {
   /**
    * Validates an object to ensure it can be used as {@link ParserrorParseOptions}.
    *
-   * @param {Object} options The object to validate.
+   * @param {ParserrorParseOptions} options The object to validate.
    * @throws {TypeError} If the `cases` property is not an `array`.
    * @throws {TypeError} If the `scopes` property is not an `array`.
    * @access protected

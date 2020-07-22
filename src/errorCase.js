@@ -16,7 +16,7 @@ class ErrorCase {
    * @throws {TypeError} If the definition `condition` is not a RegExp nor a string.
    * @throws {TypeError} If the definition includes `parsers` and it's not an object.
    * @throws {TypeError} If a parser is not an object, a function or an instance of
-   *                     {@link CaseParserClass}.
+   *                     {@link CaseParser}.
    * @throws {TypeError} If the definition includes `parse` and it's not an `array` nor an object.
    * @throws {TypeError} If the definition includes `parse` and an item is not an `array`, a
    *                     function or an object.
@@ -478,8 +478,8 @@ class ErrorCase {
   /**
    * Validates and normalizes the parse instructions for the case.
    *
-   * @param {?Array|?Object} parse The list/map of instructions to validate.
-   * @returns {Array|Object}
+   * @param {?InstructionListLike} parse The list/map of instructions to validate.
+   * @returns {InstructionListLike}
    * @throws {Error} If the instructions are not an `array` nor an `object`.
    * @throws {Error} If an instruction is not a `function`, a `string` or an `array`.
    * @access protected
@@ -525,11 +525,11 @@ class ErrorCase {
   /**
    * Validates and normalizes a parser intended to be used in the case.
    *
-   * @param {string}                          name             The name of the parser.
-   * @param {CaseParserClass|Object|Function} parser           The parser definition.
-   * @param {Class<CaseParser>}               CaseParserClass  To compare if the parser definition
-   *                                                           is `instaceof`.
-   * @returns {CaseParserClass}
+   * @param {string}                     name             The name of the parser.
+   * @param {CaseParser|Object|Function} parser           The parser definition.
+   * @param {Class<CaseParser>}          CaseParserClass  To compare if the parser definition
+   *                                                      is `instaceof`.
+   * @returns {CaseParser}
    * @throws {Error} If the `parser` is not an instance of {@link CaseParserClass}, an `object`
    *                 nor a `function`.
    * @access protected
@@ -556,7 +556,7 @@ class ErrorCase {
    * Validates a dictionary of parsers so it can be used by the case.
    *
    * @param {?Object} parsers A dictionary of reusable parsers.
-   * @returns {Object}
+   * @returns {Object.<string,CaseParser>}
    * @throws {Error} If `parsers` is not an object.
    * @throws {Error} If a a value insde a parser is not an instance of {@link CaseParserClass},
    *                 an `object` nor a `function`.

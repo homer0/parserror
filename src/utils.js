@@ -41,8 +41,9 @@ class Utils {
   /**
    * Ensures a given value is wrapped on an `array`.
    *
-   * @param {*} target The target to validate and, if necessary, wrap.
-   * @returns {Array}
+   * @param {T|T[]} target The target to validate and, if necessary, wrap.
+   * @returns {T[]}
+   * @template T
    * @static
    */
   static ensureArray(target) {

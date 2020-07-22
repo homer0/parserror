@@ -20,7 +20,7 @@ class Scope {
     /**
      * The list of cases the scope manages.
      *
-     * @type {Array}
+     * @type {ErrorCase[]}
      * @access protected
      * @ignore
      */
@@ -28,7 +28,7 @@ class Scope {
     /**
      * A map of the parsers the scope has.
      *
-     * @type {Object}
+     * @type {Object.<string,CaseParser>}
      * @access protected
      * @ignore
      */
@@ -97,7 +97,7 @@ class Scope {
   /**
    * Returns all available cases for this scope.
    *
-   * @returns {Array<ErrorCase>}
+   * @returns {ErrorCase[]}
    */
   getCases() {
     return this._cases;
