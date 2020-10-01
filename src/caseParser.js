@@ -1,4 +1,4 @@
-const Utils = require('./utils.js');
+const Utils = require('./utils');
 
 /**
  * A parser an error cases can use to format a value extracted from an error.

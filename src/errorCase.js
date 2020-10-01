@@ -1,6 +1,6 @@
-const Utils = require('./utils.js');
-const CaseParser = require('./caseParser.js');
-const FormattedError = require('./formattedError.js');
+const Utils = require('./utils');
+const CaseParser = require('./caseParser');
+const FormattedError = require('./formattedError');
 
 /**
  * The core object of Parserror. A case is like a "service" that validates if an error message

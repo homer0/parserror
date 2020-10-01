@@ -1,5 +1,5 @@
-const CaseParser = require('./caseParser.js');
-const ErrorCase = require('./errorCase.js');
+const CaseParser = require('./caseParser');
+const ErrorCase = require('./errorCase');
 /**
  * A scope is just a group of cases and parsers Parserror can make use of.
  */
