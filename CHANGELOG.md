@@ -1,3 +1,10 @@
+## [3.0.4](https://github.com/homer0/parserror/compare/3.0.3...3.0.4) (2020-10-01)
+
+
+### Bug Fixes
+
+* implement cjs2esm ([#20](https://github.com/homer0/parserror/issues/20)) ([c445758](https://github.com/homer0/parserror/commit/c445758a68dd5f824f77aaae75b17bcf2eddc720))
+
 ## [3.0.3](https://github.com/homer0/parserror/compare/3.0.2...3.0.3) (2020-08-09)
 
 
