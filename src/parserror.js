@@ -1,8 +1,8 @@
-const CaseParser = require('./caseParser.js');
-const ErrorCase = require('./errorCase.js');
-const FormattedError = require('./formattedError.js');
-const Scope = require('./scope.js');
-const Utils = require('./utils.js');
+const CaseParser = require('./caseParser');
+const ErrorCase = require('./errorCase');
+const FormattedError = require('./formattedError');
+const Scope = require('./scope');
+const Utils = require('./utils');
 
 /**
  * The main class of the library. It allows you to create cases, parsers and scopes.
