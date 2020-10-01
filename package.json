@@ -38,7 +38,7 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "prepare": "./utils/scripts/prepare",
+    "prepublishOnly": "./utils/scripts/prepublishOnly",
     "test": "./utils/scripts/test",
     "lint": "./utils/scripts/lint",
     "lint:all": "./utils/scripts/lint-all",
