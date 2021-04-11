@@ -5,7 +5,7 @@ const ErrorCase = require('./errorCase');
  */
 class Scope {
   /**
-   * @param {string} name The name of the scope.
+   * @param {string} name  The name of the scope.
    * @throws {TypeError} If the `name` is not a `string`.
    */
   constructor(name) {
@@ -28,7 +28,7 @@ class Scope {
     /**
      * A map of the parsers the scope has.
      *
-     * @type {Object.<string,CaseParser>}
+     * @type {Object.<string, CaseParser>}
      * @access protected
      * @ignore
      */
@@ -37,7 +37,7 @@ class Scope {
   /**
    * Adds a new case to the scope.
    *
-   * @param {ErrorCase} theCase The case to add.
+   * @param {ErrorCase} theCase  The case to add.
    * @returns {Scope} For chaining purposes.
    * @throws {Error} If there's already a case with the same name on the scope.
    * @throws {Error} If `theCase` is not an instance of {@link ErrorCase}.
@@ -47,7 +47,7 @@ class Scope {
     if (this.hasCase(theCase.name)) {
       throw new Error(
         `The case name '${theCase.name}' is already being used on the ` +
-        `scope '${this._name}'`,
+          `scope '${this._name}'`,
       );
     }
 
@@ -57,7 +57,7 @@ class Scope {
   /**
    * Adds a reusable parser to the scope.
    *
-   * @param {CaseParser} parser The parser to add.
+   * @param {CaseParser} parser  The parser to add.
    * @returns {Scope} For chaining purposes.
    * @throws {Error} If there's already a parser with the same name on the scope.
    * @throws {Error} If `parser` is not an instance of {@link CaseParser}.
@@ -67,7 +67,7 @@ class Scope {
     if (this.hasParser(parser.name)) {
       throw new Error(
         `The parser name '${parser.name}' is already being used on the ` +
-        `scope '${this._name}'`,
+          `scope '${this._name}'`,
       );
     }
 
@@ -77,19 +77,16 @@ class Scope {
   /**
    * Returns a case by its name.
    *
-   * @param {string}  name                 The name of the case.
-   * @param {boolean} [failWithError=true] Whether or not the method should throw an error if the
-   *                                       case can't be found.
+   * @param {string}  name                  The name of the case.
+   * @param {boolean} [failWithError=true]  Whether or not the method should throw an
+   *                                        error if the case can't be found.
    * @returns {?ErrorCase}
    * @throws {Error} If `failWithError` is `true` and the case can't be found.
    */
   getCase(name, failWithError = true) {
     const theCase = this._cases.find((item) => item.name === name);
     if (!theCase && failWithError) {
-      throw new Error(
-        `The case '${name}' doesn't exist on the scope ` +
-        `'${this._name}'`,
-      );
+      throw new Error(`The case '${name}' doesn't exist on the scope '${this._name}'`);
     }
 
     return theCase || null;
@@ -105,19 +102,16 @@ class Scope {
   /**
    * Returns a parser by its name.
    *
-   * @param {string}  name                 The name of the parser.
-   * @param {boolean} [failWithError=true] Whether or not the method should throw an error if the
-   *                                       parser can't be found.
+   * @param {string}  name                  The name of the parser.
+   * @param {boolean} [failWithError=true]  Whether or not the method should throw an
+   *                                        error if the parser can't be found.
    * @returns {?CaseParser}
    * @throws {Error} If `failWithError` is `true` and the parser can't be found.
    */
   getParser(name, failWithError = true) {
     const parser = this._parsers[name];
     if (!parser && failWithError) {
-      throw new Error(
-        `The parser '${name}' doesn't exist on the scope ` +
-        `'${this._name}'`,
-      );
+      throw new Error(`The parser '${name}' doesn't exist on the scope '${this._name}'`);
     }
 
     return parser || null;
@@ -125,7 +119,7 @@ class Scope {
   /**
    * Checks whether or not there's a case based on its name.
    *
-   * @param {string} name The case's name.
+   * @param {string} name  The case's name.
    * @returns {boolean}
    */
   hasCase(name) {
@@ -134,7 +128,7 @@ class Scope {
   /**
    * Checks whether or not there's a parser based on its name.
    *
-   * @param {string} name The parser's name.
+   * @param {string} name  The parser's name.
    * @returns {boolean}
    */
   hasParser(name) {
@@ -143,10 +137,12 @@ class Scope {
   /**
    * Removes a case from the scope.
    *
-   * @param {string|ErrorCase} theCase The name or the reference for the case to remove.
+   * @param {string | ErrorCase} theCase  The name or the reference for the case to
+   *                                      remove.
    * @returns {Scope} For chaining purposes.
    * @throws {Error} If the case doesn't exist on the scope.
-   * @throws {Error} If `theCase` is a reference but is not an instance of {@link ErrorCase}.
+   * @throws {Error} If `theCase` is a reference but is not an instance of
+   *                 {@link ErrorCase}.
    */
   removeCase(theCase) {
     let name;
@@ -161,10 +157,7 @@ class Scope {
     if (newCases.length !== this._cases.length) {
       this._cases = newCases;
     } else {
-      throw new Error(
-        `The case '${name}' doesn't exist on the scope ` +
-        `'${this._name}'`,
-      );
+      throw new Error(`The case '${name}' doesn't exist on the scope '${this._name}'`);
     }
 
     return this;
@@ -172,10 +165,12 @@ class Scope {
   /**
    * Removes a parser from the scope.
    *
-   * @param {string|CaseParser} parser The name or the reference for the parser to remove.
+   * @param {string | CaseParser} parser  The name or the reference for the parser to
+   *                                      remove.
    * @returns {Scope} For chaining purposes.
    * @throws {Error} If the parser doesn't exist on the scope.
-   * @throws {Error} If `parser` is a reference but is not an instance of {@link CaseParser}.
+   * @throws {Error} If `parser` is a reference but is not an instance of
+   *                 {@link CaseParser}.
    */
   removeParser(parser) {
     let name;
@@ -191,10 +186,7 @@ class Scope {
       delete newParsers[name];
       this._parsers = newParsers;
     } else {
-      throw new Error(
-        `The parser '${name}' doesn't exist on the scope ` +
-        `'${this._name}'`,
-      );
+      throw new Error(`The parser '${name}' doesn't exist on the scope '${this._name}'`);
     }
 
     return this;
@@ -210,20 +202,20 @@ class Scope {
   /**
    * Validates if a case is an instance of {@link ErrorCase}.
    *
-   * @param {ErrorCase} theCase The case to validate.
+   * @param {ErrorCase} theCase  The case to validate.
    * @throws {TypeError} If `theCase` is not an instance of {@link ErrorCase}.
    * @access protected
    * @ignore
    */
   _validateCase(theCase) {
     if (!(theCase instanceof ErrorCase)) {
-      throw new TypeError('The received case is not an instance of \'ErrorCase\'');
+      throw new TypeError("The received case is not an instance of 'ErrorCase'");
     }
   }
   /**
    * Validates that the name the class intends to use is a `string`.
    *
-   * @param {string} name The name to validate.
+   * @param {string} name  The name to validate.
    * @returns {string}
    * @throws {TypeError} If the `name` is not a string.
    * @access protected
@@ -231,7 +223,7 @@ class Scope {
    */
   _validateName(name) {
     if (typeof name !== 'string') {
-      throw new TypeError('The \'name\' can only be a \'string\'');
+      throw new TypeError("The 'name' can only be a 'string'");
     }
 
     return name;
@@ -239,14 +231,14 @@ class Scope {
   /**
    * Validates if a parser is an instance of {@link CaseParser}.
    *
-   * @param {CaseParser} parser The case to validate.
+   * @param {CaseParser} parser  The case to validate.
    * @throws {TypeError} If `parser` is not an instance of {@link CaseParser}.
    * @access protected
    * @ignore
    */
   _validateParser(parser) {
     if (!(parser instanceof CaseParser)) {
-      throw new TypeError('The received parser is not an instance of \'CaseParser\'');
+      throw new TypeError("The received parser is not an instance of 'CaseParser'");
     }
   }
 }

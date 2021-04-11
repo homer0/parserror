@@ -8,19 +8,19 @@ class FormattedError extends Error {
   /**
    * @param {string} message
    * The error message.
-   * @param {Object.<string,string>|string[]} [params={}]
-   * The parsed parameters Parserror. When parsing a case that uses named groups, the parameters
-   * are stored on an `object`; otherwise, they'll be an `array`.
+   * @param {Object.<string, string> | string[]} [params={}]
+   * The parsed parameters Parserror. When parsing a case that uses named groups, the
+   * parameters are stored on an `object`; otherwise, they'll be an `array`.
    * @param {?Object} [context=null]
    * Any extra context information for the error.
    */
   constructor(message, params = {}, context = null) {
     super(message);
     /**
-     * The parsed parameters Parserror found. When parsing a case that uses named groups, the
-     * parameters are stored on an `object`; otherwise, they'll be an `array`.
+     * The parsed parameters Parserror found. When parsing a case that uses named groups,
+     * the parameters are stored on an `object`; otherwise, they'll be an `array`.
      *
-     * @type {Object.<string,string>|string[]}
+     * @type {Object.<string, string> | string[]}
      * @todo Remove `Object.freeze`.
      */
     this.params = Object.freeze(params);

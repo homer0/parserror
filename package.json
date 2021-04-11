@@ -15,49 +15,50 @@
   ],
   "dependencies": {},
   "devDependencies": {
+    "@commitlint/cli": "^12.1.1",
+    "@commitlint/config-conventional": "^12.1.1",
+    "@homer0/eslint-plugin": "^7.0.0",
+    "@homer0/prettier-config": "^1.1.1",
+    "@homer0/prettier-plugin-jsdoc": "^4.0.0",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
-    "cjs2esm": "^1.1.0",
-    "commitizen": "^4.2.1",
-    "cz-conventional-changelog": "^3.3.0",
+    "cjs2esm": "^2.0.0",
     "docdash": "homer0/docdash#semver:2.1.0",
-    "eslint": "^7.10.0",
-    "eslint-plugin-homer0": "^5.0.2",
-    "husky": "^4.3.0",
-    "jest": "^26.4.2",
+    "eslint": "^7.24.0",
+    "husky": "^6.0.0",
+    "is-ci": "^3.0.0",
+    "jest": "^26.6.3",
     "jsdoc": "^3.6.6",
-    "jsdoc-ts-utils": "^1.1.1",
-    "leasot": "^11.3.0",
-    "lint-staged": "^10.4.0",
-    "semantic-release": "^17.1.2",
-    "wootils": "^4.2.0"
+    "jsdoc-ts-utils": "^2.0.0",
+    "leasot": "^12.0.0",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1",
+    "semantic-release": "^17.4.2",
+    "wootils": "^5.0.0"
   },
   "engine-strict": true,
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=12"
   },
   "main": "src/index.js",
   "scripts": {
     "prepublishOnly": "./utils/scripts/prepublishOnly",
+    "prepare": "./utils/scripts/prepare",
     "test": "./utils/scripts/test",
     "lint": "./utils/scripts/lint",
     "lint:all": "./utils/scripts/lint-all",
     "docs": "./utils/scripts/docs",
     "todo": "./utils/scripts/todo"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "./utils/hooks/pre-commit",
-      "post-merge": "./utils/hooks/post-merge",
-      "prepare-commit-msg": "./utils/hooks/prepare-commit-msg"
-    }
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   },
   "lint-staged": {
-    "*.js": "eslint"
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
+    "*.js": [
+      "eslint",
+      "prettier --write"
+    ]
   }
 }
