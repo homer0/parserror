@@ -67,8 +67,8 @@
 
     <section class="readme usertext">
         <article><h1>Parserror</h1>
-<p><a href="https://github.com/homer0/parserror/actions?query=workflow%3ATest"><img src="https://img.shields.io/github/workflow/status/homer0/parserror/Test/master?style=flat-square" alt="GitHub Workflow Status (master)"></a>
-<a href="https://coveralls.io/github/homer0/parserror?branch=master"><img src="https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square" alt="Coveralls github"></a>
+<p><a href="https://github.com/homer0/parserror/actions?query=workflow%3ATest"><img src="https://img.shields.io/github/workflow/status/homer0/parserror/Test/main?style=flat-square" alt="GitHub Workflow Status (main)"></a>
+<a href="https://coveralls.io/github/homer0/parserror?branch=main"><img src="https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square" alt="Coveralls github"></a>
 <a href="https://david-dm.org/homer0/parserror"><img src="https://img.shields.io/david/homer0/parserror.svg?style=flat-square" alt="David"></a>
 <a href="https://david-dm.org/homer0/parserror"><img src="https://img.shields.io/david/dev/homer0/parserror.svg?style=flat-square" alt="David"></a></p>
 <p>Parse errors and generate more human messages</p>
@@ -476,13 +476,17 @@ import Parserror from 'parserror/esm';
 </tbody>
 </table>
 <h3>Repository hooks</h3>
-<p>I use <a href="https://yarnpkg.com/package/husky"><code>husky</code></a> to automatically install the repository hooks so the code will be tested and linted before any commit and the dependencies updated after every merge.</p>
-<p>The configuration is on the <code>husky</code> property of the <code>package.json</code> and the hooks' files are on <code>./utils/hooks</code>.</p>
+<p>I use <a href="https://yarnpkg.com/package/husky"><code>husky</code></a> to automatically install the repository hooks so...</p>
+<ol>
+<li>The code will be formatted and linted before any commit.</li>
+<li>The dependencies will be updated after every merge.</li>
+<li>The tests will run before pushing.</li>
+</ol>
 <h4>Commits convention</h4>
-<p>I use <a href="https://www.conventionalcommits.org">conventional commits</a> with <a href="https://yarnpkg.com/package/commitizen"><code>commitizen</code></a> in order to support semantic releases. The one that sets it up is actually husky, that installs a script that runs commitizen on the <code>git commit</code> command.</p>
-<p>The hook for this is on <code>./utils/hooks/prepare-commit-msg</code> and the configuration for comitizen is on the <code>config.commitizen</code> property of the <code>package.json</code>.</p>
+<p>I use <a href="https://www.conventionalcommits.org">conventional commits</a> with <a href="https://commitlint.js.org"><code>commitlint</code></a> in order to support semantic releases. The one that sets it up is actually husky, that installs a script that runs <code>commitlint</code> on the <code>git commit</code> command.</p>
+<p>The configuration is on the <code>commitlint</code> property of the <code>package.json</code>.</p>
 <h3>Releases</h3>
-<p>I use <a href="https://yarnpkg.com/package/semantic-release"><code>semantic-release</code></a> and a GitHub action to automatically release on NPM everything that gets merged to master.</p>
+<p>I use <a href="https://yarnpkg.com/package/semantic-release"><code>semantic-release</code></a> and a GitHub action to automatically release on NPM everything that gets merged to main.</p>
 <p>The configuration for <code>semantic-release</code> is on <code>./releaserc</code> and the workflow for the release is on <code>./.github/workflow/release.yml</code>.</p>
 <h3>Testing</h3>
 <p>I use <a href="https://facebook.github.io/jest/">Jest</a> to test the project.</p>
