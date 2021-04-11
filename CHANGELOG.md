@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/homer0/parserror/compare/3.0.4...4.0.0) (2021-04-11)
+
+
+### Bug Fixes
+
+* drop support for Node 10 ([4b50b72](https://github.com/homer0/parserror/commit/4b50b7221d0509d30bb1232ab2cdf4958d1664b4))
+
+
+### BREAKING CHANGES
+
+* This package no longer supports Node 10.
+
 ## [3.0.4](https://github.com/homer0/parserror/compare/3.0.3...3.0.4) (2020-10-01)
 
 
