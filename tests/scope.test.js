@@ -27,10 +27,11 @@ describe('Scope', () => {
   });
 
   describe('cases', () => {
-    it('should throw an error when trying to add a case that doesn\'t extend `ErrorCase`', () => {
+    it("should throw an error when trying to add a case that doesn't extend `ErrorCase`", () => {
       // Given/When/Then
-      expect(() => (new Scope('myScope')).addCase({}))
-      .toThrow(/The received case is not an instance of 'ErrorCase'/i);
+      expect(() => new Scope('myScope').addCase({})).toThrow(
+        /The received case is not an instance of 'ErrorCase'/i,
+      );
     });
 
     it('should throw an error when trying to add a case with an already used name', () => {
@@ -45,20 +46,23 @@ describe('Scope', () => {
       // When/Then
       sut = new Scope('myScope');
       sut.addCase(myCase);
-      expect(() => sut.addCase(myCase))
-      .toThrow(/The case name '\w+' is already being used on the scope '\w+'/);
+      expect(() => sut.addCase(myCase)).toThrow(
+        /The case name '\w+' is already being used on the scope '\w+'/,
+      );
     });
 
     it('should throw an error when trying to access a case that is not registered', () => {
       // Given/When/Then
-      expect(() => (new Scope('myScope')).getCase('nop'))
-      .toThrow(/The case '\w+' doesn't exist on the scope '\w+'/i);
+      expect(() => new Scope('myScope').getCase('nop')).toThrow(
+        /The case '\w+' doesn't exist on the scope '\w+'/i,
+      );
     });
 
     it('should throw an error when trying to remove a case that is not registered', () => {
       // Given/When/Then
-      expect(() => (new Scope('myScope')).removeCase('nop'))
-      .toThrow(/The case '\w+' doesn't exist on the scope '\w+'/i);
+      expect(() => new Scope('myScope').removeCase('nop')).toThrow(
+        /The case '\w+' doesn't exist on the scope '\w+'/i,
+      );
     });
 
     it('should return a saved case', () => {
@@ -96,9 +100,7 @@ describe('Scope', () => {
       let result = null;
       // When
       sut = new Scope('myScope');
-      sut
-      .addCase(myFirstCase)
-      .addCase(mySecondCase);
+      sut.addCase(myFirstCase).addCase(mySecondCase);
       result = sut.getCases();
       // Then
       expect(result).toEqual([myFirstCase, mySecondCase]);
@@ -150,10 +152,11 @@ describe('Scope', () => {
   });
 
   describe('parsers', () => {
-    it('should throw an error when trying to add a parser that doesn\'t extend `CaseParser`', () => {
+    it("should throw an error when trying to add a parser that doesn't extend `CaseParser`", () => {
       // Given/When/Then
-      expect(() => (new Scope('myScope')).addParser({}))
-      .toThrow(/The received parser is not an instance of 'CaseParser'/i);
+      expect(() => new Scope('myScope').addParser({})).toThrow(
+        /The received parser is not an instance of 'CaseParser'/i,
+      );
     });
 
     it('should throw an error when trying to add a parser with an already used name', () => {
@@ -164,20 +167,23 @@ describe('Scope', () => {
       // When/Then
       sut = new Scope('myScope');
       sut.addParser(myParser);
-      expect(() => sut.addParser(myParser))
-      .toThrow(/The parser name '\w+' is already being used on the scope '\w+'/);
+      expect(() => sut.addParser(myParser)).toThrow(
+        /The parser name '\w+' is already being used on the scope '\w+'/,
+      );
     });
 
     it('should throw an error when trying to access a parser that is not registered', () => {
       // Given/When/Then
-      expect(() => (new Scope('myScope')).getParser('nop'))
-      .toThrow(/The parser '\w+' doesn't exist on the scope '\w+'/i);
+      expect(() => new Scope('myScope').getParser('nop')).toThrow(
+        /The parser '\w+' doesn't exist on the scope '\w+'/i,
+      );
     });
 
     it('should throw an error when trying to remove a parser that is not registered', () => {
       // Given/When/Then
-      expect(() => (new Scope('myScope')).removeParser('nop'))
-      .toThrow(/The parser '\w+' doesn't exist on the scope '\w+'/i);
+      expect(() => new Scope('myScope').removeParser('nop')).toThrow(
+        /The parser '\w+' doesn't exist on the scope '\w+'/i,
+      );
     });
 
     it('should return a saved case', () => {

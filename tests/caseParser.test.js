@@ -16,16 +16,18 @@ describe('CaseParser', () => {
 
     it('should throw an error when instantiated with an invalid parser', () => {
       // Given/When/Then
-      expect(() => new CaseParser('myParser'))
-      .toThrow(/'\w+': the 'parser' parameter can only be a 'string' or a 'function'/i);
+      expect(() => new CaseParser('myParser')).toThrow(
+        /'\w+': the 'parser' parameter can only be a 'string' or a 'function'/i,
+      );
     });
 
     it('should throw an error when instantiated with an empty object as parser', () => {
       // Given
       Utils.isObject.mockImplementationOnce(() => true);
       // When/Then
-      expect(() => new CaseParser('myParser', {}))
-      .toThrow(/'\w+': the parser is empty\. It should include at least one item to map/i);
+      expect(() => new CaseParser('myParser', {})).toThrow(
+        /'\w+': the parser is empty\. It should include at least one item to map/i,
+      );
     });
 
     it('should be instantiated', () => {
@@ -41,7 +43,7 @@ describe('CaseParser', () => {
   });
 
   describe('parse:map', () => {
-    it('shouldn\'t do anything when the value doesn\'t match its keys', () => {
+    it("shouldn't do anything when the value doesn't match its keys", () => {
       // Given
       Utils.isObject.mockImplementationOnce(() => true);
       const parser = {

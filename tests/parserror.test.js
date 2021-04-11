@@ -168,10 +168,7 @@ describe('Parserror', () => {
         ErrorCaseClass: ErrorCase,
       });
       globalScope = sut.getScope(sut.globalScopeName);
-      result = sut.addCases([
-        caseOneDefinition,
-        caseTwoDefinition,
-      ]);
+      result = sut.addCases([caseOneDefinition, caseTwoDefinition]);
       // Then
       expect(result).toBe(sut);
       expect(ErrorCase).toHaveBeenCalledTimes(2);
@@ -214,13 +211,7 @@ describe('Parserror', () => {
         ErrorCaseClass: ErrorCase,
       });
       customScope = sut.getScope(scopeName);
-      result = sut.addCases(
-        [
-          caseOneDefinition,
-          caseTwoDefinition,
-        ],
-        scopeName,
-      );
+      result = sut.addCases([caseOneDefinition, caseTwoDefinition], scopeName);
       // Then
       expect(result).toBe(sut);
       expect(ErrorCase).toHaveBeenCalledTimes(2);
@@ -419,10 +410,7 @@ describe('Parserror', () => {
         ErrorCaseClass: ErrorCase,
       });
       globalScope = sut.getScope(sut.globalScopeName);
-      result = sut.allowOriginals([
-        conditionOne,
-        conditionTwo,
-      ]);
+      result = sut.allowOriginals([conditionOne, conditionTwo]);
       // Then
       expect(result).toBe(sut);
       expect(ErrorCase).toHaveBeenCalledTimes(2);
@@ -477,13 +465,7 @@ describe('Parserror', () => {
         ErrorCaseClass: ErrorCase,
       });
       customScope = sut.getScope(scopeName);
-      result = sut.allowOriginals(
-        [
-          conditionOne,
-          conditionTwo,
-        ],
-        scopeName,
-      );
+      result = sut.allowOriginals([conditionOne, conditionTwo], scopeName);
       // Then
       expect(result).toBe(sut);
       expect(ErrorCase).toHaveBeenCalledTimes(2);
@@ -569,10 +551,11 @@ describe('Parserror', () => {
   });
 
   describe('scopes', () => {
-    it('should throw an error when trying to access a scope that doesn\'t exist', () => {
+    it("should throw an error when trying to access a scope that doesn't exist", () => {
       // Given/When/Then
-      expect(() => (new Parserror()).getScope('something', false))
-      .toThrow(/The scope '\w+' doesn't exist/i);
+      expect(() => new Parserror().getScope('something', false)).toThrow(
+        /The scope '\w+' doesn't exist/i,
+      );
     });
 
     it('should throw an error when trying to add a scope that already exists', () => {
@@ -580,8 +563,7 @@ describe('Parserror', () => {
       let sut = null;
       // When/Then
       sut = new Parserror();
-      expect(() => sut.addScope(sut.globalScopeName))
-      .toThrow(
+      expect(() => sut.addScope(sut.globalScopeName)).toThrow(
         /The scope '\w+' already exists\. You can use 'removeScope' to remove it first, or set the 'overwrite' parameter to 'true'/i,
       );
     });
@@ -591,11 +573,12 @@ describe('Parserror', () => {
       let sut = null;
       // When/Then
       sut = new Parserror();
-      expect(() => sut.removeScope(sut.globalScopeName))
-      .toThrow(/You can't delete the global scope/i);
+      expect(() => sut.removeScope(sut.globalScopeName)).toThrow(
+        /You can't delete the global scope/i,
+      );
     });
 
-    it('should create a scope if it doesn\'t exist when trying to access it', () => {
+    it("should create a scope if it doesn't exist when trying to access it", () => {
       // Given
       const scopeName = 'myScope';
       Scope.mockImplementationOnce((name) => ({ name }));
@@ -606,15 +589,15 @@ describe('Parserror', () => {
       sut = new Parserror();
       result = sut.getScope(scopeName);
       // Then
-      expect(result).toEqual(({
+      expect(result).toEqual({
         name: scopeName,
-      }));
+      });
       expect(Scope).toHaveBeenCalledTimes(2);
       expect(Scope).toHaveBeenCalledWith(sut.globalScopeName);
       expect(Scope).toHaveBeenCalledWith(scopeName);
     });
 
-    it('shouldn\'t create the same scope twice when trying to access it', () => {
+    it("shouldn't create the same scope twice when trying to access it", () => {
       // Given
       const scopeName = 'myScope';
       Scope.mockImplementationOnce((name) => ({ name }));
@@ -626,9 +609,9 @@ describe('Parserror', () => {
       sut.getScope(scopeName);
       result = sut.getScope(scopeName);
       // Then
-      expect(result).toEqual(({
+      expect(result).toEqual({
         name: scopeName,
-      }));
+      });
       expect(Scope).toHaveBeenCalledTimes(2);
       expect(Scope).toHaveBeenCalledWith(sut.globalScopeName);
       expect(Scope).toHaveBeenCalledWith(scopeName);
@@ -759,22 +742,23 @@ describe('Parserror', () => {
   describe('parse', () => {
     it('should throw an error if the received error is not a string or an object', () => {
       // Given/When/Then
-      expect(() => (new Parserror()).parse([]))
-      .toThrow(
+      expect(() => new Parserror().parse([])).toThrow(
         /'parse' can only handle error messages \('string'\), native errors \('Error'\) or literal objects \('object'\) with a 'message' property/i,
       );
     });
 
     it('should throw an error if the `cases` option is not an array', () => {
       // Given/When/Then
-      expect(() => (new Parserror()).parse('something', { cases: 'nop' }))
-      .toThrow(/The 'cases' option can only be an 'array'/i);
+      expect(() => new Parserror().parse('something', { cases: 'nop' })).toThrow(
+        /The 'cases' option can only be an 'array'/i,
+      );
     });
 
     it('should throw an error if the `scopes` option is not an array', () => {
       // Given/When/Then
-      expect(() => (new Parserror()).parse('something', { scopes: 'nop' }))
-      .toThrow(/The 'scopes' option can only be an 'array'/i);
+      expect(() => new Parserror().parse('something', { scopes: 'nop' })).toThrow(
+        /The 'scopes' option can only be an 'array'/i,
+      );
     });
 
     it('should parse an error (string)', () => {
@@ -797,11 +781,7 @@ describe('Parserror', () => {
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(theCase.parse).toHaveBeenCalledTimes(1);
-      expect(theCase.parse).toHaveBeenCalledWith(
-        error,
-        [scopeInstance],
-        null,
-      );
+      expect(theCase.parse).toHaveBeenCalledWith(error, [scopeInstance], null);
     });
 
     it('should parse an error (Error)', () => {
@@ -825,11 +805,7 @@ describe('Parserror', () => {
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(theCase.parse).toHaveBeenCalledTimes(1);
-      expect(theCase.parse).toHaveBeenCalledWith(
-        errorMessage,
-        [scopeInstance],
-        null,
-      );
+      expect(theCase.parse).toHaveBeenCalledWith(errorMessage, [scopeInstance], null);
     });
 
     it('should parse an error (Object)', () => {
@@ -856,11 +832,7 @@ describe('Parserror', () => {
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(theCase.parse).toHaveBeenCalledTimes(1);
-      expect(theCase.parse).toHaveBeenCalledWith(
-        errorMessage,
-        [scopeInstance],
-        null,
-      );
+      expect(theCase.parse).toHaveBeenCalledWith(errorMessage, [scopeInstance], null);
     });
 
     it('should parse an error with custom scopes', () => {
@@ -956,7 +928,7 @@ describe('Parserror', () => {
       );
     });
 
-    it('shouldn\'t use the cases option if the global scope is included', () => {
+    it("shouldn't use the cases option if the global scope is included", () => {
       // Given
       const globalScopeCaseName = 'someCase';
       const globalScopeCase = {
@@ -1059,11 +1031,7 @@ describe('Parserror', () => {
       expect(result).toEqual(errorInstance);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        error,
-        {},
-        { original: true },
-      );
+      expect(FormattedError).toHaveBeenCalledWith(error, {}, { original: true });
     });
 
     it('should fail to parse an error message and return a fallback', () => {
@@ -1088,11 +1056,7 @@ describe('Parserror', () => {
       expect(result).toEqual(errorInstance);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        fallback,
-        {},
-        { fallback: true },
-      );
+      expect(FormattedError).toHaveBeenCalledWith(fallback, {}, { fallback: true });
     });
   });
 
@@ -1119,11 +1083,7 @@ describe('Parserror', () => {
       expect(result).toBe(formatted);
       expect(scopeInstance.getCases).toHaveBeenCalledTimes(1);
       expect(theCase.parse).toHaveBeenCalledTimes(1);
-      expect(theCase.parse).toHaveBeenCalledWith(
-        error,
-        [scopeInstance],
-        null,
-      );
+      expect(theCase.parse).toHaveBeenCalledWith(error, [scopeInstance], null);
     });
 
     it('should create a wrapped parser for a global case', () => {
@@ -1150,11 +1110,7 @@ describe('Parserror', () => {
       expect(scopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(scopeInstance.getCase).toHaveBeenCalledWith(theCaseName);
       expect(theCase.parse).toHaveBeenCalledTimes(1);
-      expect(theCase.parse).toHaveBeenCalledWith(
-        error,
-        [scopeInstance],
-        null,
-      );
+      expect(theCase.parse).toHaveBeenCalledWith(error, [scopeInstance], null);
     });
 
     it('should create a wrapped parser with cases and scopes', () => {
@@ -1232,17 +1188,9 @@ describe('Parserror', () => {
       expect(scopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(scopeInstance.getCase).toHaveBeenCalledWith(theCaseName);
       expect(theCase.parse).toHaveBeenCalledTimes(1);
-      expect(theCase.parse).toHaveBeenCalledWith(
-        error,
-        [scopeInstance],
-        null,
-      );
+      expect(theCase.parse).toHaveBeenCalledWith(error, [scopeInstance], null);
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        fallback,
-        {},
-        { fallback: true },
-      );
+      expect(FormattedError).toHaveBeenCalledWith(fallback, {}, { fallback: true });
     });
 
     it('should create a wrapped parser and support a custom fallback', () => {
@@ -1273,17 +1221,9 @@ describe('Parserror', () => {
       expect(scopeInstance.getCase).toHaveBeenCalledTimes(1);
       expect(scopeInstance.getCase).toHaveBeenCalledWith(theCaseName);
       expect(theCase.parse).toHaveBeenCalledTimes(1);
-      expect(theCase.parse).toHaveBeenCalledWith(
-        error,
-        [scopeInstance],
-        null,
-      );
+      expect(theCase.parse).toHaveBeenCalledWith(error, [scopeInstance], null);
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        fallback,
-        {},
-        { fallback: true },
-      );
+      expect(FormattedError).toHaveBeenCalledWith(fallback, {}, { fallback: true });
     });
   });
 
@@ -1376,11 +1316,7 @@ describe('Parserror', () => {
         null,
       );
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        fallback,
-        {},
-        { fallback: true },
-      );
+      expect(FormattedError).toHaveBeenCalledWith(fallback, {}, { fallback: true });
     });
 
     it('should create a wrapped parser for an specific scope and support a custom fallback', () => {
@@ -1431,11 +1367,7 @@ describe('Parserror', () => {
         null,
       );
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        fallback,
-        {},
-        { fallback: true },
-      );
+      expect(FormattedError).toHaveBeenCalledWith(fallback, {}, { fallback: true });
     });
   });
 });

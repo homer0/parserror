@@ -24,43 +24,51 @@ describe('ErrorCase', () => {
 
     it('should throw an error when `name` is not a `string`', () => {
       // Given/When/Then
-      expect(() => new ErrorCase({
-        name: [],
-        condition: 'condition',
-        message: 'message',
-      }))
-      .toThrow(/The 'name' can only be a 'string'/i);
+      expect(
+        () =>
+          new ErrorCase({
+            name: [],
+            condition: 'condition',
+            message: 'message',
+          }),
+      ).toThrow(/The 'name' can only be a 'string'/i);
     });
 
     it('should throw an error when `message` is not a `string` nor a `function`', () => {
       // Given/When/Then
-      expect(() => new ErrorCase({
-        name: 'name',
-        condition: 'condition',
-        message: [],
-      }))
-      .toThrow(/'\w+': 'message' can only be a 'string' or a 'function'/i);
+      expect(
+        () =>
+          new ErrorCase({
+            name: 'name',
+            condition: 'condition',
+            message: [],
+          }),
+      ).toThrow(/'\w+': 'message' can only be a 'string' or a 'function'/i);
     });
 
     it('should throw an error when `condition` is not a `string` nor a `RegExp`', () => {
       // Given/When/Then
-      expect(() => new ErrorCase({
-        name: 'name',
-        condition: [],
-        message: 'message',
-      }))
-      .toThrow(/'\w+': 'condition' can only be a 'string' or a 'RegExp'/i);
+      expect(
+        () =>
+          new ErrorCase({
+            name: 'name',
+            condition: [],
+            message: 'message',
+          }),
+      ).toThrow(/'\w+': 'condition' can only be a 'string' or a 'RegExp'/i);
     });
 
     it('should throw an error when `parsers` is not an `object`', () => {
       // Given/When/Then
-      expect(() => new ErrorCase({
-        name: 'name',
-        condition: 'condition',
-        message: 'message',
-        parsers: 'parsers',
-      }))
-      .toThrow(/'\w+': 'parsers' can only be an 'object'/i);
+      expect(
+        () =>
+          new ErrorCase({
+            name: 'name',
+            condition: 'condition',
+            message: 'message',
+            parsers: 'parsers',
+          }),
+      ).toThrow(/'\w+': 'parsers' can only be an 'object'/i);
     });
 
     it('should throw an error when a parser is not a `function` nor an `object`', () => {
@@ -76,8 +84,9 @@ describe('ErrorCase', () => {
         },
       };
       // When/Then
-      expect(() => new ErrorCase(definition))
-      .toThrow(/'\w+' - '\w+': a parser can only be a 'function' or an 'object'/i);
+      expect(() => new ErrorCase(definition)).toThrow(
+        /'\w+' - '\w+': a parser can only be a 'function' or an 'object'/i,
+      );
       expect(Utils.isObject).toHaveBeenCalledTimes(2);
       expect(Utils.isObject).toHaveBeenCalledWith(definition.parsers);
       expect(Utils.isObject).toHaveBeenCalledWith(definition.parsers.parser);
@@ -85,24 +94,30 @@ describe('ErrorCase', () => {
 
     it('should throw an error when `parse` is not an `array` nor an `object`', () => {
       // Given/When/Then
-      expect(() => new ErrorCase({
-        name: 'name',
-        condition: 'condition',
-        message: 'message',
-        parse: 'parse',
-      }))
-      .toThrow(/'\w+': 'parse' can only be an 'array' or an 'object'/i);
+      expect(
+        () =>
+          new ErrorCase({
+            name: 'name',
+            condition: 'condition',
+            message: 'message',
+            parse: 'parse',
+          }),
+      ).toThrow(/'\w+': 'parse' can only be an 'array' or an 'object'/i);
     });
 
     it('should throw an error when a `parse` instruction is invalid', () => {
       // Given/When/Then
-      expect(() => new ErrorCase({
-        name: 'name',
-        condition: 'condition',
-        message: 'message',
-        parse: [1],
-      }))
-      .toThrow(/'\w+': a 'parse' instruction can only be an 'array', a 'function' or a 'string'/i);
+      expect(
+        () =>
+          new ErrorCase({
+            name: 'name',
+            condition: 'condition',
+            message: 'message',
+            parse: [1],
+          }),
+      ).toThrow(
+        /'\w+': a 'parse' instruction can only be an 'array', a 'function' or a 'string'/i,
+      );
     });
 
     it('should create an instance', () => {
@@ -123,7 +138,7 @@ describe('ErrorCase', () => {
   });
 
   describe('parse:list', () => {
-    it('should ignore an error that doesn\'t match its condition', () => {
+    it("should ignore an error that doesn't match its condition", () => {
       // Given
       Utils.escapeForRegExp.mockImplementationOnce(() => /condition/);
       const definition = {
@@ -216,11 +231,7 @@ describe('ErrorCase', () => {
       expect(definition.message).toHaveBeenCalledTimes(1);
       expect(definition.message).toHaveBeenCalledWith();
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        formattedMessage,
-        [],
-        null,
-      );
+      expect(FormattedError).toHaveBeenCalledWith(formattedMessage, [], null);
       expect(Utils.execRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
@@ -245,11 +256,7 @@ describe('ErrorCase', () => {
       expect(definition.message).toHaveBeenCalledTimes(1);
       expect(definition.message).toHaveBeenCalledWith(parameter);
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        parameter,
-        [parameter],
-        null,
-      );
+      expect(FormattedError).toHaveBeenCalledWith(parameter, [parameter], null);
       expect(Utils.execRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
@@ -275,11 +282,7 @@ describe('ErrorCase', () => {
       expect(definition.message).toHaveBeenCalledTimes(1);
       expect(definition.message).toHaveBeenCalledWith(parameter);
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        parameter,
-        [parameter],
-        context,
-      );
+      expect(FormattedError).toHaveBeenCalledWith(parameter, [parameter], context);
       expect(Utils.execRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
@@ -413,9 +416,9 @@ describe('ErrorCase', () => {
       const definition = {
         name: 'name',
         condition: /(\w+) had (\d+) robin/,
-        message: jest.fn((name, count) => (
-          `Did you know that ${name} actually had ${count} robins?`
-        )),
+        message: jest.fn(
+          (name, count) => `Did you know that ${name} actually had ${count} robins?`,
+        ),
         parse: [
           'renameParser',
           [
@@ -453,7 +456,10 @@ describe('ErrorCase', () => {
       expect(addDamianParser).toHaveBeenCalledTimes(1);
       expect(addDamianParser).toHaveBeenCalledWith(3);
       expect(definition.message).toHaveBeenCalledTimes(1);
-      expect(definition.message).toHaveBeenCalledWith(formattedParameterOne, expectedParameterTwo);
+      expect(definition.message).toHaveBeenCalledWith(
+        formattedParameterOne,
+        expectedParameterTwo,
+      );
       expect(FormattedError).toHaveBeenCalledTimes(1);
       expect(FormattedError).toHaveBeenCalledWith(
         `Did you know that ${formattedParameterOne} actually had ${expectedParameterTwo} robins?`,
@@ -628,7 +634,7 @@ describe('ErrorCase', () => {
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });
 
-    it('should throw an error when it can\'t find a parser on the scope', () => {
+    it("should throw an error when it can't find a parser on the scope", () => {
       // Given
       const parameter = 'Batman';
       Utils.execRegExp.mockImplementationOnce((exp, txt) => exp.exec(txt));
@@ -688,11 +694,7 @@ describe('ErrorCase', () => {
       expect(definition.message).toHaveBeenCalledTimes(1);
       expect(definition.message).toHaveBeenCalledWith();
       expect(FormattedError).toHaveBeenCalledTimes(1);
-      expect(FormattedError).toHaveBeenCalledWith(
-        formattedMessage,
-        [],
-        null,
-      );
+      expect(FormattedError).toHaveBeenCalledWith(formattedMessage, [], null);
       expect(Utils.execRegExp).toHaveBeenCalledTimes(1);
       expect(Utils.execRegExp).toHaveBeenCalledWith(definition.condition, error);
     });

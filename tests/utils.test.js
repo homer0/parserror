@@ -78,7 +78,7 @@ describe('Utils', () => {
   });
 
   describe('ensureArray', () => {
-    it('shouldn\'t transform something that is already an array', () => {
+    it("shouldn't transform something that is already an array", () => {
       // Given
       const target = ['Rosario'];
       // When/Then
@@ -100,11 +100,9 @@ describe('Utils', () => {
       const samples = 5;
       let results = null;
       // When
-      results = lengths.map((length) => (
-        (new Array(samples))
-        .fill('')
-        .map(() => Utils.getRandomString(length))
-      ));
+      results = lengths.map((length) =>
+        new Array(samples).fill('').map(() => Utils.getRandomString(length)),
+      );
       // Then
       results.forEach((result, index) => {
         const length = lengths[index];
