@@ -514,9 +514,11 @@ Since the next LTS to become "the oldest" is 12, which still uses the flag, I st
 
 ### Repository hooks
 
-I use [`husky`](https://yarnpkg.com/package/husky) to automatically install the repository hooks so the code will be tested and linted before any commit and the dependencies updated after every merge.
+I use [`husky`](https://yarnpkg.com/package/husky) to automatically install the repository hooks so...
 
-The configuration is on the `husky` property of the `package.json` and the hooks' files are on `./utils/hooks`.
+1. The code will be formatted and linted before any commit.
+2. The dependencies will be updated after every merge.
+3. The tests will run before pushing.
 
 #### Commits convention
 
