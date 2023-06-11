@@ -1,9 +1,7 @@
 # Parserror
 
-[![GitHub Workflow Status (main)](https://img.shields.io/github/workflow/status/homer0/parserror/Test/main?style=flat-square)](https://github.com/homer0/parserror/actions?query=workflow%3ATest)
+[![GitHub Workflow Status (main)](https://img.shields.io/github/actions/workflow/status/homer0/parserror/test.yml?branch=main&style=flat-square)](https://github.com/homer0/parserror/actions?query=workflow%3ATest)
 [![Coveralls github](https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square)](https://coveralls.io/github/homer0/parserror?branch=main)
-[![David](https://img.shields.io/david/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)
-[![David](https://img.shields.io/david/dev/homer0/parserror.svg?style=flat-square)](https://david-dm.org/homer0/parserror)
 
 Parse errors and generate more human messages
 
@@ -501,7 +499,7 @@ Since the next LTS to become "the oldest" is 12, which still uses the flag, I st
 
 ## Development
 
-### NPM/Yarn tasks
+### NPM tasks
 
 | Task       | Description                         |
 |------------|-------------------------------------|
@@ -514,7 +512,7 @@ Since the next LTS to become "the oldest" is 12, which still uses the flag, I st
 
 ### Repository hooks
 
-I use [`husky`](https://yarnpkg.com/package/husky) to automatically install the repository hooks so...
+I use [`husky`](https://www.npmjs.com/package/husky) to automatically install the repository hooks so...
 
 1. The code will be formatted and linted before any commit.
 2. The dependencies will be updated after every merge.
@@ -528,7 +526,7 @@ The configuration is on the `commitlint` property of the `package.json`.
 
 ### Releases
 
-I use [`semantic-release`](https://yarnpkg.com/package/semantic-release) and a GitHub action to automatically release on NPM everything that gets merged to main.
+I use [`semantic-release`](https://www.npmjs.com/package/semantic-release) and a GitHub action to automatically release on NPM everything that gets merged to main.
 
 The configuration for `semantic-release` is on `./releaserc` and the workflow for the release is on `./.github/workflow/release.yml`.
 
@@ -540,9 +538,9 @@ The configuration file is on `./.jestrc.js`, the tests are on `./tests` and the 
 
 ### Linting && Formatting
 
-I use [ESlint](https://eslint.org) with [my own custom configuration](https://yarnpkg.com/en/package/@homer0/eslint-plugin) to validate all the JS code. The configuration file for the project code is on `./.eslintrc` and the one for the tests is on `./tests/.eslintrc`. There's also an `./.eslintignore` to exclude some files on the process. The script that runs it is on `./utils/scripts/lint-all`.
+I use [ESlint](https://eslint.org) with [my own custom configuration](https://www.npmjs.com/package/@homer0/eslint-plugin) to validate all the JS code. The configuration file for the project code is on `./.eslintrc` and the one for the tests is on `./tests/.eslintrc`. There's also an `./.eslintignore` to exclude some files on the process. The script that runs it is on `./utils/scripts/lint-all`.
 
-For formatting I use [Prettier](https://prettier.io) with [my custom configuration](https://yarnpkg.com/en/package/@homer0/prettier-config). The configuration file for the project code is on `./.prettierrc`.
+For formatting I use [Prettier](https://prettier.io) with [my custom configuration](https://www.npmjs.com/package/@homer0/prettier-config). The configuration file for the project code is on `./.prettierrc`.
 
 ### Documentation
 
@@ -552,7 +550,7 @@ The configuration file is on `./.jsdoc.js` and the script that runs it is on `./
 
 ### To-Dos
 
-I use `@todo` comments to write all the pending improvements and fixes, and [Leasot](https://yarnpkg.com/en/package/leasot) to generate a report. The script that runs it is on `./utils/scripts/todo`.
+I use `@todo` comments to write all the pending improvements and fixes, and [Leasot](https://www.npmjs.com/package/leasot) to generate a report. The script that runs it is on `./utils/scripts/todo`.
 
 ## Motivation
 
