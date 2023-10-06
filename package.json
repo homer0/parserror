@@ -36,6 +36,9 @@
     "semantic-release": "^22.0.5"
   },
   "engine-strict": true,
+  "engines": {
+    "node": ">=12"
+  },
   "main": "src/index.js",
   "scripts": {
     "prepublishOnly": "./utils/scripts/prepublishOnly",
