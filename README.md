@@ -1,7 +1,7 @@
 # Parserror
 
-[![GitHub Workflow Status (main)](https://img.shields.io/github/actions/workflow/status/homer0/parserror/test.yml?branch=main&style=flat-square)](https://github.com/homer0/parserror/actions?query=workflow%3ATest)
-[![Coveralls github](https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square)](https://coveralls.io/github/homer0/parserror?branch=main)
+[![GitHub Workflow Status (main)](https://img.shields.io/github/actions/workflow/status/homer0/parserror/test.yml?branch=main&style=flat-square)](https://github.com/homer0/parserror/actions/workflows/test.yml?query=branch%3Amain)
+[![Coveralls GitHub](https://img.shields.io/coveralls/github/homer0/parserror.svg?style=flat-square)](https://coveralls.io/github/homer0/parserror?branch=main)
 
 Parse errors and generate more human messages
 
