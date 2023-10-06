@@ -3,39 +3,44 @@ const packageJson = require('./package.json');
 module.exports = {
   source: {
     include: ['./src'],
-    includePattern: '.js$'
+    includePattern: '.js$',
   },
-  plugins: [
-    'docdash/nativeTypesPlugin',
-    'jsdoc-ts-utils',
-    'plugins/markdown',
-  ],
+  plugins: ['docdash/nativeTypesPlugin', 'jsdoc-ts-utils', 'plugins/markdown'],
   templates: {
     cleverLinks: true,
     default: {
-      includeDate: false
-    }
+      includeDate: false,
+    },
   },
   opts: {
     recurse: true,
     destination: './docs',
     readme: 'README.md',
-    template: 'node_modules/docdash'
+    template: 'node_modules/docdash',
   },
   docdash: {
     title: packageJson.name,
     meta: {
       title: `${packageJson.name} docs`,
     },
-    sectionOrder: [
-      'Classes',
-    ],
+    sectionOrder: ['Classes'],
     collapse: true,
-    menu: {
-      'GitHub': {
-        href: `https://github.com/${packageJson.repository}`,
-        target: '_blank',
+    refLinks: [
+      {
+        title: 'View the package on Yarn',
+        url: `https://yarnpkg.com/package/${packageJson.name}`,
+        type: 'yarn',
       },
-    },
+      {
+        title: 'Go to the GitHub repository',
+        url: `https://github.com/${packageJson.repository}`,
+        type: 'github',
+      },
+      {
+        title: 'View the package on NPM',
+        url: `https://www.npmjs.com/package/${packageJson.name}`,
+        type: 'npm',
+      },
+    ],
   },
 };
